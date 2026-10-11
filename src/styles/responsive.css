@@ -1,0 +1,36 @@
+/* One column on a phone. */
+@media (max-width: 900px) {
+.topbar {
+    padding: 10px 14px;
+    gap: 10px;
+  }
+.topbar .search {
+    display: none;
+  }
+.topbar .hide-m {
+    display: none;
+  }
+.main {
+    padding: 16px 14px 32px;
+  }
+.admin {
+    grid-template-columns: 1fr;
+  }
+.side {
+    border-right: 0;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    padding: 10px;
+  }
+.side .lab {
+    display: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+* {
+    transition: none !important;
+    animation: none !important;
+  }
+}

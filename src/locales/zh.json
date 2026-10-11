@@ -1,0 +1,54 @@
+{
+  "loading": "加载中…",
+  "cancel": "取消",
+  "create": "创建",
+  "close": "关闭",
+  "delete": "删除",
+  "remove": "移除",
+  "topbar": {
+    "sections": "栏目",
+    "profile": "个人资料"
+  },
+  "chat": {
+    "title": "聊天",
+    "conversations": "对话",
+    "conversation": "对话",
+    "topics": "话题",
+    "archive": "归档",
+    "noTopics": "暂无话题",
+    "newTopic": "新话题",
+    "topicTitle": "话题",
+    "topicHint": "话题有独立的历史记录，记忆和空间与主对话相同。",
+    "loadOlder": "更早的消息",
+    "emptyTitle": "你好，我是 {name}",
+    "placeholder": "给 {name} 发消息…",
+    "send": "发送",
+    "attach": "附加文件",
+    "typing": "智能体正在输入",
+    "moreSteps": "{count, plural, other {另外 # 个步骤}}",
+    "hideSteps": "隐藏步骤",
+    "unread": "{count} 条未读回复",
+    "retry": "重试",
+    "tooLarge": "文件太大。",
+    "stop": "停止",
+    "voice": {
+      "hold": "按住录音",
+      "stop": "停止录音",
+      "recording": "录音中… {seconds} 秒",
+      "review": "发送前请检查转写文本",
+      "notRecognized": "未能识别语音",
+      "micDenied": "无法访问麦克风",
+      "unsupported": "此浏览器不支持语音输入"
+    },
+    "confirm": {
+      "title": "确认操作",
+      "text": "代理想要执行：{action}",
+      "approve": "执行",
+      "reject": "拒绝"
+    },
+    "wait": {
+      "starting": "代理正在启动…",
+      "queued": "{count, plural, =0 {排队中 · 您是下一位} other {排队中 · 前面还有 # 位}}"
+    }
+  }
+}

@@ -1,0 +1,150 @@
+/* Buttons, icon buttons, chips, status badges, sections, cards. */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  border-radius: var(--r-m);
+  padding: 8px 14px;
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  color: var(--text);
+  text-align: center;
+}
+.btn.primary {
+  background: var(--violet);
+  border-color: var(--violet);
+  color: #fff;
+}
+.btn.ok {
+  background: var(--green);
+  border-color: var(--green);
+  color: #fff;
+}
+.btn.ghost {
+  border-color: transparent;
+  background: none;
+  color: var(--text-2);
+}
+.btn.danger {
+  color: var(--red);
+  border-color: var(--red-soft);
+}
+.btn.danger-fill {
+  background: var(--red);
+  border-color: var(--red);
+  color: #fff;
+}
+.btn.sm {
+  padding: 5px 10px;
+  font-size: 13px;
+}
+.btn[disabled] {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.iconbtn {
+  border: 0;
+  background: none;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--r-m);
+  display: grid;
+  place-items: center;
+  color: var(--text-2);
+  flex: none;
+  padding: 0;
+}
+.iconbtn:hover {
+  background: var(--surface-2);
+}
+.iconbtn.fill {
+  background: var(--violet);
+  color: #fff;
+}
+.iconbtn.rec {
+  background: var(--red);
+  color: #fff;
+}
+.iconbtn[disabled] {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  padding: 5px 11px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  color: var(--text-2);
+  background: var(--surface);
+  white-space: nowrap;
+}
+button.chip:hover {
+  border-color: var(--border-strong);
+}
+.chip.on {
+  background: var(--violet-soft);
+  border-color: transparent;
+  color: var(--violet-text);
+  font-weight: 500;
+}
+.chips {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.st {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.st::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.st.draft {
+  background: var(--surface-2);
+  color: var(--text-2);
+}
+h3.sec {
+  font-size: 15px;
+  font-weight: 600;
+  margin: 0 0 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.count {
+  font-size: 12px;
+  font-weight: 600;
+  background: var(--amber-soft);
+  color: var(--amber);
+  border-radius: 999px;
+  padding: 1px 8px;
+}
+.card {
+  border: 1px solid var(--border);
+  border-radius: var(--r-m);
+  background: var(--surface);
+  padding: 16px 18px;
+}
+.loading {
+  padding: 40px;
+  text-align: center;
+  color: var(--muted);
+}

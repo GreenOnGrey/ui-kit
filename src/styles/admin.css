@@ -1,0 +1,182 @@
+/* The profile menu, the segmented switch, the layout of administration, tables, tabs, sign-in. */
+.menu {
+  position: absolute;
+  right: 16px;
+  top: 52px;
+  width: 340px;
+  max-width: calc(100vw - 32px);
+  border: 1px solid var(--border);
+  border-radius: var(--r-l);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  padding: 8px;
+  z-index: 40;
+  max-height: calc(100vh - 70px);
+  overflow-y: auto;
+}
+.menu .sec {
+  padding: 10px;
+  border-top: 1px solid var(--border);
+}
+.menu .sec:first-child {
+  border-top: 0;
+}
+.menu .line {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 14px;
+}
+.menu .lab {
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.menu .action {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  background: none;
+  border: 0;
+  padding: 0;
+  width: 100%;
+  text-align: left;
+  color: var(--text);
+  text-decoration: none;
+  font-size: 14px;
+}
+.menu .action + .action {
+  margin-top: 10px;
+}
+.menu .action.danger {
+  color: var(--red);
+}
+.mini-seg {
+  display: flex;
+  border: 1px solid var(--border);
+  border-radius: var(--r-s);
+  overflow: hidden;
+}
+.mini-seg button {
+  font-size: 12px;
+  padding: 4px 10px;
+  color: var(--text-2);
+  background: none;
+  border: 0;
+}
+.mini-seg button.on {
+  background: var(--violet);
+  color: #fff;
+}
+.admin {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
+  flex: 1;
+  min-height: 0;
+}
+.side {
+  border-right: 1px solid var(--border);
+  padding: 18px 12px;
+  background: var(--surface-2);
+}
+.side a {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: var(--r-m);
+  color: var(--text-2);
+  text-decoration: none;
+  font-size: 14px;
+}
+.side a.active {
+  background: var(--surface);
+  color: var(--text);
+  font-weight: 500;
+  box-shadow: var(--shadow);
+}
+.side .lab {
+  font-size: 12px;
+  color: var(--muted);
+  padding: 0 10px 8px;
+}
+table.t {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+table.t th {
+  text-align: left;
+  font-weight: 500;
+  font-size: 12px;
+  color: var(--muted);
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border);
+}
+table.t td {
+  padding: 10px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+table.t td:first-child {
+  white-space: nowrap;
+}
+table.t tr.sel {
+  background: var(--surface-2);
+}
+table.t tr.clickable {
+  cursor: pointer;
+}
+.tabs {
+  display: flex;
+  gap: 4px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+.tabs button {
+  padding: 8px 12px;
+  font-size: 14px;
+  color: var(--text-2);
+  border: 0;
+  background: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+}
+.tabs button.on {
+  color: var(--text);
+  border-color: var(--violet);
+  font-weight: 500;
+}
+.warn {
+  color: var(--amber);
+}
+.err {
+  color: var(--red);
+}
+.login {
+  min-height: 100%;
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(600px 300px at 50% 35%, var(--violet-soft), transparent),
+    var(--bg);
+  padding: 24px;
+}
+.login img {
+  width: 96px;
+  height: 96px;
+  border-radius: 22px;
+  margin-bottom: 18px;
+}
+.login h1 {
+  font-size: 26px;
+  margin: 0 0 4px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+.login .btn {
+  width: 100%;
+  padding: 11px 16px;
+}

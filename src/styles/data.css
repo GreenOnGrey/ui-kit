@@ -1,0 +1,239 @@
+/* Sections of the top bar and the burger, numbers, tables, Markdown, the model error. */
+.main.wide {
+  max-width: none;
+}
+.ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+.keys {
+  display: inline-flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+.tabs a {
+  padding: 8px 12px;
+  font-size: 14px;
+  color: var(--text-2);
+  text-decoration: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+}
+.tabs a.on,
+.tabs a[aria-current="page"] {
+  color: var(--text);
+  border-color: var(--violet);
+  font-weight: 500;
+}
+.nav {
+  display: flex;
+  gap: 2px;
+}
+.nav a,
+.navmenu a {
+  padding: 6px 12px;
+  border-radius: var(--r-s);
+  font-size: 14px;
+  color: var(--text-2);
+  text-decoration: none;
+  white-space: nowrap;
+}
+.nav a:hover {
+  background: var(--surface-2);
+  color: var(--text);
+}
+.nav a.on {
+  background: var(--violet-soft);
+  color: var(--violet-text);
+  font-weight: 500;
+}
+.burger {
+  display: none;
+  position: relative;
+}
+.burger .iconbtn.on {
+  background: var(--surface-2);
+  color: var(--text);
+}
+.navmenu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 8px);
+  z-index: 40;
+  min-width: 200px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 6px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-l);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+.navmenu a {
+  padding: 10px 12px;
+  font-size: 15px;
+  color: var(--text);
+}
+.navmenu a.on {
+  background: var(--violet-soft);
+  color: var(--violet-text);
+  font-weight: 600;
+}
+.kpi {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 10px;
+  margin: 12px 0 18px;
+}
+.kpi > div {
+  border: 1px solid var(--border);
+  border-radius: var(--r-m);
+  background: var(--surface);
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.kpi b {
+  font-size: 22px;
+  font-weight: 600;
+}
+.kpi span {
+  font-size: 12px;
+  color: var(--muted);
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.table {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.svc {
+  border: 1px solid var(--border);
+  border-radius: var(--r-m);
+  background: var(--surface);
+  padding: 12px 14px;
+  margin-bottom: 12px;
+}
+.svc > .h {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+table.cov {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  margin: 8px 0;
+}
+table.cov th {
+  text-align: left;
+  font-weight: 500;
+  font-size: 12px;
+  color: var(--muted);
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--border);
+}
+table.cov td {
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+table.cov tr.gap td {
+  background: var(--red-soft);
+}
+.webhook {
+  font-family: var(--mono);
+  font-size: 12px;
+  white-space: pre-wrap;
+  word-break: break-all;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-s);
+  padding: 10px 12px;
+  margin-top: 8px;
+}
+.prose {
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+.prose > :first-child {
+  margin-top: 0;
+}
+.prose > :last-child {
+  margin-bottom: 0;
+}
+.prose h1,
+.prose h2,
+.prose h3 {
+  font-size: 15px;
+  margin: 14px 0 6px;
+}
+.prose pre {
+  font-family: var(--mono);
+  font-size: 12px;
+  background: var(--surface-2);
+  padding: 8px 10px;
+  border-radius: var(--r-s);
+  overflow-x: auto;
+}
+.prose code {
+  font-family: var(--mono);
+  font-size: 0.92em;
+}
+.prose ul,
+.prose ol {
+  padding-left: 20px;
+}
+@media (max-width: 900px) {
+.nav {
+    display: none;
+  }
+.burger {
+    display: block;
+  }
+}
+.side a.sub {
+  padding-left: 22px;
+}
+select.inp.inherit {
+  border-style: dashed;
+  color: var(--muted);
+}
+.llmerr {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 14px;
+  border-radius: var(--r-m);
+  background: var(--red-soft);
+  color: var(--text);
+  font-size: 14px;
+}
+.llmerr.amber {
+  background: var(--amber-soft);
+}
+.llmerr .row {
+  gap: 8px;
+  margin-top: 4px;
+}
+.t .num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.nowrap {
+  white-space: nowrap;
+}
+@media (min-width: 901px) {
+.topbar > .search { margin-left: auto; }
+.topbar > .search + .top-actions { margin-left: 0; }
+}

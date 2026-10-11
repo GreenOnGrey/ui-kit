@@ -1,0 +1,80 @@
+/* Design tokens: colours, radii, shadows, fonts, the light and the dark theme. Green and amber
+   are reserved for statuses and never used decoratively. */
+:root {
+  --bg: #eeedf3;
+  --surface: #ffffff;
+  --surface-2: #f6f5fa;
+  --border: #e1dfea;
+  --border-strong: #c9c5d8;
+  --text: #1b1830;
+  --text-2: #55506e;
+  --muted: #8a86a0;
+  --violet: #6d4aff;
+  --violet-soft: #eeeaff;
+  --violet-text: #4b2fd6;
+  --green: #12a876;
+  --green-soft: #e3f6ef;
+  --amber: #b87400;
+  --amber-soft: #fff3dc;
+  --red: #c8333f;
+  --red-soft: #fde8ea;
+  --shadow: 0 1px 2px rgba(27, 24, 48, 0.06), 0 8px 24px rgba(27, 24, 48, 0.06);
+  --r-s: 6px;
+  --r-m: 10px;
+  --r-l: 16px;
+  --font: "Onest", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --overlay: rgba(27, 24, 48, 0.35);
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+:root:not([data-theme="light"]) {
+    --bg: #0f0d1a;
+    --surface: #1a1829;
+    --surface-2: #221f35;
+    --border: #2f2b46;
+    --border-strong: #433e60;
+    --text: #eceaf6;
+    --text-2: #b3aecb;
+    --muted: #7f7a99;
+    --violet: #8f74ff;
+    --violet-soft: #2a2350;
+    --violet-text: #bfb0ff;
+    --green: #3dd6a0;
+    --green-soft: #153a30;
+    --amber: #f0b44a;
+    --amber-soft: #3a2d12;
+    --red: #ff6b76;
+    --red-soft: #3c1a20;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.25);
+    --overlay: rgba(0, 0, 0, 0.55);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f0d1a;
+  --surface: #1a1829;
+  --surface-2: #221f35;
+  --border: #2f2b46;
+  --border-strong: #433e60;
+  --text: #eceaf6;
+  --text-2: #b3aecb;
+  --muted: #7f7a99;
+  --violet: #8f74ff;
+  --violet-soft: #2a2350;
+  --violet-text: #bfb0ff;
+  --green: #3dd6a0;
+  --green-soft: #153a30;
+  --amber: #f0b44a;
+  --amber-soft: #3a2d12;
+  --red: #ff6b76;
+  --red-soft: #3c1a20;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.25);
+  --overlay: rgba(0, 0, 0, 0.55);
+  color-scheme: dark;
+}
+:root:lang(zh-CN) {
+  --font:
+    "Onest", "PingFang SC", "Noto Sans SC", "Microsoft YaHei", system-ui,
+    sans-serif;
+}

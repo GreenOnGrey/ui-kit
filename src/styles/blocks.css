@@ -1,0 +1,68 @@
+/* The empty state and toasts. */
+.empty {
+  text-align: center;
+  padding: 36px 20px;
+  color: var(--text-2);
+}
+.empty.dashed {
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--r-m);
+}
+.empty .ic {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--surface-2);
+  display: grid;
+  place-items: center;
+  margin: 0 auto 12px;
+  color: var(--muted);
+}
+.empty b {
+  display: block;
+  color: var(--text);
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+.empty .acts {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 14px;
+  flex-wrap: wrap;
+}
+.toast-wrap {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: calc(100vw - 32px);
+}
+.toast {
+  width: 380px;
+  max-width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--violet);
+  border-radius: var(--r-m);
+  box-shadow: var(--shadow);
+  padding: 14px 16px;
+}
+.toast.error {
+  border-left-color: var(--red);
+}
+.toast.ok {
+  border-left-color: var(--green);
+}
+.toast b {
+  display: block;
+  margin-bottom: 2px;
+}
+.toast .acts {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}

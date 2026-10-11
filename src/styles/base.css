@@ -1,0 +1,86 @@
+/* Reset, focus, icons and the utilities: text tones, rows, the hidden label. */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+html,
+body,
+#root {
+  height: 100%;
+}
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 15px/1.5 var(--font);
+  -webkit-font-smoothing: antialiased;
+}
+img {
+  max-width: 100%;
+}
+a {
+  color: var(--violet-text);
+}
+button {
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+:focus-visible {
+  outline: 2px solid var(--violet);
+  outline-offset: 2px;
+}
+svg.i {
+  width: 18px;
+  height: 18px;
+  flex: none;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.mono {
+  font-family: var(--mono);
+  font-size: 0.86em;
+}
+.muted {
+  color: var(--muted);
+}
+.t2 {
+  color: var(--text-2);
+}
+.small {
+  font-size: 13px;
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+.row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.grow {
+  flex: 1;
+  min-width: 0;
+}
+.spacer {
+  flex: 1;
+}

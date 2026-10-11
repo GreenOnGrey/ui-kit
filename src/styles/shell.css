@@ -1,0 +1,102 @@
+/* The frame of an application: the top bar, the brand, the search, the avatar, the main area. */
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 10px 20px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+  position: relative;
+  z-index: 5;
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+  font-size: 16px;
+  color: var(--text);
+  text-decoration: none;
+}
+.brand img {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+}
+.search {
+  flex: 1;
+  max-width: 460px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-m);
+  padding: 7px 12px;
+  color: var(--muted);
+}
+.search input {
+  border: 0;
+  background: none;
+  outline: none;
+  flex: 1;
+  min-width: 0;
+  color: var(--text);
+}
+.top-actions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--violet-soft);
+  color: var(--violet-text);
+  font-weight: 600;
+  font-size: 13px;
+  display: grid;
+  place-items: center;
+  flex: none;
+  border: 0;
+  padding: 0;
+  overflow: hidden;
+}
+.avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.avatar.s {
+  width: 24px;
+  height: 24px;
+  font-size: 10px;
+}
+.avatar.agent {
+  background: linear-gradient(135deg, #6d4aff, #22c58b);
+  color: #fff;
+}
+.avatar.agent.business {
+  background: linear-gradient(135deg, #3b4a8f, #6d4aff);
+}
+.avatar.agent.friendly {
+  background: linear-gradient(135deg, #f08a3c, #22c58b);
+}
+.avatar.agent.mentor {
+  background: linear-gradient(135deg, #6d4aff, #c04ad8);
+}
+.main {
+  padding: 24px 28px 48px;
+  min-width: 0;
+  overflow-y: auto;
+}
+.main.narrow {
+  max-width: 980px;
+}

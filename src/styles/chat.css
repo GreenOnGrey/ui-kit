@@ -1,0 +1,137 @@
+/* Messages, bubbles, the typing mark, the composer, the transcript of a recording. */
+.msgs {
+  flex: 1;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow-y: auto;
+  min-height: 0;
+}
+.m {
+  max-width: 88%;
+  font-size: 14px;
+  line-height: 1.5;
+}
+.m .bub {
+  padding: 9px 12px;
+  border-radius: 14px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.m.a .bub {
+  background: var(--surface-2);
+  border-top-left-radius: 4px;
+}
+.m.u {
+  align-self: flex-end;
+}
+.m.u .bub {
+  background: var(--violet);
+  color: #fff;
+  border-top-right-radius: 4px;
+}
+.m.err .bub {
+  background: var(--red-soft);
+  color: var(--text);
+}
+.m .edit {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin: 6px 4px 0 0;
+  font-size: 12px;
+  color: var(--violet-text);
+  border: 1px solid var(--violet-soft);
+  border-radius: 999px;
+  padding: 2px 9px;
+}
+.m .atts {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 6px;
+  justify-content: flex-end;
+}
+.m .atts a {
+  font-size: 12px;
+  color: var(--text-2);
+}
+.typing {
+  display: inline-flex;
+  gap: 3px;
+}
+.typing i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--muted);
+  animation: blink 1.2s infinite;
+}
+.typing i:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.typing i:nth-child(3) {
+  animation-delay: 0.4s;
+}
+@keyframes blink {
+  0%,
+  80%,
+  100% {
+    opacity: 0.2;
+  }
+  40% {
+    opacity: 1;
+  }
+}
+.composer {
+  border-top: 1px solid var(--border);
+  padding: 10px;
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+}
+.composer textarea {
+  flex: 1;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-m);
+  padding: 8px 10px;
+  font-size: 14px;
+  min-height: 38px;
+  max-height: 160px;
+  resize: none;
+  background: var(--surface);
+}
+.composer .rec-box {
+  flex: 1;
+  color: var(--red);
+  font-size: 14px;
+  padding: 8px 10px;
+}
+.pending-files {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  padding: 8px 10px 0;
+}
+.transcript {
+  border: 1px solid var(--violet);
+  border-radius: var(--r-m);
+  padding: 10px;
+  font-size: 14px;
+  background: var(--surface);
+  margin: 10px;
+}
+.transcript textarea {
+  width: 100%;
+  border: 0;
+  background: none;
+  resize: vertical;
+  min-height: 60px;
+  outline: none;
+}
+.transcript .row2 {
+  display: flex;
+  gap: 6px;
+  justify-content: flex-end;
+}

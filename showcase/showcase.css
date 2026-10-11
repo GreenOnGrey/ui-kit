@@ -1,0 +1,39 @@
+/* The page of the showcase itself. The elements it shows are styled by the kit only. */
+.sc { height: 100%; display: flex; flex-direction: column; }
+.sc-body { display: grid; grid-template-columns: 220px minmax(0, 1fr); flex: 1; min-height: 0; }
+.sc-toc { border-right: 1px solid var(--border); background: var(--surface); padding: 14px 10px; display: flex; flex-direction: column; gap: 2px; overflow-y: auto; }
+.sc-toc a { padding: 6px 10px; border-radius: var(--r-s); font-size: 14px; color: var(--text-2); text-decoration: none; }
+.sc-toc a:hover { background: var(--surface-2); }
+.sc-toc a.sc-on { background: var(--violet-soft); color: var(--violet-text); font-weight: 500; }
+.sc-main { padding: 24px 28px 48px; overflow-y: auto; min-width: 0; scroll-behavior: smooth; }
+.sc-main.sc-phone { display: grid; place-items: start center; background: var(--surface-2); }
+.sc-main.sc-phone iframe { width: 390px; height: 100%; min-height: 700px; border: 1px solid var(--border-strong); border-radius: var(--r-l); background: var(--bg); }
+.sc-section { margin-bottom: 44px; scroll-margin-top: 16px; }
+.sc-section > h2 { font-size: 20px; font-weight: 600; margin: 0 0 4px; }
+.sc-lead { color: var(--text-2); font-size: 14px; margin: 0 0 14px; max-width: 720px; }
+.sc-example { margin-bottom: 18px; }
+.sc-label { font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+.sc-stage { min-width: 0; }
+.sc-stage.sc-box { border: 1px solid var(--border); border-radius: var(--r-l); overflow: hidden; background: var(--bg); position: relative; }
+.sc-code { display: flex; align-items: flex-start; gap: 10px; border: 1px solid var(--border); border-radius: var(--r-m); background: var(--surface-2); padding: 8px 8px 8px 12px; margin-top: 8px; }
+.sc-code pre { margin: 0; flex: 1; min-width: 0; overflow-x: auto; font-family: var(--mono); font-size: 12px; line-height: 1.5; max-height: 132px; }
+.sc-sw { display: flex; align-items: center; gap: 8px; font-size: 12px; }
+.sc-sw > span:first-child { width: 32px; height: 32px; border-radius: var(--r-s); border: 1px solid var(--border); flex: none; }
+.sc-sw code { font-family: var(--mono); overflow-wrap: anywhere; }
+.sc-icons { display: grid; grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); gap: 8px; }
+.sc-icons button { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 10px 4px; border: 1px solid var(--border); border-radius: var(--r-m); background: var(--surface); font-size: 11px; color: var(--text-2); font-family: var(--mono); }
+.sc-icons button:hover { border-color: var(--border-strong); }
+.sc-chat { height: 620px; display: flex; flex-direction: column; }
+.sc-chat.sc-narrow { width: 360px; max-width: 100%; border-left: 1px solid var(--border); background: var(--surface); }
+.sc-login { display: block; width: 100%; height: 620px; border: 0; }
+.sc-version { font-family: var(--mono); }
+.sc-only-m { display: none; }
+@media (max-width: 900px) {
+  .sc-body { grid-template-columns: 1fr; }
+  .sc-toc { display: none; }
+  .sc-toc.sc-open { display: flex; position: absolute; z-index: 30; top: 53px; left: 0; right: 0; bottom: 0; border-right: 0; }
+  .sc-main { padding: 16px 14px 32px; }
+  .sc-hide-m { display: none; }
+  .sc-only-m { display: grid; }
+  .sc-chat.sc-narrow { width: 100%; border-left: 0; }
+}

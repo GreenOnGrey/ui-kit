@@ -1,0 +1,94 @@
+/* What came with Nabu: the chat with the list of conversations, channel marks, tool steps,
+   the page, key-value rows, the hint box, the dark sign-in, the state of a turn, panels. */
+.brand img{border-radius:8px}
+.nb-app{position:relative;display:grid;grid-template-columns:260px minmax(0,1fr) auto;flex:1;min-height:0}
+.nb-side{border-right:1px solid var(--border);padding:14px 12px;background:var(--surface);overflow-y:auto}
+.nb-side .h{font-size:12px;color:var(--muted);margin:14px 6px 6px}
+.nb-side .it{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:var(--r-m);font-size:14px;width:100%;border:0;background:none;text-align:left;color:var(--text)}
+.nb-side .it:hover{background:var(--surface-2)}
+.nb-side .it.on{background:var(--violet-soft);color:var(--violet-text);font-weight:500}
+.nb-side .it.arch{color:var(--muted)}
+.nb-side .it .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.nb-side .it .sub{margin-left:auto;font-size:11px;color:var(--muted);white-space:nowrap}
+.nb-scrim{display:none}
+.nb-chat{display:flex;flex-direction:column;min-width:0;min-height:0;position:relative}
+.nb-chat .hd{display:flex;align-items:center;gap:10px;padding:12px 20px;border-bottom:1px solid var(--border);background:var(--surface)}
+.nb-chat .msgs{flex:1;padding:18px 20px;display:flex;flex-direction:column;gap:12px;overflow-y:auto}
+.nb-chat .m{max-width:75%}
+.nb-chat .m.u{max-width:70%}
+.nb-chat .composer{background:var(--surface)}
+.chan{display:inline-flex;align-items:center;gap:4px;font-size:11px;color:var(--muted);margin-bottom:3px}
+.m.u .chan{align-self:flex-end}
+.tool{border:1px solid var(--border);border-radius:var(--r-m);padding:7px 10px;font-size:13px;background:var(--surface-2);display:flex;align-items:center;gap:8px;max-width:520px;margin-bottom:6px;cursor:pointer;text-align:left;width:100%;color:var(--text)}
+.tool .ok{color:var(--green)}
+.tool .er{color:var(--red)}
+.tool .run{color:var(--muted)}
+.tool .tx{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.tools-fold{font-size:12px;color:var(--muted);border:0;background:none;padding:2px 0;margin-bottom:4px}
+.ok-t{color:var(--green)}
+.err-t{color:var(--red)}
+.warn-t{color:var(--amber)}
+.page{padding:24px 28px;max-width:1180px;width:100%;margin:0 auto;overflow-y:auto}
+.page h1{font-size:22px;font-weight:600;margin:0 0 4px;letter-spacing:-.01em}
+.page .lead{color:var(--text-2);margin:0 0 18px;font-size:14px}
+.hintbox{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:var(--r-m);background:var(--violet-soft);color:var(--violet-text);font-size:14px;margin-bottom:16px}
+.kv{display:grid;grid-template-columns:160px 1fr;gap:6px 14px;font-size:14px}
+.kv dt{color:var(--muted)}
+.kv dd{margin:0}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:860px){
+.nb-app{grid-template-columns:1fr}
+.nb-side{display:none}
+.nb-side.open{display:block;position:absolute;inset:0 30% 0 0;z-index:15;box-shadow:var(--shadow)}
+.nb-scrim{display:block;position:absolute;inset:0;z-index:14;border:0;padding:0;background:rgba(0,0,0,.25)}
+.nb-chat .m,.nb-chat .m.u{max-width:92%}
+.form-grid{grid-template-columns:1fr}
+.page{padding:16px}}
+.login{min-height:100vh;min-height:100dvh;display:grid;place-items:center;background:radial-gradient(ellipse at 30% 40%,rgba(109,74,255,.25),transparent 60%),radial-gradient(ellipse at 70% 60%,rgba(18,168,118,.22),transparent 60%),#0B0A14;padding:24px}
+.login .box{text-align:center;color:#fff;max-width:360px;width:100%}
+.login img{width:120px;height:120px;border-radius:24px}
+.login h1{font-size:44px;letter-spacing:.06em;margin:14px 0 4px;font-weight:600}
+.login .tag{font-family:var(--mono);background:linear-gradient(90deg,#B36BFF,#22D3C5);-webkit-background-clip:text;background-clip:text;color:transparent;font-size:16px}
+.login .btn{margin-top:28px;width:100%;justify-content:center;padding:11px 16px}
+.login .sub{margin-top:10px;font-size:13px;color:#9a97b5}
+.login .err-text{margin-top:12px}
+.login .chips{justify-content:center;margin-top:24px}
+.login .chip{background:transparent;color:#cfcbe6;border-color:#2F2B46}
+.login .chip.on{background:#2A2350;color:#fff}
+.avatar.agent.brief{background:linear-gradient(135deg,#1b1830,#5b5872)}
+.hintbox.warn{background:var(--amber-soft);color:var(--amber);border-color:transparent}
+.unread{display:inline-grid;place-items:center;min-width:18px;height:18px;padding:0 5px;border-radius:999px;background:var(--violet);color:#fff;font-size:11px;font-weight:600}
+.confirm{border:1px solid var(--amber);border-radius:var(--r-m);background:var(--amber-soft);padding:12px 14px;margin:8px 0;font-size:14px}
+.confirm .h{display:flex;gap:8px;align-items:center;font-weight:600;color:var(--amber)}
+.confirm pre{white-space:pre-wrap;word-break:break-word;font-family:var(--mono);font-size:12px;margin:8px 0;color:var(--text-2);max-height:160px;overflow:auto}
+.confirm .acts{display:flex;gap:8px;flex-wrap:wrap}
+.sysnote{font-size:13px;color:var(--muted);text-align:center;margin:6px 0}
+.warn-t{color:var(--amber)}
+.turnstate{display:flex;align-items:center;justify-content:flex-end;gap:6px;font-size:12px;color:var(--muted);margin-top:5px}
+.turnstate.q{color:var(--amber)}
+.spin{display:inline-block;width:11px;height:11px;border-radius:50%;border:2px solid var(--border-strong);border-top-color:var(--violet);animation:nb-spin 1s linear infinite}
+@keyframes nb-spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){
+.spin{animation:none}}
+.page.wide{max-width:1320px}
+.sel{border:1px solid var(--border-strong);border-radius:var(--r-m);padding:6px 8px;font-size:13px;background:var(--surface);color:var(--text);max-width:200px}
+.panel{border:1px solid var(--border);border-radius:var(--r-m);background:var(--surface);box-shadow:var(--shadow);padding:16px;font-size:14px;position:sticky;top:0;max-height:calc(100vh - 150px);overflow-y:auto}
+.panel-h{display:flex;align-items:flex-start;gap:6px}
+.panel h4{margin:0 0 4px;font-size:16px;font-weight:600}
+.panel .lab{font-size:12px;color:var(--muted);margin:14px 0 5px}
+.linkish{border:0;background:none;padding:0;color:var(--violet-text);font:inherit;font-size:13px;cursor:pointer;text-align:left}
+.nowrap{white-space:nowrap}
+.kvrow{display:grid;grid-template-columns:110px minmax(0,1fr);gap:10px;align-items:center;font-size:13px;margin-top:8px}
+.kvrow.top{align-items:start}
+.stack{display:grid;gap:8px;min-width:0}
+@media (max-width:860px){
+.panel{position:fixed;inset:0;z-index:40;max-height:none;border-radius:0;border:0}
+.kvrow{grid-template-columns:minmax(0,1fr)}}
+
+/* A narrow place — a side panel: the same as on a phone, asked for by the product
+   with ChatLayout narrow (FTR.NAB.CMN-0005 design §6.2). */
+.nb-app.narrow{grid-template-columns:1fr}
+.nb-app.narrow .nb-side{display:none}
+.nb-app.narrow .nb-side.open{display:block;position:absolute;inset:0 30% 0 0;z-index:15;box-shadow:var(--shadow)}
+.nb-app.narrow .nb-scrim{display:block;position:absolute;inset:0;z-index:14;border:0;padding:0;background:rgba(0,0,0,.25)}
+.nb-app.narrow .nb-chat .m,.nb-app.narrow .nb-chat .m.u{max-width:92%}

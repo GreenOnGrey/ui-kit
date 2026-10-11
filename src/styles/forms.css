@@ -1,0 +1,104 @@
+/* The modal dialog, fields, inputs, hints, the switch. */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--overlay);
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  z-index: 50;
+  overflow-y: auto;
+}
+.modal {
+  width: 480px;
+  max-width: 100%;
+  background: var(--surface);
+  border-radius: var(--r-l);
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+}
+.modal.wide {
+  width: 760px;
+}
+.modal header {
+  padding: 18px 22px 6px;
+  font-size: 18px;
+  font-weight: 600;
+}
+.modal .mb {
+  padding: 8px 22px 4px;
+}
+.modal footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 16px 22px 20px;
+  flex-wrap: wrap;
+}
+.field {
+  margin-bottom: 14px;
+}
+.field > label {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 5px;
+}
+.inp {
+  width: 100%;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-m);
+  padding: 9px 12px;
+  background: var(--surface);
+}
+textarea.inp {
+  resize: vertical;
+  min-height: 80px;
+}
+.hint {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 4px;
+}
+.err-text {
+  font-size: 13px;
+  color: var(--red);
+  margin-top: 6px;
+}
+.switch {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  background: none;
+  border: 0;
+  padding: 0;
+  text-align: left;
+}
+.sw {
+  width: 36px;
+  height: 20px;
+  border-radius: 999px;
+  background: var(--border-strong);
+  position: relative;
+  flex: none;
+  transition: background 0.15s;
+}
+.sw::after {
+  content: "";
+  position: absolute;
+  left: 2px;
+  top: 2px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  transition: left 0.15s;
+}
+.sw.on {
+  background: var(--violet);
+}
+.sw.on::after {
+  left: 18px;
+}

@@ -1,0 +1,55 @@
+{
+  "name": "@green-on-grey/ui-kit",
+  "version": "0.1.0",
+  "description": "UI kit of the Nabu and Hammurapi products: styles, components, the chat and the sign-in screen",
+  "license": "Apache-2.0",
+  "repository": { "type": "git", "url": "git+https://github.com/GreenOnGrey/ui-kit.git" },
+  "type": "module",
+  "sideEffects": ["**/*.css"],
+  "files": ["dist", "bin"],
+  "bin": { "ui-kit-check": "bin/ui-kit-check.mjs" },
+  "exports": {
+    ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js" },
+    "./chat": { "types": "./dist/chat/index.d.ts", "import": "./dist/chat.js" },
+    "./login": { "types": "./dist/login/index.d.ts", "import": "./dist/login.js" },
+    "./locales": { "types": "./dist/locales/index.d.ts", "import": "./dist/locales.js" },
+    "./styles.css": "./dist/styles.css",
+    "./tokens.css": "./dist/tokens.css",
+    "./manifest.json": "./dist/manifest.json"
+  },
+  "scripts": {
+    "dev": "vite --config showcase/vite.config.ts",
+    "build": "vite build && tsc -p tsconfig.build.json && node scripts/build-css.mjs",
+    "build:showcase": "npm run build && vite build --config showcase/vite.config.ts",
+    "test": "vitest run",
+    "test:e2e": "playwright test",
+    "typecheck": "tsc -b --noEmit",
+    "lint": "oxlint -c .oxlintrc.json src showcase e2e bin scripts && tsc -b --noEmit"
+  },
+  "peerDependencies": {
+    "i18next": "^26.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-i18next": "^17.0.0"
+  },
+  "dependencies": {
+    "postcss": "^8.5.29"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.64.0",
+    "@types/node": "^26.6.2",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.1.1",
+    "i18next": "^26.4.2",
+    "i18next-icu": "^2.4.4",
+    "intl-messageformat": "^11.2.15",
+    "oxlint": "^1.86.0",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "react-i18next": "^17.0.15",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.1",
+    "vitest": "^5.0.2"
+  }
+}

@@ -1,0 +1,61 @@
+# Релиз @green-on-grey/ui-kit (FTR.NAB.CMN-0005 tech §3.8):
+#   push тега vX.Y.Z  →  проверки → публикация в npm → витрина в GitHub Pages
+# Публикация — доверенная (OIDC), без токена; витрина версии ложится в /vX.Y.Z/
+# ветки gh-pages и больше не меняется, корень показывает наибольшую версию.
+name: release
+on:
+  push:
+    tags: ["v*.*.*"]
+permissions: { contents: read }
+
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    outputs:
+      version: ${{ steps.m.outputs.version }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - id: m
+        run: |
+          tag=$GITHUB_REF_NAME
+          [[ $tag =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "::error::тег «$tag» не в формате vX.Y.Z"; exit 1; }
+          version=$(node -p 'require("./package.json").version')
+          [[ v$version == "$tag" ]] || { echo "::error::тег $tag, а в package.json версия $version"; exit 1; }
+          grep -q "^## $version\b" CHANGELOG.md || { echo "::error::в CHANGELOG.md нет раздела «## $version»"; exit 1; }
+          echo "version=$version" >>"$GITHUB_OUTPUT"
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with: { node-version: 24, cache: npm }
+      - run: npm ci --no-audit --no-fund
+      - run: npm run lint
+      - run: npm test
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e
+
+  publish:
+    needs: verify
+    runs-on: ubuntu-24.04
+    permissions: { contents: read, id-token: write }
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with: { node-version: 24, cache: npm, registry-url: "https://registry.npmjs.org" }
+      - run: npm ci --no-audit --no-fund
+      - run: npm run build
+      - run: npm publish --provenance --access public
+
+  pages:
+    needs: [verify, publish]
+    runs-on: ubuntu-24.04
+    permissions: { contents: write }
+    concurrency: { group: pages, cancel-in-progress: false }
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with: { fetch-depth: 0 }
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with: { node-version: 24, cache: npm }
+      - run: npm ci --no-audit --no-fund
+      - run: npm run build:showcase
+      - name: Витрина версии — в gh-pages
+        env:
+          VERSION: ${{ needs.verify.outputs.version }}
+        run: bash scripts/publish-pages.sh "$VERSION"
