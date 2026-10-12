@@ -28,7 +28,9 @@
 .ok-t{color:var(--green)}
 .err-t{color:var(--red)}
 .warn-t{color:var(--amber)}
-.page{padding:24px 28px;max-width:1180px;width:100%;margin:0 auto;overflow-y:auto}
+/* The page scrolls across the whole width, so its scrollbar stands at the edge of the window;
+   the content keeps its column of 1180px (1320px when wide) by the side padding. */
+.page{padding:24px max(28px,calc((100% - 1180px) / 2 + 28px));width:100%;overflow-y:auto}
 .page h1{font-size:22px;font-weight:600;margin:0 0 4px;letter-spacing:-.01em}
 .page .lead{color:var(--text-2);margin:0 0 18px;font-size:14px}
 .hintbox{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:var(--r-m);background:var(--violet-soft);color:var(--violet-text);font-size:14px;margin-bottom:16px}
@@ -70,7 +72,7 @@
 @keyframes nb-spin{to{transform:rotate(360deg)}}
 @media (prefers-reduced-motion:reduce){
 .spin{animation:none}}
-.page.wide{max-width:1320px}
+.page.wide{padding-inline:max(28px,calc((100% - 1320px) / 2 + 28px))}
 .sel{border:1px solid var(--border-strong);border-radius:var(--r-m);padding:6px 8px;font-size:13px;background:var(--surface);color:var(--text);max-width:200px}
 .panel{border:1px solid var(--border);border-radius:var(--r-m);background:var(--surface);box-shadow:var(--shadow);padding:16px;font-size:14px;position:sticky;top:0;max-height:calc(100vh - 150px);overflow-y:auto}
 .panel-h{display:flex;align-items:flex-start;gap:6px}
@@ -84,6 +86,10 @@
 @media (max-width:860px){
 .panel{position:fixed;inset:0;z-index:40;max-height:none;border-radius:0;border:0}
 .kvrow{grid-template-columns:minmax(0,1fr)}}
+
+/* A long unbreakable line — a path in a tool step — never widens the list of messages. */
+.msgs{overflow-x:hidden}
+.m{min-width:0}
 
 /* A narrow place — a side panel: the same as on a phone, asked for by the product
    with ChatLayout narrow (FTR.NAB.CMN-0005 design §6.2). */

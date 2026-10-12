@@ -3,6 +3,14 @@
 Versions follow semver. A visible change of the look is at least a minor (FTR.NAB.CMN-0005 R24).
 Until `1.0.0` — the version on which Nabu shows no visible difference — the contract may change in a minor.
 
+## 0.2.0
+
+A visible change.
+
+- `.page` scrolls across the whole width: on a wide screen its scrollbar stands at the edge of the
+  window, not at the edge of the column of the content. The content keeps its place and its width
+  (1180px, 1320px for `.page.wide`).
+
 ## 0.1.4
 
 Nothing changes for a product: the package is the one of 0.1.3.
