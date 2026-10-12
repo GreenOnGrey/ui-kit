@@ -3,6 +3,13 @@
 Versions follow semver. A visible change of the look is at least a minor (FTR.NAB.CMN-0005 R24).
 Until `1.0.0` — the version on which Nabu shows no visible difference — the contract may change in a minor.
 
+## 0.1.3
+
+Nothing visible changes.
+
+- Chat: the buttons of a confirmation no longer wait for the end of the turn. The agent asks in
+  the middle of its turn, so buttons tied to `busy` could never be pressed.
+
 ## 0.1.2
 
 Nothing visible changes.

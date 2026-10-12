@@ -108,8 +108,9 @@ export function Chat(props: ChatProps) {
             <div>{t("chat.confirm.text", { action: c.summary })}</div>
             {c.preview !== undefined && <pre>{c.preview}</pre>}
             <div className="acts">
-              <button className="btn sm primary" disabled={busy} onClick={() => props.onConfirm?.(c.id, true)}>{t("chat.confirm.approve")}</button>
-              <button className="btn sm" disabled={busy} onClick={() => props.onConfirm?.(c.id, false)}>{t("chat.confirm.reject")}</button>
+              {/* never tied to `busy`: the agent asks in the middle of its turn */}
+              <button className="btn sm primary" onClick={() => props.onConfirm?.(c.id, true)}>{t("chat.confirm.approve")}</button>
+              <button className="btn sm" onClick={() => props.onConfirm?.(c.id, false)}>{t("chat.confirm.reject")}</button>
             </div>
           </div>
         ))}
