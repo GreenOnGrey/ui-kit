@@ -5,6 +5,9 @@ on:
   pull_request:
   push:
     branches: [main]
+  # Ручной запуск: коммит эталонов из update-snapshots сделан GITHUB_TOKEN и сам
+  # проверки не запускает — их вызывает update-snapshots.
+  workflow_dispatch:
 permissions: { contents: read }
 concurrency: { group: "ci-${{ github.ref }}", cancel-in-progress: true }
 

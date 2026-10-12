@@ -1,10 +1,11 @@
 # Эталоны снимков витрины создаются и обновляются только здесь — на той же
 # машине, на которой их сравнивает ci (FTR.NAB.CMN-0005 qa, решение 9). Ручной
-# запуск на ветке запроса: эталоны коммитятся в неё.
+# запуск на ветке запроса: эталоны коммитятся в неё. Коммит от GITHUB_TOKEN не
+# запускает другие workflow, поэтому ci на нём вызывается отсюда явно.
 name: update-snapshots
 on:
   workflow_dispatch:
-permissions: { contents: write }
+permissions: { contents: write, actions: write }
 
 jobs:
   update:
@@ -24,3 +25,6 @@ jobs:
           if git diff --cached --quiet; then echo "Эталоны не изменились."; exit 0; fi
           git commit -m "Эталоны снимков витрины"
           git push
+          gh workflow run ci.yml --ref "$GITHUB_REF_NAME"
+        env:
+          GH_TOKEN: ${{ github.token }}
