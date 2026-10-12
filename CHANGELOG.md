@@ -3,6 +3,12 @@
 Versions follow semver. A visible change of the look is at least a minor (FTR.NAB.CMN-0005 R24).
 Until `1.0.0` — the version on which Nabu shows no visible difference — the contract may change in a minor.
 
+## 0.1.4
+
+Nothing changes for a product: the package is the one of 0.1.3.
+
+- Showcase: the logo of Green on Grey in the header and as the icon of the page.
+
 ## 0.1.3
 
 Nothing visible changes.

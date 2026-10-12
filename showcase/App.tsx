@@ -48,7 +48,7 @@ export function App() {
   return (
     <div className="sc">
       <div className="topbar">
-        <a href="#tokens" className="brand"><img src="./nabu.jpg" alt="" /><span>UI Kit</span></a>
+        <a href="#tokens" className="brand"><img src="./logo.png" alt="" /><span>UI Kit</span></a>
         <span className="chip sc-version">v{pkg.version}</span>
         <div className="top-actions">
           <button className={`btn sm${phone ? " primary" : " ghost"} sc-hide-m`} aria-pressed={phone} onClick={() => setPhone((v) => !v)}>
