@@ -5,6 +5,7 @@
   "close": "Schließen",
   "delete": "Löschen",
   "remove": "Entfernen",
+  "agentName": "Name des Agenten",
   "topbar": {
     "sections": "Bereiche",
     "profile": "Profil"

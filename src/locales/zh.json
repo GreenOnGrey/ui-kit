@@ -5,6 +5,7 @@
   "close": "关闭",
   "delete": "删除",
   "remove": "移除",
+  "agentName": "智能体名称",
   "topbar": {
     "sections": "栏目",
     "profile": "个人资料"

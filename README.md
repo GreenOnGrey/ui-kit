@@ -24,7 +24,7 @@ const resources = { en: { translation: en, uikit: kit.en }, ru: { translation: r
 
 ```tsx
 import { Avatar, Icon, Modal, ToastProvider, TopBar, useToast } from "@green-on-grey/ui-kit";
-import { Chat, ChatLayout, ConversationList } from "@green-on-grey/ui-kit/chat";
+import { AgentButton, AgentMenu, Chat, ChatLayout, ConversationList } from "@green-on-grey/ui-kit/chat";
 import { LoginScreen } from "@green-on-grey/ui-kit/login";
 ```
 

@@ -29,7 +29,7 @@ npm run build      # the package
 ```text
 src/styles/       the styles; index.css lists the files in the order of the cascade
 src/components/   Icon, Markdown, Button, Tabs, Menu, TopBar, ui (Modal, toasts, Avatar, Switch, …)
-src/chat/         Chat, MessageView, ConversationList, useRecorder, types.ts — the contract with adapters
+src/chat/         Chat, MessageView, ConversationList, AgentMenu, useRecorder, types.ts — the contract with adapters
 src/login/        LoginScreen
 src/locales/      en, ru, de, es, zh — the namespace `uikit`
 bin/              ui-kit-check

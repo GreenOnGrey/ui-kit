@@ -5,6 +5,7 @@
   "close": "Закрыть",
   "delete": "Удалить",
   "remove": "Убрать",
+  "agentName": "Имя агента",
   "topbar": {
     "sections": "Разделы",
     "profile": "Профиль"

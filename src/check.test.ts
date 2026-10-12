@@ -20,7 +20,7 @@ describe("the styles of the kit", () => {
 
   // KIT-04: what design §2 leaves to the products is not in the kit
   it("KIT-04 hold no class of a screen of a product", () => {
-    const screens = ["mailcard", "digest", "gwrap", "capbar", "mtabs", "agentmenu", "agentbtn", "tones", "bnav", "tagline", "nbsteps",
+    const screens = ["mailcard", "digest", "gwrap", "capbar", "mtabs", "tones", "nbtones", "bnav", "tagline", "nbsteps",
       "chat-fab", "gates", "lane", "specdoc", "milkdown", "banner", "concise"];
     expect(screens.filter((c) => classes.has(c))).toEqual([]);
   });

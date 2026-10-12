@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { html } from "../testing";
+import { AgentButton, AgentMenu } from "./AgentMenu";
 import { Chat } from "./Chat";
 import { ConversationList } from "./ConversationList";
 import { MessageView, markTime, visibleSteps } from "./MessageView";
@@ -114,5 +115,26 @@ describe("conversations", () => {
     expect(out).toContain('class="nb-side open"');
     expect(out).toContain('class="nb-scrim" aria-label="Close"');
     expect(out).toContain("New topic");
+  });
+});
+
+describe("the menu of the agent", () => {
+  const menu = html(
+    <AgentMenu label="Agent" name="Ada" value="b" optionsLabel="Manner" hint="Everywhere" onRename={() => {}} onPick={() => {}} onClose={() => {}}
+      options={[{ key: "a", label: "Plain", icon: "tBusiness" }, { key: "b", label: "Short", icon: "tBrief" }]} />,
+  );
+
+  it("shows the name and the options of the product, the chosen one pressed", () => {
+    expect(menu).toContain('class="agentmenu" role="dialog" aria-label="Agent"');
+    expect(menu).toContain('aria-label="Agent name"');
+    expect(menu).toContain('value="Ada"');
+    expect(menu).toContain('class="agentoption" aria-pressed="false"');
+    expect(menu).toContain('class="agentoption on" aria-pressed="true"');
+    expect(menu).toContain("Manner");
+    expect(menu).toContain("Everywhere");
+  });
+
+  it("AgentButton is named and tells whether its menu is open", () => {
+    expect(html(<AgentButton icon="tBrief" label="Agent" expanded small />)).toContain('class="agentbtn s" aria-label="Agent" aria-expanded="true"');
   });
 });

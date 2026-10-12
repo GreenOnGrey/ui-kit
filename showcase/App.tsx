@@ -5,6 +5,7 @@ import {
 } from "../src";
 import { ICON_NAMES } from "../src/components/Icon";
 import tokensCss from "../src/styles/tokens.css?raw";
+import { AgentButton, AgentMenu } from "../src/chat";
 import { LoginScreen } from "../src/login";
 import pkg from "../package.json";
 import { ChatDemo } from "./ChatDemo";
@@ -225,6 +226,7 @@ function Sections() {
         <Example label="В очереди" box><ChatDemo demo="queued" wait="queued" /></Example>
         <Example label="Отмена хода и подтверждение действия" box><ChatDemo demo="full" full /></Example>
         <Example label="Только чтение" box><ChatDemo demo="readonly" readOnly /></Example>
+        <Example label="Кнопка агента и его меню: имя и выбор варианта, который задаёт продукт" box><AgentDemo /></Example>
         <Example label="Запись голоса: вместо поля — отсчёт; доступ к микрофону запрещён — текст под полем" box>
           <div>
             <div className="composer">
@@ -399,6 +401,30 @@ function BarDemo({ product }: { product: "nabu" | "hammurapi" }) {
         sections={names.map((label, i) => ({ key: String(i), label, href: "#topbar", active: i === on }))}
         center={nabu ? undefined : <form className="search" role="search"><Icon name="search" /><input placeholder="Поиск" aria-label="Поиск" /></form>}
         actions={nabu ? undefined : <button className="btn primary sm"><Icon name="plus" /><span className="hide-m">Новая задача</span></button>} />
+    </div>
+  );
+}
+
+const AGENT_OPTIONS = [
+  { key: "business", label: "Деловой", icon: "tBusiness" }, { key: "friendly", label: "Дружелюбный", icon: "tFriendly" },
+  { key: "brief", label: "Лаконичный", icon: "tBrief" }, { key: "mentor", label: "Наставник", icon: "tMentor" },
+] as const;
+
+function AgentDemo() {
+  const [open, setOpen] = useState(true);
+  const [name, setName] = useState("Ада");
+  const [value, setValue] = useState("business");
+  const close = useCallback(() => setOpen(false), []);
+  return (
+    <div style={{ position: "relative", height: 330, padding: 12 }} data-demo="agent">
+      <div className="row">
+        <AgentButton icon={AGENT_OPTIONS.find((o) => o.key === value)!.icon} label="Агент" expanded={open} onClick={() => setOpen((v) => !v)} />
+        <b>{name}</b>
+      </div>
+      {open && (
+        <AgentMenu label="Агент" name={name} options={[...AGENT_OPTIONS]} value={value} optionsLabel="Тон"
+          hint="Изменение действует во всех каналах." onRename={setName} onPick={setValue} onClose={close} />
+      )}
     </div>
   );
 }

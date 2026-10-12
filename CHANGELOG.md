@@ -1,7 +1,20 @@
 # Changelog
 
 Versions follow semver. A visible change of the look is at least a minor (FTR.NAB.CMN-0005 R24).
-Until `1.0.0` — the version on which Nabu shows no visible difference — the contract may change in a minor.
+Since `1.0.0` the contract of the kit — class names, tokens, props, icon names, keys of strings — changes only
+in a major.
+
+## 1.0.0
+
+The contract is stable.
+
+On this version both products are accepted: 118 screens of Nabu are identical to a pixel before the
+move to the kit and after it; Hammurapi differs only as listed in the design of FTR.NAB.CMN-0005.
+
+- Chat: `AgentButton` and `AgentMenu` — the round button of the agent and its menu: the name and a choice among the
+  options of the product, as tiles with icons. The look is the one of Nabu. A product that had its own
+  `.agentbtn` / `.agentmenu` styles removes them.
+- Tests: the browser of the snapshots renders repeatably; the baselines are shot again.
 
 ## 0.2.0
 
