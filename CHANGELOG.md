@@ -4,6 +4,11 @@ Versions follow semver. A visible change of the look is at least a minor (FTR.NA
 Since `1.0.0` the contract of the kit — class names, tokens, props, icon names, keys of strings — changes only
 in a major.
 
+## 1.0.1
+
+The first published version of the stable contract: the package is the one described under 1.0.0.
+The tag `v1.0.0` was put on an earlier commit and was not published.
+
 ## 1.0.0
 
 The contract is stable.
