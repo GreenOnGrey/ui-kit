@@ -1,4 +1,4 @@
-import { expect, openSection, test } from "./fixtures";
+import { demo, expect, openSection, test } from "./fixtures";
 
 // The behaviour that needs a real browser: focus, the keyboard, scrolling,
 // the layout by width (FTR.NAB.CMN-0005 qa §3–4).
@@ -115,7 +115,7 @@ test("CMP-07, CMP-08 on a phone the sections live behind the burger, never open 
 test.describe("chat", () => {
   test("CHAT-01, CHAT-03 Enter sends, Shift+Enter does not, the list follows the last message", async ({ page }) => {
     const s = await openSection(page, "chat");
-    const chat = s.locator(".nb-chat").first();
+    const chat = demo(s, "history");
     const input = chat.getByRole("textbox");
     await input.fill("первая строка");
     await input.press("Shift+Enter");
@@ -131,7 +131,7 @@ test.describe("chat", () => {
 
   test("CHAT-03 Enter does not send while a word is being composed", async ({ page }) => {
     const s = await openSection(page, "chat");
-    const chat = s.locator(".nb-chat").first();
+    const chat = demo(s, "history");
     const input = chat.getByRole("textbox");
     const sent = await chat.locator(".m.u").count();
     await input.fill("に");
@@ -142,7 +142,7 @@ test.describe("chat", () => {
 
   test("CHAT-10 holding the button records, releasing gives the transcript to check", async ({ page }) => {
     const s = await openSection(page, "chat");
-    const chat = s.locator(".nb-chat").first();
+    const chat = demo(s, "history");
     const mic = chat.getByRole("button", { name: "Удерживайте для записи" });
     await mic.dispatchEvent("pointerdown");
     await expect(chat.locator(".rec-box")).toContainText("Запись");
@@ -157,7 +157,7 @@ test.describe("chat", () => {
 
   test("CHAT-11 Space starts and stops the recording", async ({ page }) => {
     const s = await openSection(page, "chat");
-    const chat = s.locator(".nb-chat").first();
+    const chat = demo(s, "history");
     await chat.getByRole("button", { name: "Удерживайте для записи" }).focus();
     await page.keyboard.press("Space");
     await expect(chat.locator(".rec-box")).toBeVisible();
@@ -173,7 +173,7 @@ test.describe("chat", () => {
       navigator.mediaDevices.getUserMedia = () => Promise.reject(new DOMException("denied", "NotAllowedError"));
     });
     const s = await openSection(page, "chat");
-    const chat = s.locator(".nb-chat").first();
+    const chat = demo(s, "history");
     await chat.getByRole("button", { name: "Удерживайте для записи" }).dispatchEvent("pointerdown");
     await expect(chat.locator(".err-text").filter({ hasText: "Нет доступа к микрофону" })).toBeVisible();
   });
@@ -183,29 +183,32 @@ test.describe("chat", () => {
       delete (window as { MediaRecorder?: unknown }).MediaRecorder;
     });
     const s = await openSection(page, "chat");
-    const mic = s.locator(".nb-chat").first().getByRole("button", { name: "Удерживайте для записи" });
+    const mic = demo(s, "history").getByRole("button", { name: "Удерживайте для записи" });
     await expect(mic).toBeDisabled();
     await expect(mic).toHaveAttribute("title", "Голосовой ввод не поддерживается этим браузером");
   });
 
   test("CHAT-02 earlier messages keep the place of the list", async ({ page }) => {
     const s = await openSection(page, "chat");
-    const chat = s.locator(".nb-chat").first();
-    await chat.locator(".msgs").evaluate((el) => { el.scrollTop = 0; });
-    const before = (await chat.locator(".m").first().boundingBox())!.y;
+    const chat = demo(s, "history");
+    const list = chat.locator(".msgs");
+    // the place of a message inside the list, whatever the page scrolls to
+    const offset = (nth: number) => list.evaluate((el, n) => el.querySelectorAll(".m")[n].getBoundingClientRect().top - el.getBoundingClientRect().top, nth);
+    await list.evaluate((el) => { el.scrollTop = 0; });
+    const before = await offset(0);
     await chat.getByRole("button", { name: "Более ранние сообщения" }).click();
     await expect(chat.locator(".m").first()).toHaveText("Более раннее сообщение.");
-    expect(Math.abs((await chat.locator(".m").nth(1).boundingBox())!.y - before)).toBeLessThan(2);
+    expect(Math.abs((await offset(1)) - before)).toBeLessThan(2);
   });
 
   test("CHAT-04 nothing to send — the button is off", async ({ page }) => {
     const s = await openSection(page, "chat");
-    await expect(s.locator(".nb-chat").first().getByRole("button", { name: "Отправить" })).toBeDisabled();
+    await expect(demo(s, "history").getByRole("button", { name: "Отправить" })).toBeDisabled();
   });
 
   test("CHAT-05 the steps unfold and fold", async ({ page }) => {
     const s = await openSection(page, "chat");
-    const chat = s.locator(".nb-chat").first();
+    const chat = demo(s, "history");
     await chat.getByRole("button", { name: "ещё 3 шага" }).click();
     await expect(chat.getByText("Задания: шаг 1")).toBeVisible();
     await chat.getByRole("button", { name: "Скрыть шаги" }).click();
@@ -214,7 +217,7 @@ test.describe("chat", () => {
 
   test("CHAT-08 a retry answers the failed message", async ({ page }) => {
     const s = await openSection(page, "chat");
-    const chat = s.locator(".nb-chat").first();
+    const chat = demo(s, "history");
     await chat.getByRole("button", { name: "Повторить" }).click();
     await expect(chat.locator(".llmerr")).toHaveCount(0);
     await expect(chat.locator(".m.a .bub").last()).toHaveText("Готово.");
@@ -222,7 +225,7 @@ test.describe("chat", () => {
 
   test("CHAT-09 a chosen file stands over the composer and can be removed", async ({ page }) => {
     const s = await openSection(page, "chat");
-    const chat = s.locator(".nb-chat").first();
+    const chat = demo(s, "history");
     await chat.locator('input[type="file"]').setInputFiles({ name: "note.txt", mimeType: "text/plain", buffer: Buffer.from("x") });
     await expect(chat.locator(".pending-files .chip")).toHaveText(/note\.txt/);
     await expect(chat.getByRole("button", { name: "Отправить" })).toBeEnabled();
@@ -235,8 +238,8 @@ test.describe("chat", () => {
 
   test("CHAT-13, CHAT-14 cancelling and confirming exist only where the product handles them", async ({ page }) => {
     const s = await openSection(page, "chat");
-    const plain = s.locator(".nb-chat").first();
-    const full = s.locator(".nb-chat").nth(4);
+    const plain = demo(s, "history");
+    const full = demo(s, "full");
     await expect(plain.locator(".confirm")).toHaveCount(0);
     await expect(full.locator(".confirm")).toBeVisible();
     await full.getByRole("button", { name: "Выполнить" }).click();
@@ -253,15 +256,15 @@ test.describe("chat", () => {
 
   test("CHAT-17 a read-only conversation has no composer", async ({ page }) => {
     const s = await openSection(page, "chat");
-    const ro = s.locator(".nb-chat").nth(5);
+    const ro = demo(s, "readonly");
     await expect(ro.getByRole("textbox")).toHaveCount(0);
     await expect(ro.getByText("Тема в архиве")).toBeVisible();
   });
 
   test("CHAT-18 in a narrow place the list lies over the messages", async ({ page }, info) => {
     const s = await openSection(page, "chat");
-    const wide = s.locator(".nb-app").first();
-    const narrow = s.locator(".nb-app.narrow").first();
+    const wide = demo(s, "history");
+    const narrow = demo(s, "narrow");
     if (info.project.name === "desktop") {
       await expect(wide.locator(".nb-side")).toBeVisible();
       expect((await wide.locator(".nb-side").boundingBox())!.x).toBeLessThan((await wide.locator(".nb-chat").boundingBox())!.x);
@@ -272,13 +275,15 @@ test.describe("chat", () => {
     const side = (await narrow.locator(".nb-side").boundingBox())!;
     const msgs = (await narrow.locator(".nb-chat").boundingBox())!;
     expect(side.x).toBeLessThan(msgs.x + 2);
-    await narrow.locator(".nb-scrim").click({ position: { x: 5, y: 5 }, force: true });
+    // the list covers the left of the scrim: the tap goes beside it
+    const scrim = (await narrow.locator(".nb-scrim").boundingBox())!;
+    await page.mouse.click(scrim.x + scrim.width - 8, scrim.y + scrim.height / 2);
     await expect(narrow.locator(".nb-side")).toBeHidden();
   });
 
   test("CHAT-19 a new topic is created by Enter, an empty title is not", async ({ page }) => {
     const s = await openSection(page, "chat");
-    const narrow = s.locator(".nb-app.narrow").nth(1);
+    const narrow = demo(s, "narrow-list");
     await narrow.getByRole("button", { name: "Новая тема" }).click();
     const dialog = page.getByRole("dialog");
     await expect(dialog.getByRole("button", { name: "Создать" })).toBeDisabled();
@@ -291,9 +296,11 @@ test.describe("chat", () => {
 
   test("CHAT-20 the chat makes no request", async ({ page }) => {
     const s = await openSection(page, "chat");
+    // what a chat would talk to a server with; pictures of the page do not count
     const requests: string[] = [];
-    page.on("request", (r) => requests.push(r.url()));
-    const chat = s.locator(".nb-chat").first();
+    page.on("request", (r) => ["fetch", "xhr", "websocket", "eventsource"].includes(r.resourceType()) && requests.push(r.url()));
+    page.on("websocket", (ws) => requests.push(ws.url()));
+    const chat = demo(s, "history");
     await chat.getByRole("textbox").fill("Проверка");
     await chat.getByRole("textbox").press("Enter");
     await expect(chat.locator(".m.a .bub").last()).toHaveText("Готово.");

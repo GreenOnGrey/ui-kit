@@ -157,8 +157,8 @@ function Sections() {
         <Example label="Строки настроек">
           <div className="stack"><div className="kvrow"><span className="muted">Бюджет</span><b>$10</b></div><div className="kvrow"><span className="muted">Дни</span><b>Пн–Пт</b></div></div>
         </Example>
-        <Example label="Панель">
-          <aside className="panel" style={{ maxWidth: 360 }}><div className="panel-h"><b className="grow">Заметка</b><IconButton label="Закрыть"><Icon name="x" size={16} /></IconButton></div><div className="small t2">Содержимое панели.</div></aside>
+        <Example label="Панель: рядом с содержимым, на телефоне — на весь экран" source={notePanel}>
+          <div className="sc-contain">{notePanel}</div>
         </Example>
       </Section>
 
@@ -216,14 +216,14 @@ function Sections() {
       </Section>
 
       <Section id="chat" lead="Данные вымышленные, кнопки работают без сервера. Отмена хода, подтверждение, вложения и голос есть, только когда продукт передал обработчик.">
-        <Example label="История: подписи, шаги, вложения, ошибка с повтором" box><ChatDemo /></Example>
-        <Example label="Пустой разговор" box><ChatDemo empty /></Example>
-        <Example label="Агент печатает: шаг выполняется, текста ещё нет" box><ChatDemo typing /></Example>
-        <Example label="История не загрузилась; ранние сообщения подгружаются" box><ChatDemo historyError /></Example>
-        <Example label="Агент запускается" box><ChatDemo wait="starting" /></Example>
-        <Example label="В очереди" box><ChatDemo wait="queued" /></Example>
-        <Example label="Отмена хода и подтверждение действия" box><ChatDemo full /></Example>
-        <Example label="Только чтение" box><ChatDemo readOnly /></Example>
+        <Example label="История: подписи, шаги, вложения, ошибка с повтором" box><ChatDemo demo="history" /></Example>
+        <Example label="Пустой разговор" box><ChatDemo demo="empty" empty /></Example>
+        <Example label="Агент печатает: шаг выполняется, текста ещё нет" box><ChatDemo demo="typing" typing /></Example>
+        <Example label="История не загрузилась; ранние сообщения подгружаются" box><ChatDemo demo="history-error" historyError /></Example>
+        <Example label="Агент запускается" box><ChatDemo demo="starting" wait="starting" /></Example>
+        <Example label="В очереди" box><ChatDemo demo="queued" wait="queued" /></Example>
+        <Example label="Отмена хода и подтверждение действия" box><ChatDemo demo="full" full /></Example>
+        <Example label="Только чтение" box><ChatDemo demo="readonly" readOnly /></Example>
         <Example label="Запись голоса: вместо поля — отсчёт; доступ к микрофону запрещён — текст под полем" box>
           <div>
             <div className="composer">
@@ -249,8 +249,8 @@ function Sections() {
         </Example>
         <Example label="Узкое место — боковая панель: режимы над полем, список разговоров поверх ленты">
           <div className="row" style={{ alignItems: "flex-start", gap: 16 }}>
-            <div className="sc-stage sc-box"><ChatDemo narrow modes full /></div>
-            <div className="sc-stage sc-box"><ChatDemo narrow listOpen /></div>
+            <div className="sc-stage sc-box"><ChatDemo demo="narrow" narrow modes full /></div>
+            <div className="sc-stage sc-box"><ChatDemo demo="narrow-list" narrow listOpen /></div>
           </div>
         </Example>
       </Section>
@@ -326,6 +326,9 @@ function TabsDemo() {
 }
 
 const noop = () => {};
+const notePanel: ReactNode = (
+  <aside className="panel"><div className="panel-h"><b className="grow">Заметка</b><IconButton label="Закрыть"><Icon name="x" size={16} /></IconButton></div><div className="small t2">Содержимое панели.</div></aside>
+);
 const profileSections: ReactNode = (
   <>
     <div className="sec"><div className="row"><Avatar name="Ада Лавлейс" /><div><b>Ада Лавлейс</b><div className="small muted">ada@example.com</div></div></div></div>

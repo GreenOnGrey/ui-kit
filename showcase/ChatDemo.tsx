@@ -6,7 +6,9 @@ import { confirmations as fixtureConfirmations, conversations, history } from ".
 /** The chat of the showcase on invented data: the buttons work without a server
  * (design §3). `full` turns on what not every chat has — cancelling a turn and
  * confirming an action; `narrow` is the side panel of Hammurapi. */
-export function ChatDemo({ narrow, full, empty, readOnly, wait, typing, historyError, listOpen = false, modes }: {
+export function ChatDemo({ demo, narrow, full, empty, readOnly, wait, typing, historyError, listOpen = false, modes }: {
+  /** The name of the example: tests find the demo by it, not by its place on the page. */
+  demo: string;
   narrow?: boolean; full?: boolean; empty?: boolean; readOnly?: boolean; wait?: "starting" | "queued"; typing?: boolean; historyError?: boolean;
   listOpen?: boolean; modes?: boolean;
 }) {
@@ -60,7 +62,7 @@ export function ChatDemo({ narrow, full, empty, readOnly, wait, typing, historyE
     </div>
   );
   return (
-    <div className={`sc-chat${narrow ? " sc-narrow" : ""}`}>
+    <div className={`sc-chat${narrow ? " sc-narrow" : ""}`} data-demo={demo}>
       <ChatLayout narrow={narrow}>
         <ConversationList conversations={list} currentId={current} open={open} onClose={() => setOpen(false)}
           onPick={(id) => { setCurrent(id); setOpen(false); }}
