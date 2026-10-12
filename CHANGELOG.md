@@ -3,6 +3,16 @@
 Versions follow semver. A visible change of the look is at least a minor (FTR.NAB.CMN-0005 R24).
 Until `1.0.0` — the version on which Nabu shows no visible difference — the contract may change in a minor.
 
+## 0.1.2
+
+Nothing visible changes.
+
+- Chat: earlier messages are recognised by the ends of the list — its start changed and its end
+  did not — so the list goes to the bottom when another conversation is shown.
+- Release: publishing skips a version that is already in the registry, so a rerun still delivers
+  the showcase.
+- No lint warnings.
+
 ## 0.1.1
 
 Nothing changes for a product: the package is the one of 0.1.0. The release of 0.1.0 did not

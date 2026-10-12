@@ -12,6 +12,17 @@ import { LoginScreen } from "../login";
 
 const Link: LinkComponent = ({ href, children, ...rest }) => <a href={href} {...rest}>{children}</a>;
 
+const bar = (actions?: boolean) => html(
+  <TopBar logo="/logo.png" name="Nabu" Link={Link} avatar={<Avatar name="Ada" />} profileMenu={() => null}
+    sections={[{ key: "chat", label: "Chat", href: "/", active: true }, { key: "tasks", label: "Tasks", href: "/tasks", active: false }]}
+    actions={actions ? <button className="btn primary sm">New</button> : undefined} />,
+);
+
+const screen = (error?: string) => html(
+  <LoginScreen logo="/logo.png" logoAlt="Logo" name="NABU" tagline="Motto" signIn={{ href: "/auth/login", label: "Sign in", icon: null }}
+    note="Members only" error={error} languages={[{ code: "en", label: "EN", active: true }, { code: "ru", label: "RU", active: false }]} onLanguage={() => {}} />,
+);
+
 describe("icons (KIT-05)", () => {
   it("holds the icons of both products and the tone drawings", () => {
     for (const n of ["key", "link", "menu", "x", "tBusiness", "tFriendly", "tBrief", "tMentor", "tg", "mail", "stop", "refresh"]) {
@@ -88,12 +99,6 @@ describe("controls", () => {
 });
 
 describe("TopBar (CMP-07, CMP-09)", () => {
-  const bar = (actions?: boolean) => html(
-    <TopBar logo="/logo.png" name="Nabu" Link={Link} avatar={<Avatar name="Ada" />} profileMenu={() => null}
-      sections={[{ key: "chat", label: "Chat", href: "/", active: true }, { key: "tasks", label: "Tasks", href: "/tasks", active: false }]}
-      actions={actions ? <button className="btn primary sm">New</button> : undefined} />,
-  );
-
   it("shows the sections, the active one marked, and a closed burger", () => {
     const out = bar();
     expect(out).toContain('<a href="/" class="on" aria-current="page">Chat</a>');
@@ -110,11 +115,6 @@ describe("TopBar (CMP-07, CMP-09)", () => {
 });
 
 describe("LoginScreen (CMP-10)", () => {
-  const screen = (error?: string) => html(
-    <LoginScreen logo="/logo.png" logoAlt="Logo" name="NABU" tagline="Motto" signIn={{ href: "/auth/login", label: "Sign in", icon: null }}
-      note="Members only" error={error} languages={[{ code: "en", label: "EN", active: true }, { code: "ru", label: "RU", active: false }]} onLanguage={() => {}} />,
-  );
-
   it("shows the logo, the name, the motto, the button and the languages", () => {
     const out = screen();
     expect(out).toContain('<div class="login"><div class="box"><img src="/logo.png" alt="Logo"/><h1>NABU</h1><div class="tag">Motto</div>');

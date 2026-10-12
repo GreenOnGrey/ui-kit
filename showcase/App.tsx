@@ -69,6 +69,7 @@ export function App() {
           {SECTIONS.map(([id, title]) => <a key={id} href={`#${id}`} className={hash === id ? "sc-on" : undefined} onClick={() => setToc(false)}>{title}</a>)}
         </nav>
         {phone
+          // oxlint-disable-next-line react/iframe-missing-sandbox -- the frame shows this very page: its scripts and its storage are its own
           ? <div className="sc-main sc-phone"><iframe title="Ширина телефона" src={`?embed=1&theme=${theme}#${hash}`} key={`${theme}${hash}`} /></div>
           : <div className="sc-main"><Sections /></div>}
       </div>
@@ -278,14 +279,16 @@ const LIGHT = tokensOf(":root");
 const DARK = tokensOf(':root[data-theme="dark"]');
 const isColor = (v: string) => /^#|^rgba?\(/.test(v);
 
+/** What a value of a token looks like: a colour, a radius, a shadow, a font. */
+const sample = (name: string, value: string): ReactNode =>
+  isColor(value) ? <span style={{ background: value }} />
+    : name.startsWith("--r-") ? <span style={{ borderRadius: value, background: "var(--violet-soft)" }} />
+    : name === "--shadow" ? <span style={{ boxShadow: value, background: "var(--surface)" }} />
+    : <span style={{ display: "grid", placeItems: "center", fontFamily: name === "--font" || name === "--mono" ? value : undefined }}>Aa</span>;
+
 /** Every token with its value in the light and in the dark theme, read from tokens.css. */
 function Tokens() {
   const names = Object.keys(LIGHT);
-  const sample = (name: string, value: string): ReactNode =>
-    isColor(value) ? <span style={{ background: value }} />
-      : name.startsWith("--r-") ? <span style={{ borderRadius: value, background: "var(--violet-soft)" }} />
-      : name === "--shadow" ? <span style={{ boxShadow: value, background: "var(--surface)" }} />
-      : <span style={{ display: "grid", placeItems: "center", fontFamily: name === "--font" || name === "--mono" ? value : undefined }}>Aa</span>;
   return (
     <table className="t">
       <thead><tr><th>Токен</th><th>Светлая тема</th><th>Тёмная тема</th></tr></thead>
@@ -401,6 +404,7 @@ function BarDemo({ product }: { product: "nabu" | "hammurapi" }) {
 }
 
 function LoginFrame({ view }: { view: string }) {
+  // oxlint-disable-next-line react/iframe-missing-sandbox -- the frame shows this very page: its scripts and its storage are its own
   return <iframe className="sc-login" title={view} src={`?view=${view}`} />;
 }
 

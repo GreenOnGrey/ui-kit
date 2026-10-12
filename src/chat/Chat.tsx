@@ -23,21 +23,24 @@ export function Chat(props: ChatProps) {
 
   const first = messages[0]?.id;
   const tail = messages[messages.length - 1];
+  const last = tail?.id;
   const tailText = tail?.text.length;
   const tailSteps = tail?.steps?.length;
-  // The first message and the height of the list at the last layout: earlier
-  // messages loaded above it keep the place of the list.
-  const lastLayout = useRef<{ first?: string; height: number }>({ height: 0 });
+  // The ends and the height of the list at the last layout: earlier messages
+  // loaded above it keep the place of the list.
+  const lastLayout = useRef<{ first?: string; last?: string; height: number }>({ height: 0 });
   // The list follows new messages and the growth of the last one: the dependencies are the trigger.
   useLayoutEffect(() => {
     const el = listRef.current;
     if (!el) return;
     const was = lastLayout.current;
-    // history is prepended when the message that was first is still there, lower
-    const prepended = was.first !== undefined && first !== was.first && messages.some((m) => m.id === was.first);
+    // history is prepended when the start of the list changed and its end did not;
+    // another conversation changes both
+    const prepended = was.first !== undefined && first !== was.first && last === was.last;
     el.scrollTop = prepended ? el.scrollTop + (el.scrollHeight - was.height) : el.scrollHeight;
-    lastLayout.current = { first, height: el.scrollHeight };
-  }, [messages.length, first, tailText, tailSteps]); // oxlint-disable-line react/exhaustive-effect-dependencies
+    lastLayout.current = { first, last, height: el.scrollHeight };
+    // oxlint-disable-next-line react/exhaustive-effect-dependencies -- the length and the growth of the tail only trigger
+  }, [messages.length, first, last, tailText, tailSteps]);
 
   const send = async (body: string, voice: boolean) => {
     const msg = body.trim();

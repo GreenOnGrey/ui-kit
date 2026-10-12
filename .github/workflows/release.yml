@@ -41,7 +41,17 @@ jobs:
         with: { node-version: 24, cache: npm, registry-url: "https://registry.npmjs.org" }
       - run: npm ci --no-audit --no-fund
       - run: npm run build
-      - run: npm publish --provenance --access public
+      # Повторный запуск релиза не падает на уже опубликованной версии: витрина
+      # в Pages должна доехать и тогда, когда пакет опубликован раньше.
+      - name: Публикация в npm
+        env:
+          VERSION: ${{ needs.verify.outputs.version }}
+        run: |
+          if npm view "@green-on-grey/ui-kit@$VERSION" version >/dev/null 2>&1; then
+            echo "Версия $VERSION уже в реестре — публикация пропущена."
+          else
+            npm publish --provenance --access public
+          fi
 
   pages:
     needs: [verify, publish]

@@ -9,6 +9,14 @@ const msg = (m: Partial<ChatMessage>): ChatMessage => ({ id: "m1", role: "user",
 const steps = (n: number): ChatStep[] => Array.from({ length: n }, (_, i) => ({ id: `s${i}`, text: `step ${i}`, status: "done" }));
 const send = () => Promise.resolve();
 
+const list = (open: boolean, onCreate?: (t: string) => Promise<void>) => html(
+  <ConversationList open={open} currentId="1" onPick={() => {}} onClose={() => {}} onCreate={onCreate} conversations={[
+    { id: "1", group: "main", title: "Main", when: "now" },
+    { id: "2", group: "topic", title: "Release", unread: 2, icon: "mail" },
+    { id: "3", group: "archive", title: "Old" },
+  ]} />,
+);
+
 describe("message", () => {
   it("CHAT-05 folds more than three steps to the last two", () => {
     expect(visibleSteps(steps(3), false)).toHaveLength(3);
@@ -92,14 +100,6 @@ describe("chat", () => {
 });
 
 describe("conversations", () => {
-  const list = (open: boolean, onCreate?: (t: string) => Promise<void>) => html(
-    <ConversationList open={open} currentId="1" onPick={() => {}} onClose={() => {}} onCreate={onCreate} conversations={[
-      { id: "1", group: "main", title: "Main", when: "now" },
-      { id: "2", group: "topic", title: "Release", unread: 2, icon: "mail" },
-      { id: "3", group: "archive", title: "Old" },
-    ]} />,
-  );
-
   it("CHAT-18 groups the conversations and marks the current and the unread", () => {
     const out = list(false);
     expect(out).toContain('<button class="it on" aria-current="true">');
