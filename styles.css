@@ -1311,6 +1311,7 @@ select.inp.inherit {
 /* .field of the forms has a margin under it: in the composer the field stands on the line of the buttons */
 .composer .field{flex:1;display:flex;align-items:flex-end;gap:6px;min-width:0;margin-bottom:0}
 .composer .field textarea{min-width:0}
+.composer .field.recognizing textarea{opacity:.55;cursor:progress;background:var(--surface-2)}
 .composer .field.with-skill{flex-wrap:wrap}
 .skill-chip{background:var(--violet-soft);color:var(--violet-text);border-color:transparent;align-self:center}
 .palette{position:absolute;left:10px;right:10px;bottom:calc(100% - 4px);z-index:15;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-m);box-shadow:var(--shadow-l, 0 12px 32px rgba(0,0,0,.18));padding:6px;max-height:300px;overflow-y:auto}
@@ -1346,6 +1347,13 @@ select.inp.inherit {
 .recbar.ending{border-color:var(--amber);background:var(--amber-soft)}
 .recbar.ending .tm{color:var(--amber)}
 .recbar.ending .dot,.recbar.ending .lvl i{background:var(--amber)}
+.voicewait{width:36px;height:36px;flex:none;display:flex;align-items:center;justify-content:center;gap:3px}
+.voicewait i{width:3px;height:16px;border-radius:2px;background:var(--violet);transform:scaleY(.3);animation:nb-wave 1s ease-in-out infinite}
+.voicewait i:nth-child(2){animation-delay:.15s}
+.voicewait i:nth-child(3){animation-delay:.3s}
+.voicewait i:nth-child(4){animation-delay:.45s}
+.voicewait i:nth-child(5){animation-delay:.6s}
+@keyframes nb-wave{0%,100%{transform:scaleY(.3)}50%{transform:scaleY(1)}}
 .agentmodels{display:flex;flex-direction:column;gap:4px}
 .agentmodel{display:flex;gap:10px;align-items:flex-start;width:100%;padding:8px;border:0;border-radius:var(--r-m);background:none;color:var(--text);text-align:left}
 .agentmodel.on{background:var(--violet-soft)}
@@ -1358,3 +1366,35 @@ select.inp.inherit {
 .agentmodel .badges{display:flex;gap:4px;flex-wrap:wrap;margin-top:2px}
 .agentmodel .cap{display:inline-flex;align-items:center;gap:3px;font-size:11px;padding:1px 7px;border-radius:999px;background:var(--surface-2);color:var(--text-2)}
 .agentmodel .warn{font-size:12px;color:var(--amber);margin-top:2px}
+/* FTR.NAB.CHAT-0001 R34: the files of a message and their preview */
+.m.a .atts{justify-content:flex-start}
+.m .atts{align-items:flex-start;gap:8px}
+.att-thumb{position:relative;border:1px solid var(--border);border-radius:var(--r-m);padding:0;background:var(--surface-2);width:160px;height:120px;display:grid;place-items:center;overflow:hidden;cursor:zoom-in}
+.att-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.att-cap{position:absolute;left:0;right:0;bottom:0;padding:4px 8px;background:linear-gradient(transparent,rgba(0,0,0,.55));color:#fff;font-size:12px;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.att-tile{width:120px;height:120px;border:1px solid var(--border);border-radius:var(--r-m);background:var(--surface);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:8px;color:var(--text);font:inherit;text-decoration:none;cursor:zoom-in}
+.att-tile:hover{border-color:var(--border-strong)}
+.att-tile.dl{border-style:dashed;cursor:pointer}
+.att-ic{position:relative;width:40px;height:40px;border-radius:10px;display:grid;place-items:center;margin-bottom:4px;background:var(--surface-2);color:var(--text-2)}
+.att-kl{position:absolute;right:-8px;bottom:-4px;font-size:9px;font-weight:700;letter-spacing:.03em;padding:1px 4px;border-radius:4px;color:#fff;background:var(--text-2)}
+.att-tile .att-name{font-size:12px;max-width:100%}
+.att-size{font-size:11px;color:var(--muted)}
+.att-tile.pdf .att-ic{background:var(--red-soft);color:var(--red)}.att-tile.pdf .att-kl{background:var(--red)}
+.att-tile.markdown .att-ic,.att-tile.image .att-ic{background:var(--violet-soft);color:var(--violet)}.att-tile.markdown .att-kl,.att-tile.image .att-kl{background:var(--violet)}
+.att-tile.table .att-ic{background:var(--green-soft);color:var(--green)}.att-tile.table .att-kl{background:var(--green)}
+.att-tile.dl .att-ic{color:var(--muted)}.att-tile.dl .att-kl{background:var(--muted)}
+.att-name{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.att-title{display:flex;align-items:baseline;gap:10px;min-width:0}
+.att-view{display:grid;place-items:center;min-height:200px}
+.att-img{max-width:100%;max-height:70vh;object-fit:contain;border-radius:var(--r-m)}
+.att-pdf{width:100%;height:70vh;border:1px solid var(--border);border-radius:var(--r-m);background:var(--surface)}
+.att-view.markdown{display:block}
+.att-md{max-height:70vh;overflow:auto;padding:4px 2px}
+.att-msg{color:var(--muted);display:flex;align-items:center;gap:8px}
+.att-view.table,.att-view.text{display:block}
+.att-table{max-height:70vh;overflow:auto}
+.att-table table{border-collapse:collapse;font-family:var(--mono);font-size:12px}
+.att-table th,.att-table td{border:1px solid var(--border);padding:5px 8px;text-align:left;white-space:nowrap}
+.att-table th{background:var(--surface-2);font-weight:600;position:sticky;top:0}
+.att-more{margin-top:8px;font-size:12px;color:var(--muted)}
+.att-text{max-height:70vh;overflow:auto;margin:0;font-family:var(--mono);font-size:12px;white-space:pre-wrap;overflow-wrap:anywhere}
