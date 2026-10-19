@@ -156,7 +156,7 @@ export function Chat(props: ChatProps) {
 
   // design §3.1: the field grows with its lines up to three, then scrolls (its max-height in CSS); a change of
   // its width (a turned phone, a resized panel) wraps the lines anew
-  useLayoutEffect(() => fitField(fieldRef.current), [text]);
+  useLayoutEffect(() => fitField(fieldRef.current, listRef.current), [text]);
   useEffect(() => {
     const el = fieldRef.current;
     if (!el || typeof ResizeObserver === "undefined") return;
@@ -164,7 +164,7 @@ export function Chat(props: ChatProps) {
     const ro = new ResizeObserver(() => {
       if (el.clientWidth !== width) {
         width = el.clientWidth;
-        fitField(el);
+        fitField(el, listRef.current);
       }
     });
     ro.observe(el);
@@ -338,9 +338,12 @@ function touchKeyboard(): boolean {
   return typeof window !== "undefined" && !!window.matchMedia?.("(hover: none) and (pointer: coarse)").matches;
 }
 
-/** Sets the height of the field to its lines; the CSS bounds it to three. */
-function fitField(el: HTMLTextAreaElement | null) {
+/** Sets the height of the field to its lines; the CSS bounds it to three. The list of messages gets lower as the
+ * field grows: a list read to its end stays at its end, so the last message is not hidden under the field. */
+function fitField(el: HTMLTextAreaElement | null, list: HTMLElement | null) {
   if (!el) return;
+  const atEnd = !!list && list.scrollHeight - list.scrollTop - list.clientHeight < 2;
   el.style.height = "auto";
   el.style.height = `${el.scrollHeight + el.offsetHeight - el.clientHeight}px`;
+  if (list && atEnd) list.scrollTop = list.scrollHeight;
 }

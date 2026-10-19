@@ -459,5 +459,7 @@ test("FTR.NAB.CHAT-0001 INP-02 the field grows with its lines up to three, then 
   expect(three).toBeGreaterThan(two);
   expect(five).toBe(three);
   expect(await input.evaluate((el) => el.scrollHeight > el.clientHeight)).toBe(true);
+  // the list read to its end stays at its end: the last message is not hidden under the grown field
+  expect(await demo(s, "history").locator(".msgs").evaluate((el) => el.scrollHeight - el.scrollTop - el.clientHeight)).toBeLessThan(2);
   expect(await height(1)).toBe(one);
 });

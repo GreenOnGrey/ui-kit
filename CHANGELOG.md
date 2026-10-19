@@ -11,6 +11,8 @@ A visible change (FTR.NAB.CHAT-0001 R34, design §3.6).
 - Chat: the preview of an HTML page lays it out at the width of a desktop (1280 px) and scales it to
   the width of the modal, so a page made for a screen — a deck of slides — is seen whole instead of cut; the modal of
   an HTML page or a PDF is 1100 px wide (within the screen).
+- Chat: a growing field of the composer keeps the list of messages at its end, so the last message is not hidden;
+  the focus of the field is its own violet border instead of a ring around it, which read as a second frame.
 
 ## 1.4.0
 
