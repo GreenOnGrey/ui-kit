@@ -1,4 +1,4 @@
-import { demo, expect, openSection, test } from "./fixtures";
+import { demo, expect, openSection, send, test } from "./fixtures";
 
 // The behaviour that needs a real browser: focus, the keyboard, scrolling,
 // the layout by width (FTR.NAB.CMN-0005 qa §3–4).
@@ -130,7 +130,7 @@ test("CMP-07, CMP-08 on a phone the sections live behind the burger, never open 
 });
 
 test.describe("chat", () => {
-  test("CHAT-01, CHAT-03 Enter sends, Shift+Enter does not, the list follows the last message", async ({ page }) => {
+  test("CHAT-01, CHAT-03 Enter sends (the button on a touch screen), Shift+Enter does not, the list follows the last message", async ({ page }) => {
     const s = await openSection(page, "chat");
     const chat = demo(s, "history");
     const input = chat.getByRole("textbox");
@@ -138,7 +138,7 @@ test.describe("chat", () => {
     await input.press("Shift+Enter");
     await expect(chat.locator(".m.u .bub").last()).not.toHaveText("первая строка");
     await input.fill("Проверка отправки");
-    await input.press("Enter");
+    await send(input);
     await expect(chat.locator(".m.u .bub").last()).toHaveText("Проверка отправки");
     await expect(input).toHaveValue("");
     const atBottom = await chat.locator(".msgs").evaluate((el) => el.scrollHeight - el.scrollTop - el.clientHeight);
@@ -172,7 +172,7 @@ test.describe("chat", () => {
     await expect(chat.getByRole("button", { name: "Отправить" })).toBeDisabled();
     await expect(input).toHaveValue(/Расшифровка записи/);
     await expect(chat.getByRole("button", { name: "Записать голосом" })).toBeVisible();
-    await input.press("Enter");
+    await send(input);
     await expect(chat.locator(".m.u").last()).toContainText("Расшифровка записи");
     await expect(chat.locator(".m.u .chan").last()).toContainText("голосом");
   });
@@ -229,7 +229,7 @@ test.describe("chat", () => {
 
   test("FTR.NAB.CHAT-0001 ATT-20, SEC-04 an HTML page is drawn in a frame without permissions; «Code» shows its source", async ({ page }) => {
     const outside: string[] = [];
-    page.on("request", (r) => { if (r.url().includes("tracker.invalid")) outside.push(r.url()); });
+    page.on("request", (r) => { if (/tracker\.invalid|leak\.png/.test(r.url())) outside.push(r.url()); });
     const s = await openSection(page, "chat");
     await demo(s, "files").getByRole("button", { name: "Открыть slides.html" }).click();
     const dialog = page.getByRole("dialog");
@@ -287,12 +287,12 @@ test.describe("chat", () => {
     const input = chat.getByRole("textbox");
     const sent = await chat.locator(".m.u").count();
     await input.fill("/foo bar");
-    await input.press("Enter");
+    await send(input);
     await expect(chat.locator(".cmd-unknown")).toContainText("Неизвестная команда /foo");
     await expect(chat.locator(".m.u")).toHaveCount(sent);
     await input.fill("/new");
     await input.press("Escape");
-    await input.press("Enter");
+    await send(input);
     await expect(chat.locator(".evdiv").last()).toContainText("Контекст сброшен");
   });
 
@@ -361,10 +361,10 @@ test.describe("chat", () => {
     await expect(full.locator(".confirm")).toHaveCount(0);
     await expect(full.locator(".sysnote").last()).toHaveText("Вы подтвердили: отправка письма");
     await plain.getByRole("textbox").fill("раз");
-    await plain.getByRole("textbox").press("Enter");
+    await send(plain.getByRole("textbox"));
     await expect(plain.getByRole("button", { name: "Остановить", exact: true })).toHaveCount(0);
     await full.getByRole("textbox").fill("два");
-    await full.getByRole("textbox").press("Enter");
+    await send(full.getByRole("textbox"));
     await full.getByRole("button", { name: "Остановить", exact: true }).click();
     await expect(full.locator(".sysnote").last()).toHaveText("Ход отменён");
   });
@@ -417,7 +417,7 @@ test.describe("chat", () => {
     page.on("websocket", (ws) => requests.push(ws.url()));
     const chat = demo(s, "history");
     await chat.getByRole("textbox").fill("Проверка");
-    await chat.getByRole("textbox").press("Enter");
+    await send(chat.getByRole("textbox"));
     await expect(chat.locator(".m.a .bub").last()).toHaveText("Готово.");
     expect(requests).toEqual([]);
   });

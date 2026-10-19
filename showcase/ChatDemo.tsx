@@ -147,8 +147,9 @@ async function loadDemoFile(a: { id: string }): Promise<Blob> {
   if (a.id === "page") {
     return new Blob(['<!doctype html><title>Каркас презентации</title><style>body{font:16px system-ui;margin:24px;color:#1d1d2c}h1{color:#7c5cff}' +
       '.card{border:1px solid #ddd;border-radius:12px;padding:16px}</style><h1>Релиз 1.3</h1><div class="card">Файлы агента и их просмотр</div>' +
-      // an outside picture: the policy of the preview does not load it
-      '<img src="https://tracker.invalid/pixel.png" alt="">' +
+      // an outside picture, a relative one (it would go to the site) and a refresh: the preview loads none of them
+      '<img src="https://tracker.invalid/pixel.png" alt=""><img src="leak.png" alt="">' +
+      '<meta http-equiv="refresh" content="0;url=https://tracker.invalid/">' +
       '<script>document.body.innerHTML = "скрипт выполнился"</script>'], { type: "text/html" });
   }
   if (a.id === "logo") {

@@ -20,3 +20,12 @@ export async function openSection(page: Page, id: string, theme: "light" | "dark
   await expect(section).toBeVisible();
   return section;
 }
+
+/** Sends what the composer holds as its user does: Enter on a computer; its button on a touch screen, where Enter
+ * breaks the line (FTR.NAB.CHAT-0001 design §3.1, INP-01). */
+export async function send(input: Locator) {
+  const touch = await input.evaluate(() => matchMedia("(hover: none) and (pointer: coarse)").matches);
+  if (!touch) return input.press("Enter");
+  await input.locator("xpath=ancestor::*[contains(concat(' ', normalize-space(@class), ' '), ' composer ')][1]")
+    .getByRole("button", { name: "Отправить", exact: true }).click();
+}

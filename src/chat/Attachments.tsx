@@ -71,13 +71,42 @@ export function fileSize(bytes: number, language: string): string {
  * fonts inside the file and its own styles stay. */
 const HTML_POLICY = "default-src 'none'; img-src data: blob:; media-src data: blob:; font-src data:; style-src 'unsafe-inline' data:";
 
-/** The document of a previewed HTML page: the policy first, after the doctype of the file if it has one, so the
- * page keeps its standards mode. A meta of CSP is honoured only in the head, and the parser puts a meta that comes
- * before any content into the head. */
+/** The document of a previewed HTML page. In a browser the page is parsed inert (a DOMParser loads nothing) and
+ * cleaned of everything that would load or lead anywhere: scripts, frames, plug-ins, links of the head, its own
+ * `http-equiv` (a refresh), and every address that is not `data:`, `blob:` or an anchor — a relative one would go to
+ * the site with the session. The policy is put first into the head, after the doctype of the file, so the page keeps
+ * its mode. The policy alone is not enough: a browser may fetch a picture before it applies a policy of a meta. */
 export function htmlDocument(text: string): string {
   const meta = `<meta http-equiv="Content-Security-Policy" content="${HTML_POLICY}">`;
   const doctype = /^\s*<!doctype[^>]*>/i.exec(text)?.[0] ?? "";
-  return doctype + meta + text.slice(doctype.length);
+  if (typeof DOMParser === "undefined") return doctype + meta + text.slice(doctype.length);
+  const doc = new DOMParser().parseFromString(text, "text/html");
+  doc.querySelectorAll("script, noscript, iframe, frame, frameset, object, embed, applet, base, link, meta[http-equiv], portal").forEach((el) => el.remove());
+  doc.querySelectorAll("*").forEach((el) => {
+    // a copy: attributes are removed while they are walked
+    for (const attr of Array.from(el.attributes)) {
+      const name = attr.name.toLowerCase();
+      if (name.startsWith("on")) el.removeAttribute(attr.name);
+      else if (URL_ATTRS.has(name) && !SAFE_URL.test(attr.value)) el.removeAttribute(attr.name);
+      else if (name === "srcset" && attr.value.split(",").some((c) => !SAFE_URL.test(c))) el.removeAttribute(attr.name);
+      else if (name === "style") el.setAttribute("style", cleanCss(attr.value));
+    }
+  });
+  doc.querySelectorAll("style").forEach((el) => { el.textContent = cleanCss(el.textContent ?? ""); });
+  const policy = doc.createElement("meta");
+  policy.setAttribute("http-equiv", "Content-Security-Policy");
+  policy.setAttribute("content", HTML_POLICY);
+  doc.head.prepend(policy);
+  return (doctype ? "<!doctype html>" : "") + doc.documentElement.outerHTML;
+}
+
+// The attributes that load a resource or lead to an address.
+const URL_ATTRS = new Set(["src", "href", "xlink:href", "action", "formaction", "poster", "background", "data", "ping", "lowsrc", "dynsrc", "manifest", "cite", "longdesc", "codebase", "archive", "usemap"]);
+const SAFE_URL = /^\s*(data:|blob:|#|$)/i;
+
+/** CSS without what loads from outside: `@import` and any `url()` that is not `data:` or `blob:`. */
+function cleanCss(css: string): string {
+  return css.replace(/@import[^;]*;?/gi, "").replace(/url\(\s*(['"]?)(.*?)\1\s*\)/gi, (m, _q: string, u: string) => (SAFE_URL.test(u) && u.trim() !== "" ? m : "none"));
 }
 
 // The types of the previews by the extension: a file whose type is unknown (a file of a space comes as
