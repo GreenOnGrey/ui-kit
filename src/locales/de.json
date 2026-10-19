@@ -71,7 +71,8 @@
       "meter": "Kontext: {used} von {total} Tokens ({pct} %)",
       "full": "Antworten werden teurer, der Agent kann durcheinanderkommen.",
       "compact": "Komprimieren",
-      "reset": "Neu beginnen"
+      "reset": "Neu beginnen",
+      "waitTurn": "Warten Sie auf die Antwort oder stoppen Sie sie"
     },
     "event": {
       "details": "Zusammenfassung"

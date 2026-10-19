@@ -262,8 +262,9 @@ function Sections() {
             <div className="composer">
               <div className="field with-skill"><span className="chip skill-chip"><Icon name="spark" size={12} />contract-review</span>
                 <textarea rows={1} placeholder="Что сделать по скиллу?" aria-label="Что сделать по скиллу?" /></div>
-              <ContextMeter context={{ tokens: 40_000, window: 1_000_000 }} />
+              <ContextMeter context={{ tokens: 40_000, window: 1_000_000 }} onCompact={() => {}} onReset={() => {}} />
               <ContextMeter context={{ tokens: 96_000, window: 128_000 }} />
+              <ContextMeter context={{ tokens: 950_000, window: 1_000_000 }} onCompact={() => {}} onReset={() => {}} busy />
               <ContextMeter context={{ tokens: 912_000, window: 1_000_000 }} onCompact={() => {}} onReset={() => {}} />
             </div>
           </div>

@@ -227,21 +227,29 @@ test.describe("chat", () => {
     await expect(chat.getByRole("link", { name: "Скачать data.zip" })).toHaveAttribute("download", "data.zip");
   });
 
-  test("FTR.NAB.CHAT-0001 ATT-20, SEC-04 an HTML page is drawn in a frame without permissions; «Code» shows its source", async ({ page }) => {
+  test("FTR.NAB.CHAT-0001 ATT-20, SEC-04 an HTML page is drawn in a frame that runs and loads nothing, scaled to fit; «Code» shows its source", async ({ page }) => {
     const outside: string[] = [];
     page.on("request", (r) => { if (/tracker\.invalid|leak\.png/.test(r.url())) outside.push(r.url()); });
     const s = await openSection(page, "chat");
     await demo(s, "files").getByRole("button", { name: "Открыть slides.html" }).click();
     const dialog = page.getByRole("dialog");
     const frame = dialog.locator("iframe.att-html");
-    await expect(frame).toHaveAttribute("sandbox", "");
+    // no scripts, forms or popups: only the reading of its width by the chat
+    await expect(frame).toHaveAttribute("sandbox", "allow-same-origin");
     // the script of the page did not run
     await expect(dialog.frameLocator("iframe.att-html").getByRole("heading", { name: "Релиз 1.3" })).toBeVisible();
     // nothing is loaded from outside
     expect(outside).toEqual([]);
-    // a slide of 1280 px is scaled to the modal, not cut: the frame is no wider than its box
-    const [frameBox, holder] = [await frame.boundingBox(), await dialog.locator(".att-htmlbox").boundingBox()];
-    expect(frameBox && holder && frameBox.width <= holder.width + 1).toBe(true);
+    // a slide wider than a desktop is scaled to the modal, not cut: the frame is no wider than its box and the page
+    // has no scroll to the side
+    await expect.poll(async () => {
+      const [frameBox, holder] = [await frame.boundingBox(), await dialog.locator(".att-htmlbox").boundingBox()];
+      return !!frameBox && !!holder && frameBox.width <= holder.width + 1;
+    }).toBe(true);
+    expect(await frame.evaluate((f: HTMLIFrameElement) => {
+      const root = f.contentDocument?.documentElement;
+      return !!root && root.scrollWidth <= root.clientWidth;
+    })).toBe(true);
     await dialog.getByRole("button", { name: "Код" }).click();
     await expect(dialog.locator("pre.att-text")).toContainText("<h1>Релиз 1.3</h1>");
     await dialog.getByRole("button", { name: "Страница" }).click();
@@ -282,6 +290,24 @@ test.describe("chat", () => {
     await input.fill("/");
     await input.press("Escape");
     await expect(chat.locator(".palette")).toHaveCount(0);
+  });
+
+  test("FTR.NAB.CHAT-0001 CTX-13 the menu of a full context holds the reset and the compaction", async ({ page }) => {
+    const s = await openSection(page, "chat");
+    const chat = demo(s, "full");
+    await chat.locator(".ctxring").click();
+    const tip = chat.locator(".ctxtip");
+    await expect(tip.getByRole("button", { name: "Сжать" })).toBeEnabled();
+    await tip.getByRole("button", { name: "Начать заново" }).click();
+    await expect(tip).toHaveCount(0);
+    await expect(chat.locator(".evdiv").last()).toContainText("Контекст сброшен");
+    // while a turn runs both are off, and the reason is said
+    await chat.getByRole("textbox").fill("ещё");
+    await send(chat.getByRole("textbox"));
+    await chat.locator(".ctxring").click();
+    await expect(tip.getByRole("button", { name: "Сжать" })).toBeDisabled();
+    await expect(tip.getByRole("button", { name: "Начать заново" })).toBeDisabled();
+    await expect(tip).toContainText("Дождитесь ответа или остановите его");
   });
 
   test("SKL-02 an unknown command is not sent; a known one runs", async ({ page }) => {
@@ -460,6 +486,12 @@ test("FTR.NAB.CHAT-0001 INP-02 the field grows with its lines up to three, then 
   expect(five).toBe(three);
   expect(await input.evaluate((el) => el.scrollHeight > el.clientHeight)).toBe(true);
   // the list read to its end stays at its end: the last message is not hidden under the grown field
-  expect(await demo(s, "history").locator(".msgs").evaluate((el) => el.scrollHeight - el.scrollTop - el.clientHeight)).toBeLessThan(2);
+  const list = demo(s, "history").locator(".msgs");
+  expect(await list.evaluate((el) => el.scrollHeight > el.clientHeight)).toBe(true);
+  expect(await list.evaluate((el) => el.scrollHeight - el.scrollTop - el.clientHeight)).toBeLessThan(2);
   expect(await height(1)).toBe(one);
+  // a list scrolled up stays where it is
+  await list.evaluate((el) => { el.scrollTop = 0; });
+  await height(3);
+  expect(await list.evaluate((el) => el.scrollTop)).toBe(0);
 });

@@ -43,6 +43,8 @@ export function Chat(props: ChatProps) {
   const maxSeconds = props.voiceMaxSeconds ?? 300;
   const recorder = useRecorder(maxSeconds, () => void stopAndTranscribe());
   const { messages, busy = false } = props;
+  // FTR.NAB.CHAT-0001 R1, R2: the context is reset or compacted between turns, not during one
+  const turnRunning = busy || messages.some((m) => m.status === "pending" || m.status === "streaming");
   const onPendingChange = props.onPendingChange;
   useEffect(() => onPendingChange?.(pending), [pending, onPendingChange]);
 
@@ -156,7 +158,7 @@ export function Chat(props: ChatProps) {
 
   // design §3.1: the field grows with its lines up to three, then scrolls (its max-height in CSS); a change of
   // its width (a turned phone, a resized panel) wraps the lines anew
-  useLayoutEffect(() => fitField(fieldRef.current, listRef.current), [text]);
+  useLayoutEffect(() => keepListEnd(listRef.current, () => fitField(fieldRef.current)), [text]);
   useEffect(() => {
     const el = fieldRef.current;
     if (!el || typeof ResizeObserver === "undefined") return;
@@ -164,7 +166,7 @@ export function Chat(props: ChatProps) {
     const ro = new ResizeObserver(() => {
       if (el.clientWidth !== width) {
         width = el.clientWidth;
-        fitField(el, listRef.current);
+        keepListEnd(listRef.current, () => fitField(el));
       }
     });
     ro.observe(el);
@@ -293,7 +295,7 @@ export function Chat(props: ChatProps) {
                   onKeyDown={keys} />
               </div>
             )}
-            {props.context && !recorder.recording && <ContextMeter context={props.context} onCompact={props.onCompact} onReset={props.onReset} />}
+            {props.context && !recorder.recording && <ContextMeter context={props.context} onCompact={props.onCompact} onReset={props.onReset} busy={turnRunning} />}
             {props.onTranscribe && !recorder.recording && (
               <VoiceButton supported={recorder.supported} recognizing={recognizing} onStart={() => void recorder.start()} />
             )}
@@ -338,12 +340,25 @@ function touchKeyboard(): boolean {
   return typeof window !== "undefined" && !!window.matchMedia?.("(hover: none) and (pointer: coarse)").matches;
 }
 
-/** Sets the height of the field to its lines; the CSS bounds it to three. The list of messages gets lower as the
- * field grows: a list read to its end stays at its end, so the last message is not hidden under the field. */
-function fitField(el: HTMLTextAreaElement | null, list: HTMLElement | null) {
+/** A list scrolled to its end (within the rounding of a pixel). */
+const atEnd = (list: HTMLElement) => list.scrollHeight - list.scrollTop - list.clientHeight < 2;
+
+/** FTR.NAB.CHAT-0001 design §3.1: the list of messages gets lower as the field grows; a list read to its end stays at
+ * its end, so the last message is not hidden under the field, and a list scrolled up stays where it is. */
+function keepListEnd(list: HTMLElement | null, change: () => void) {
+  const pinned = !!list && atEnd(list);
+  change();
+  if (list && pinned) list.scrollTop = list.scrollHeight;
+}
+
+/** FTR.NAB.CHAT-0001 design §3.1: sets the height of the field to its lines; the CSS bounds it to three. */
+function fitField(el: HTMLTextAreaElement | null) {
   if (!el) return;
-  const atEnd = !!list && list.scrollHeight - list.scrollTop - list.clientHeight < 2;
+  // measured without a scrollbar: a scrollbar that takes room (Windows) would add to the height it is measured by
+  el.style.overflowY = "hidden";
   el.style.height = "auto";
-  el.style.height = `${el.scrollHeight + el.offsetHeight - el.clientHeight}px`;
-  if (list && atEnd) list.scrollTop = list.scrollHeight;
+  const full = el.scrollHeight + el.offsetHeight - el.clientHeight;
+  el.style.height = `${full}px`;
+  // the bar appears only past three lines, where the CSS stops the field
+  el.style.overflowY = el.offsetHeight < full ? "auto" : "hidden";
 }

@@ -4,6 +4,24 @@ Versions follow semver. A visible change of the look is at least a minor (FTR.NA
 Since `1.0.0` the contract of the kit — class names, tokens, props, icon names, keys of strings — changes only
 in a major.
 
+## 1.6.0
+
+A visible change (FTR.NAB.CHAT-0001 design §3.1).
+
+- Chat: in the menu of a full context (from 90 %) «Compact» and «Reset» are both buttons with their border, «Reset»
+  with the new icon `reset` (a circular arrow, as in the mockup); they are off while a turn runs (`busy` of
+  `ContextMeter`, string `chat.context.waitTurn`). The products drop their own menu of the conversation with the same
+  actions.
+- Chat: the field of the composer is measured without a scrollbar, so where a scrollbar takes room (Windows) the field
+  is not higher than its lines; the bar appears only past three lines.
+- Chat: the menu of the context meter says why its actions are off («Wait for the answer or stop it») in words under
+  them, not only in a tooltip a disabled button may not show.
+- Chat: the focus of the composer keeps a transparent outline, which the forced colours of Windows draw, so the focus
+  stays seen there.
+- Chat: the preview of an HTML page is laid out at the width of its content when it is wider than a desktop (a deck of
+  wide slides) and scaled to the modal, so it has no scroll to the side. For that the frame has `allow-same-origin`
+  (never `allow-scripts`); a page may no longer use `blob:` addresses, which would reach the files of the site.
+
 ## 1.5.0
 
 A visible change (FTR.NAB.CHAT-0001 R34, design §3.6).

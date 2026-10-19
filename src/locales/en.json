@@ -71,7 +71,8 @@
       "meter": "Context: {used} of {total} tokens ({pct}%)",
       "full": "Answers get more expensive and the agent may get confused.",
       "compact": "Compact",
-      "reset": "Start over"
+      "reset": "Start over",
+      "waitTurn": "Wait for the answer or stop it"
     },
     "event": {
       "details": "Summary"

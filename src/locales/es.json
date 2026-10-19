@@ -71,7 +71,8 @@
       "meter": "Contexto: {used} de {total} tokens ({pct} %)",
       "full": "Las respuestas se encarecen y el agente puede confundirse.",
       "compact": "Compactar",
-      "reset": "Empezar de nuevo"
+      "reset": "Empezar de nuevo",
+      "waitTurn": "Espere la respuesta o deténgala"
     },
     "event": {
       "details": "Resumen"

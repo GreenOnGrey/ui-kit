@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type SyntheticEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { Icon, type IconName } from "../components/Icon";
 import { Markdown } from "../components/Markdown";
@@ -69,7 +69,7 @@ export function fileSize(bytes: number, language: string): string {
 
 /** The policy put into a previewed HTML page: nothing is loaded from outside and nothing runs; images and
  * fonts inside the file and its own styles stay. */
-const HTML_POLICY = "default-src 'none'; img-src data: blob:; media-src data: blob:; font-src data:; style-src 'unsafe-inline' data:";
+const HTML_POLICY = "default-src 'none'; img-src data:; media-src data:; font-src data:; style-src 'unsafe-inline' data:";
 
 /** The document of a previewed HTML page. In a browser the page is parsed inert (a DOMParser loads nothing) and
  * cleaned of everything that would load or lead anywhere: scripts, frames, plug-ins, links of the head, its own
@@ -102,9 +102,11 @@ export function htmlDocument(text: string): string {
 
 // The attributes that load a resource or lead to an address.
 const URL_ATTRS = new Set(["src", "href", "xlink:href", "action", "formaction", "poster", "background", "data", "ping", "lowsrc", "dynsrc", "manifest", "cite", "longdesc", "codebase", "archive", "usemap"]);
-const SAFE_URL = /^\s*(data:|blob:|#|$)/i;
+// No `blob:`: the frame shares the origin of the site (HtmlPage), so a blob address would reach the files the site
+// holds, other attachments among them.
+const SAFE_URL = /^\s*(data:|#|$)/i;
 
-/** CSS without what loads from outside: `@import` and any `url()` that is not `data:` or `blob:`. */
+/** CSS without what loads from outside: `@import` and any `url()` that is not `data:`. */
 function cleanCss(css: string): string {
   return css.replace(/@import[^;]*;?/gi, "").replace(/url\(\s*(['"]?)(.*?)\1\s*\)/gi, (m, _q: string, u: string) => (SAFE_URL.test(u) && u.trim() !== "" ? m : "none"));
 }
@@ -250,15 +252,20 @@ function TableView({ text, tab }: { text: string; tab: boolean }) {
  * page made for a screen (a deck of slides) is seen whole instead of cut. */
 export const PAGE_WIDTH = 1280;
 
-/** A previewed HTML page: a frame with no permissions — no scripts, forms or access to the site — and nothing
- * from outside, laid out at PAGE_WIDTH and scaled to the width of the preview. */
+/** A previewed HTML page, laid out at PAGE_WIDTH or at the width of its content when it is wider (a deck of wide
+ * slides), and scaled to the width of the preview, so the page is seen whole, without a scroll to the side.
+ * The frame has only `allow-same-origin`, so the chat can read the width of the page (FTR.NAB.CHAT-0001 tech,
+ * decision 28): nothing in it runs — its scripts are removed (htmlDocument), and the frame and the policy forbid
+ * them — and it loads nothing from outside. The isolation rests on the frame having no `allow-scripts`: with it,
+ * the page would act as the site. Never add it. */
 function HtmlPage({ text, title }: { text: string; title: string }) {
   const box = useRef<HTMLDivElement>(null);
-  const [scale, setScale] = useState(1);
+  const [boxWidth, setBoxWidth] = useState(PAGE_WIDTH);
+  const [pageWidth, setPageWidth] = useState(PAGE_WIDTH);
   useEffect(() => {
     const el = box.current;
     if (!el) return;
-    const fit = () => setScale(Math.min(1, el.clientWidth / PAGE_WIDTH));
+    const fit = () => setBoxWidth(el.clientWidth);
     fit();
     if (typeof ResizeObserver === "undefined") return;
     const ro = new ResizeObserver(fit);
@@ -266,10 +273,27 @@ function HtmlPage({ text, title }: { text: string; title: string }) {
     return () => ro.disconnect();
   }, []);
   const doc = useMemo(() => htmlDocument(text), [text]);
+  // another document is laid out anew at the width of a desktop, not at the width the last one needed
+  const [measured, setMeasured] = useState(doc);
+  if (measured !== doc) {
+    setMeasured(doc);
+    setPageWidth(PAGE_WIDTH);
+  }
+  const measure = (e: SyntheticEvent<HTMLIFrameElement>) => {
+    const frame = e.currentTarget;
+    const read = () => {
+      const page = frame.contentDocument?.documentElement;
+      if (page) setPageWidth(Math.max(PAGE_WIDTH, page.scrollWidth));
+    };
+    read();
+    // the fonts of the file (data:) may widen the page after it has loaded
+    void frame.contentDocument?.fonts?.ready.then(read);
+  };
+  const scale = Math.min(1, boxWidth / pageWidth);
   return (
     <div className="att-htmlbox" ref={box}>
-      <iframe className="att-html" sandbox="" srcDoc={doc} title={title} referrerPolicy="no-referrer"
-        style={{ width: PAGE_WIDTH, height: `${100 / scale}%`, transform: `scale(${scale})` }} />
+      <iframe className="att-html" sandbox="allow-same-origin" srcDoc={doc} title={title} referrerPolicy="no-referrer" onLoad={measure}
+        style={{ width: pageWidth, height: `${100 / scale}%`, transform: `scale(${scale})` }} />
     </div>
   );
 }

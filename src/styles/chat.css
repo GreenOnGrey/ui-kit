@@ -105,9 +105,10 @@
   resize: none;
   background: var(--surface);
 }
-/* the focus is the border of the field itself: a ring around a growing field read as a second frame */
+/* FTR.NAB.CHAT-0001 design §3.1: the focus is the border of the field itself, a ring around a growing field read
+   as a second frame; the transparent outline is what the forced colours of Windows draw */
 .composer textarea:focus-visible {
-  outline: none;
+  outline: 2px solid transparent;
   border-color: var(--violet);
   box-shadow: 0 0 0 1px var(--violet);
 }

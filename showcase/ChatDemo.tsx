@@ -52,6 +52,9 @@ export function ChatDemo({ demo, narrow, full, empty, readOnly, wait, typing, hi
       { id, role: "assistant", text: "", createdAt: new Date().toISOString(), status: "pending" }]);
     answer(id);
   };
+  // FTR.NAB.CHAT-0001 R1, R2: a reset or a compaction is a divider of the conversation
+  const contextEvent = (name: "new" | "compact") => setMessages((ms) => [...ms, { id: `e${n.current++}`, role: "event", text: "", createdAt: new Date().toISOString(), status: "done",
+    event: name === "new" ? { icon: "undo", text: "Контекст сброшен" } : { icon: "compress", text: "Контекст сжат: 42 тыс. → 3 тыс. токенов", details: "Изложение разговора." } }]);
   const onRetry = (id: string) => { setBusy(true); answer(id); };
   const onCancel = () => {
     window.clearTimeout(timer.current);
@@ -101,11 +104,10 @@ export function ChatDemo({ demo, narrow, full, empty, readOnly, wait, typing, hi
             { kind: "command", name: "compact", description: "Сжать контекст", takesText: true },
             { kind: "skill", name: "contract-review", description: "Проверка договора", source: "Юристы" },
           ] : undefined}
-          onCommand={full ? async (name) => {
-            setMessages((ms) => [...ms, { id: `e${n.current++}`, role: "event", text: "", createdAt: new Date().toISOString(), status: "done",
-              event: name === "new" ? { icon: "undo", text: "Контекст сброшен" } : { icon: "compress", text: "Контекст сжат: 42 тыс. → 3 тыс. токенов", details: "Изложение разговора." } }]);
-          } : undefined}
-          context={full ? { tokens: 42_000, window: 1_000_000 } : undefined} />
+          onCommand={full ? async (name) => { if (name === "new" || name === "compact") contextEvent(name); } : undefined}
+          onReset={full ? () => contextEvent("new") : undefined}
+          onCompact={full ? () => contextEvent("compact") : undefined}
+          context={full ? { tokens: 912_000, window: 1_000_000 } : undefined} />
       </ChatLayout>
     </div>
   );
@@ -145,9 +147,9 @@ async function loadDemoFile(a: { id: string }): Promise<Blob> {
     return new Blob(["$ npm run build\n> vite build\n✓ 412 modules transformed.\ndist/assets/index-" + "a1b2c3d4".repeat(24) + ".js\n✓ built in 1.61s\n"], { type: "text/plain" });
   }
   if (a.id === "page") {
-    // a slide of a fixed width, as a deck is made: the preview scales it to the modal instead of cutting it
-    return new Blob(['<!doctype html><title>Каркас презентации</title><style>body{margin:0;font:16px system-ui;color:#fff;background:#1d1838}' +
-      '.slide{width:1280px;height:720px;box-sizing:border-box;padding:96px;background:linear-gradient(135deg,#2a2150,#3b2d7a)}h1{font-size:72px;margin:0 0 24px}' +
+    // a slide wider than a desktop, as a deck may be: the preview scales it to the modal instead of cutting it
+    return new Blob(['<!doctype html><title>Каркас презентации</title><style>body{margin:24px;font:16px system-ui;color:#fff;background:#1d1838}' +
+      '.slide{width:1440px;height:720px;box-sizing:border-box;padding:96px;background:linear-gradient(135deg,#2a2150,#3b2d7a)}h1{font-size:72px;margin:0 0 24px}' +
       '.card{display:inline-block;border:1px solid #7c5cff;border-radius:12px;padding:16px 24px;font-size:28px}</style>' +
       '<div class="slide"><h1>Релиз 1.3</h1><div class="card">Файлы агента и их просмотр</div></div>' +
       // an outside picture, a relative one (it would go to the site) and a refresh: the preview loads none of them

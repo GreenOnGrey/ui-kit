@@ -71,7 +71,8 @@
       "meter": "上下文：{used} / {total} 个令牌（{pct}%）",
       "full": "回答变得更贵，代理可能会混淆。",
       "compact": "压缩",
-      "reset": "重新开始"
+      "reset": "重新开始",
+      "waitTurn": "请等待回答或停止它"
     },
     "event": {
       "details": "摘要"

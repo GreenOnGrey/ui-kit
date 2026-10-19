@@ -42,6 +42,7 @@ const PATHS = {
   bug: '<rect x="8" y="7" width="8" height="12" rx="4"/><path d="M12 7V5M9 5l1.5 2M15 5l-1.5 2M4 11h4M16 11h4M4 17l4-2M20 17l-4-2"/>',
   rocket: '<path d="M5 15c-1.5 1.5-2 4-2 6 2 0 4.5-.5 6-2M9 15l-3-3c1.5-5 5.5-8 12-9-1 6.5-4 10.5-9 12z"/><circle cx="14.5" cy="9.5" r="1.5"/>',
   undo: '<path d="M9 14 4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/>',
+  reset: '<path d="M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5"/>',
   flag: '<path d="M5 21V4M5 4h11l-2 4 2 4H5"/>',
   code: '<path d="m8 8-4 4 4 4M16 8l4 4-4 4M13 5l-2 14"/>',
   flask: '<path d="M9 3h6M10 3v6L5 19a1.5 1.5 0 0 0 1.3 2h11.4a1.5 1.5 0 0 0 1.3-2l-5-10V3"/>',

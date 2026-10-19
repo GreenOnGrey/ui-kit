@@ -49,6 +49,21 @@ for (const theme of ["light", "dark"] as const) {
     await expect(page.locator(".navmenu .side")).toHaveScreenshot(`admin-burger-${theme}.png`);
   });
 
+  // FTR.NAB.CHAT-0001 design §3.1: the menu of the context meter and the focus of the composer
+  test(`context menu ${theme}`, async ({ page }) => {
+    const s = await openSection(page, "chat", theme);
+    await s.locator('[data-demo="full"] .ctxring').click();
+    await expect(s.locator('[data-demo="full"] .ctxtip')).toHaveScreenshot(`context-menu-${theme}.png`);
+  });
+
+  test(`composer focus ${theme}`, async ({ page }) => {
+    const s = await openSection(page, "chat", theme);
+    const composer = s.locator('[data-demo="history"] .composer');
+    await composer.getByRole("textbox").fill("первая строка\nвторая строка");
+    await composer.getByRole("textbox").focus();
+    await expect(composer).toHaveScreenshot(`composer-focus-${theme}.png`);
+  });
+
   test(`shown toasts ${theme}`, async ({ page }) => {
     const s = await openSection(page, "toasts", theme);
     for (const button of ["Успех", "Ошибка", "С действиями"]) await s.getByRole("button", { name: button, exact: true }).click();
