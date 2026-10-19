@@ -30,7 +30,8 @@ for (const theme of ["light", "dark"] as const) {
   }
 
   // FTR.NAB.CHAT-0001 R34: the preview of a file sent by the agent (PDF is left out: its viewer is the browser's)
-  for (const [name, file, ready] of [["preview-markdown", "release-notes.md", "h1"], ["preview-table", "metrics.csv", "table"]]) {
+  // the drawn Markdown shifts the headings by two levels: «#» is <h3>
+  for (const [name, file, ready] of [["preview-markdown", "release-notes.md", ".att-md :is(h1, h2, h3, h4, h5, h6)"], ["preview-table", "metrics.csv", "table"]]) {
     test(`${name} ${theme}`, async ({ page }) => {
       const s = await openSection(page, "chat", theme);
       await s.locator('[data-demo="files"]').getByRole("button", { name: `Открыть ${file}` }).click();
