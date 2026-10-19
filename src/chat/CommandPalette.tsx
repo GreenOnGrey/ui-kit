@@ -24,7 +24,8 @@ export function CommandPalette({ items, active, onPick, onHover }: {
     <button key={c.kind + c.name} type="button" role="option" aria-selected={i === active} className={`palette-row${i === active ? " on" : ""}`}
       // the field keeps the focus: the pick happens before the blur
       onMouseDown={(e) => { e.preventDefault(); onPick(c); }} onMouseEnter={() => onHover(i)}>
-      {c.kind === "skill" ? <Icon name="spark" size={14} /> : <span className="slash">/</span>}
+      {/* the name of a command starts with «/» itself: its column stays empty, the names line up with the skills */}
+      {c.kind === "skill" ? <Icon name="spark" size={14} /> : <span className="slash" aria-hidden="true" />}
       <span className="nm">{c.kind === "command" ? "/" + c.name : c.name}</span>
       <span className="ds">{c.description}</span>
       {c.source && <span className="src">{c.source}</span>}

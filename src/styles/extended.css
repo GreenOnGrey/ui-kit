@@ -114,7 +114,8 @@
    the dividers of events, the bar of a recording, the models of the agent. */
 .composer-wrap{position:relative;border-top:1px solid var(--border)}
 .composer-wrap .composer{border-top:0}
-.composer .field{flex:1;display:flex;align-items:flex-end;gap:6px;min-width:0}
+/* .field of the forms has a margin under it: in the composer the field stands on the line of the buttons */
+.composer .field{flex:1;display:flex;align-items:flex-end;gap:6px;min-width:0;margin-bottom:0}
 .composer .field textarea{min-width:0}
 .composer .field.with-skill{flex-wrap:wrap}
 .skill-chip{background:var(--violet-soft);color:var(--violet-text);border-color:transparent;align-self:center}

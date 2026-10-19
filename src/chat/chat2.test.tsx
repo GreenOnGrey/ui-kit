@@ -22,6 +22,7 @@ describe("palette", () => {
     const out = html(<CommandPalette items={commands} active={2} onPick={() => {}} onHover={() => {}} />);
     expect(out).toContain("Commands");
     expect(out).toContain("/new");
+    expect(out).not.toContain(">/<"); // a command shows its «/» once: in «/new»
     expect(out).toContain("contract-review");
     expect(out).toContain("Lawyers");
     expect(out.match(/aria-selected="true"/g)).toHaveLength(1);

@@ -43,7 +43,9 @@
       "start": "Record a voice message",
       "done": "Stop",
       "recognizing": "Recognizing…",
-      "recordingNow": "Recording"
+      "recordingNow": "Recording",
+      "failed": "The voice message could not be recognized",
+      "retry": "Retry"
     },
     "confirm": {
       "title": "Confirm the action",

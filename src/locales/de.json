@@ -43,7 +43,9 @@
       "start": "Sprachnachricht aufnehmen",
       "done": "Stopp",
       "recognizing": "Wird erkannt…",
-      "recordingNow": "Aufnahme"
+      "recordingNow": "Aufnahme",
+      "failed": "Die Sprachnachricht konnte nicht erkannt werden",
+      "retry": "Wiederholen"
     },
     "confirm": {
       "title": "Aktion bestätigen",

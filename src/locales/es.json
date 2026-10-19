@@ -43,7 +43,9 @@
       "start": "Grabar un mensaje de voz",
       "done": "Detener",
       "recognizing": "Reconociendo…",
-      "recordingNow": "Grabando"
+      "recordingNow": "Grabando",
+      "failed": "No se pudo reconocer el mensaje de voz",
+      "retry": "Reintentar"
     },
     "confirm": {
       "title": "Confirme la acción",

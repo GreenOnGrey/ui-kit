@@ -116,7 +116,8 @@ export interface ChatProps {
   onUpload?(file: File): Promise<ChatUpload | null>;
   /** The files attached to the message being written, after every change. */
   onPendingChange?(uploads: ChatUpload[]): void;
-  /** The text of a recording; `null`: it failed and the product has told the user. */
+  /** The text of a recording; `null`: it failed and the product has told the user. A rejection
+   * with an `Error` is shown by the kit with its message and «Retry» on the same recording. */
   onTranscribe?(recording: Blob): Promise<string | null>;
 }
 

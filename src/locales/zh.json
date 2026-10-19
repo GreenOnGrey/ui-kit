@@ -43,7 +43,9 @@
       "start": "录制语音",
       "done": "停止",
       "recognizing": "正在识别…",
-      "recordingNow": "录音中"
+      "recordingNow": "录音中",
+      "failed": "无法识别语音消息",
+      "retry": "重试"
     },
     "confirm": {
       "title": "确认操作",

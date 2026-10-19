@@ -4,6 +4,17 @@ Versions follow semver. A visible change of the look is at least a minor (FTR.NA
 Since `1.0.0` the contract of the kit — class names, tokens, props, icon names, keys of strings — changes only
 in a major.
 
+## 1.2.0
+
+A visible change (FTR.NAB.CHAT-0001 design §3.1).
+
+- Chat: the field of the composer stands on the line of its buttons; the margin of `.field` of the forms lifted it by
+  14 px.
+- Chat: the palette shows a command once — «/new»; the extra «/» in the column of the icon is gone.
+- Chat: a failed recognition of a recording — `onTranscribe` rejects with an `Error` — is a toast with its message and
+  «Retry»; the recording stays with the toast until it is closed. A `null` still means the product has told the user.
+  Strings `chat.voice.failed`, `chat.voice.retry`.
+
 ## 1.1.0
 
 A visible change (FTR.NAB.CHAT-0001 design §3).

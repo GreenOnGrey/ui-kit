@@ -5,6 +5,7 @@ import { useKitT } from "../i18n";
 import { CommandPalette, matchCommands } from "./CommandPalette";
 import { ContextMeter } from "./ContextMeter";
 import { MessageView } from "./MessageView";
+import { transcribe } from "./transcription";
 import type { ChatCommand, ChatProps, ChatUpload } from "./types";
 import { clock, useRecorder } from "./useRecorder";
 
@@ -159,17 +160,17 @@ export function Chat(props: ChatProps) {
   async function stopAndTranscribe() {
     const blob = await recorder.stop();
     if (!blob || !props.onTranscribe) return;
-    setRecognizing(true);
-    const r = await props.onTranscribe(blob).catch(() => null);
-    setRecognizing(false);
-    if (r === null) return;
-    if (!r) {
-      toast({ kind: "error", title: t("chat.voice.notRecognized") });
-      return;
-    }
-    voice.current = true;
-    setText((x) => (x.trim() ? x.trimEnd() + " " + r : r));
-    fieldRef.current?.focus();
+    await transcribe(blob, props.onTranscribe, {
+      busy: setRecognizing,
+      empty: () => toast({ kind: "error", title: t("chat.voice.notRecognized") }),
+      // design §3.1: the recording stays until the toast is closed
+      failed: (reason, retry) => toast({ kind: "error", title: reason ?? t("chat.voice.failed"), actions: [{ label: t("chat.voice.retry"), primary: true, onClick: retry }] }),
+      text: (r) => {
+        voice.current = true;
+        setText((x) => (x.trim() ? x.trimEnd() + " " + r : r));
+        fieldRef.current?.focus();
+      },
+    });
   }
 
   const voiceKey = (e: KeyboardEvent) => {
