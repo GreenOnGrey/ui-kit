@@ -1,6 +1,6 @@
 export { Chat, VoiceButton } from "./Chat";
 export { ChatLayout, ConversationList, NewTopicModal } from "./ConversationList";
-export { AttachmentList, AttachmentPreview, fileSize, parseTable, previewKind, type LoadAttachment, type PreviewKind } from "./Attachments";
+export { AttachmentList, AttachmentPreview, fileSize, parseTable, previewIcon, previewKind, type LoadAttachment, type PreviewKind } from "./Attachments";
 export { AgentButton, AgentMenu, type AgentModelOption, type AgentModels, type AgentOption } from "./AgentMenu";
 export { CommandPalette } from "./CommandPalette";
 export { ContextMeter, tokens } from "./ContextMeter";

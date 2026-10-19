@@ -83,7 +83,9 @@
       "tooLarge": "The file is too large to preview — download it",
       "save": "Download {name}",
       "notUtf8": "The file is not in UTF-8 — download it",
-      "rows": "Showing {shown} of {total, plural, one {# row} other {# rows}}"
+      "rows": "Showing {shown} of {total, plural, one {# row} other {# rows}}",
+      "source": "Code",
+      "page": "Page"
     }
   }
 }

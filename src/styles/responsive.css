@@ -27,6 +27,9 @@
 .side .lab {
     display: none;
   }
+.side.in-burger {
+    display: none;
+  }
 }
 @media (prefers-reduced-motion: reduce) {
 * {

@@ -83,7 +83,9 @@
       "tooLarge": "Die Datei ist zu groß für die Vorschau — bitte herunterladen",
       "save": "{name} herunterladen",
       "notUtf8": "Die Datei ist nicht in UTF-8 — bitte herunterladen",
-      "rows": "{shown} von {total, plural, one {# Zeile} other {# Zeilen}} angezeigt"
+      "rows": "{shown} von {total, plural, one {# Zeile} other {# Zeilen}} angezeigt",
+      "source": "Code",
+      "page": "Seite"
     }
   }
 }

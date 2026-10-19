@@ -188,16 +188,18 @@
 .att-tile.pdf .att-ic{background:var(--red-soft);color:var(--red)}.att-tile.pdf .att-kl{background:var(--red)}
 .att-tile.markdown .att-ic,.att-tile.image .att-ic{background:var(--violet-soft);color:var(--violet)}.att-tile.markdown .att-kl,.att-tile.image .att-kl{background:var(--violet)}
 .att-tile.table .att-ic{background:var(--green-soft);color:var(--green)}.att-tile.table .att-kl{background:var(--green)}
+.att-tile.html .att-ic{background:var(--amber-soft);color:var(--amber)}.att-tile.html .att-kl{background:var(--amber)}
 .att-tile.dl .att-ic{color:var(--muted)}.att-tile.dl .att-kl{background:var(--muted)}
 .att-name{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .att-title{display:flex;align-items:baseline;gap:10px;min-width:0}
-.att-view{display:grid;place-items:center;min-height:200px}
+.att-view{display:grid;place-items:center;min-height:200px;min-width:0}
 .att-img{max-width:100%;max-height:70vh;object-fit:contain;border-radius:var(--r-m)}
 .att-pdf{width:100%;height:70vh;border:1px solid var(--border);border-radius:var(--r-m);background:var(--surface)}
 .att-view.markdown{display:block}
 .att-md{max-height:70vh;overflow:auto;padding:4px 2px}
 .att-msg{color:var(--muted);display:flex;align-items:center;gap:8px}
-.att-view.table,.att-view.text{display:block}
+.att-view.table,.att-view.text,.att-view.html{display:block}
+.att-html{width:100%;height:70vh;border:1px solid var(--border);border-radius:var(--r-m);background:#fff}
 .att-table{max-height:70vh;overflow:auto}
 .att-table table{border-collapse:collapse;font-family:var(--mono);font-size:12px}
 .att-table th,.att-table td{border:1px solid var(--border);padding:5px 8px;text-align:left;white-space:nowrap}

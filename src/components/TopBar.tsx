@@ -13,8 +13,10 @@ export interface TopBarSection { key: string; label: ReactNode; href: string; ac
 /** The top bar (FTR.NAB.CMN-0005 R5, design §4): the logo and the name, the
  * sections in a row and behind the burger on a phone, the actions of the product,
  * the avatar that opens the profile menu. The profile menu and the list of
- * sections are never open together. */
-export function TopBar({ logo, name, home = "/", sections, Link, center, actions, avatar, profileMenu }: {
+ * sections are never open together. A part of the product with its own
+ * navigation (the administration) puts it behind the burger in place of the
+ * sections: `menu`, with the side panel marked `in-burger`, hidden on a phone. */
+export function TopBar({ logo, name, home = "/", sections, Link, center, actions, avatar, profileMenu, menu }: {
   logo: string; name: string; home?: string; sections: TopBarSection[]; Link: LinkComponent;
   /** Between the sections and the actions: the search of Hammurapi. */
   center?: ReactNode;
@@ -22,6 +24,9 @@ export function TopBar({ logo, name, home = "/", sections, Link, center, actions
   actions?: ReactNode;
   avatar: ReactNode;
   profileMenu: (close: () => void) => ReactNode;
+  /** The burger of a phone in place of the sections: the navigation of the current part of the product and
+   * its name, which the burger is called by. */
+  menu?: { label: string; render: (close: () => void) => ReactNode };
 }) {
   const t = useKitT();
   const [profileOpen, setProfileOpen] = useState(false);
@@ -50,10 +55,12 @@ export function TopBar({ logo, name, home = "/", sections, Link, center, actions
         </button>
         <div className="burger" ref={ref}>
           <button className={`iconbtn${sectionsOpen ? " on" : ""}`} onClick={() => { setProfileOpen(false); setSectionsOpen((v) => !v); }}
-            aria-label={t("topbar.sections")} aria-expanded={sectionsOpen} aria-controls="nav-sections">
+            aria-label={menu?.label ?? t("topbar.sections")} aria-expanded={sectionsOpen} aria-controls="nav-sections">
             <Icon name={sectionsOpen ? "x" : "menu"} />
           </button>
-          {sectionsOpen && <nav id="nav-sections" className="navmenu" aria-label={t("topbar.sections")}>{links}</nav>}
+          {sectionsOpen && (menu
+            ? <div id="nav-sections" className="navmenu">{menu.render(closeSections)}</div>
+            : <nav id="nav-sections" className="navmenu" aria-label={t("topbar.sections")}>{links}</nav>)}
         </div>
       </div>
       {profileOpen && profileMenu(closeProfile)}

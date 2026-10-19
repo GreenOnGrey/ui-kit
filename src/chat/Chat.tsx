@@ -147,11 +147,29 @@ export function Chat(props: ChatProps) {
       setSkill(null); // design §3.1: Backspace in the empty field takes the skill off
       return;
     }
-    if (e.key === "Enter" && !e.shiftKey && !e.nativeEvent.isComposing) {
+    // FTR.NAB.CHAT-0001 design §3.1: on a touch screen Enter is a new line, the message goes by its button
+    if (e.key === "Enter" && !e.shiftKey && !e.nativeEvent.isComposing && !touchKeyboard()) {
       e.preventDefault();
       void send(text);
     }
   };
+
+  // design §3.1: the field grows with its lines up to three, then scrolls (its max-height in CSS); a change of
+  // its width (a turned phone, a resized panel) wraps the lines anew
+  useLayoutEffect(() => fitField(fieldRef.current), [text]);
+  useEffect(() => {
+    const el = fieldRef.current;
+    if (!el || typeof ResizeObserver === "undefined") return;
+    let width = el.clientWidth;
+    const ro = new ResizeObserver(() => {
+      if (el.clientWidth !== width) {
+        width = el.clientWidth;
+        fitField(el);
+      }
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [recorder.recording]);
 
   const attach = async (files: FileList | null) => {
     if (!files?.length || !props.onUpload) return;
@@ -313,4 +331,16 @@ export function VoiceButton({ supported, recognizing, onStart }: { supported: bo
       <Icon name="mic" />
     </button>
   );
+}
+
+/** A touch screen without a mouse: its on-screen keyboard has no Shift+Enter, so Enter breaks the line. */
+function touchKeyboard(): boolean {
+  return typeof window !== "undefined" && !!window.matchMedia?.("(hover: none) and (pointer: coarse)").matches;
+}
+
+/** Sets the height of the field to its lines; the CSS bounds it to three. */
+function fitField(el: HTMLTextAreaElement | null) {
+  if (!el) return;
+  el.style.height = "auto";
+  el.style.height = `${el.scrollHeight + el.offsetHeight - el.clientHeight}px`;
 }

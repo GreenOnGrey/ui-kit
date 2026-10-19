@@ -11,7 +11,7 @@ import type { ChatAttachment } from "./types";
 // images as thumbnails, the files with a preview as tiles with the icon of the
 // preview, the rest as tiles that download.
 
-export type PreviewKind = "image" | "pdf" | "markdown" | "table" | "text";
+export type PreviewKind = "image" | "pdf" | "markdown" | "table" | "html" | "text";
 
 /** Loads the content of an attachment: the product fetches it with its session. */
 export type LoadAttachment = (a: ChatAttachment) => Promise<Blob>;
@@ -19,7 +19,7 @@ export type LoadAttachment = (a: ChatAttachment) => Promise<Blob>;
 // SVG is an image of <img>: there its scripts do not run.
 const IMAGES = new Set(["image/png", "image/jpeg", "image/gif", "image/webp", "image/svg+xml"]);
 const IMAGE_EXT = /\.(png|jpe?g|gif|webp|svg)$/;
-const TEXT_EXT = /\.(txt|log|json|ya?ml|xml|ini|toml|sql|sh|py|go|js|ts|tsx|java|kt|rb|rs|c|cpp|h|css|html?)$/;
+const TEXT_EXT = /\.(txt|log|json|ya?ml|xml|ini|toml|sql|sh|py|go|js|ts|tsx|java|kt|rb|rs|c|cpp|h|css)$/;
 
 /** Text, tables and Markdown larger than this are downloaded, not drawn. */
 export const TEXT_PREVIEW_MAX = 1 << 20;
@@ -34,17 +34,21 @@ export function previewKind(a: Pick<ChatAttachment, "fileName" | "mimeType">): P
   if (type === "application/pdf" || name.endsWith(".pdf")) return "pdf";
   if (type === "text/markdown" || /\.(md|markdown)$/.test(name)) return "markdown";
   if (type === "text/csv" || type === "text/tab-separated-values" || /\.(csv|tsv)$/.test(name)) return "table";
-  // HTML is shown as its source text, never as a page
+  if (type === "text/html" || /\.html?$/.test(name)) return "html";
   if (type.startsWith("text/") || type === "application/json" || type === "application/xml" || TEXT_EXT.test(name)) return "text";
   return null;
 }
 
-const KIND_ICON: Record<PreviewKind, IconName> = { image: "image", pdf: "pdf", markdown: "markdown", table: "table", text: "source" };
+const KIND_ICON: Record<PreviewKind, IconName> = { image: "image", pdf: "pdf", markdown: "markdown", table: "table", html: "globe", text: "source" };
+
+/** The icon of a kind of preview: the tiles of the chat and the products' own lists of files show it. */
+export const previewIcon = (kind: PreviewKind): IconName => KIND_ICON[kind];
 
 /** The label of a tile: the kind of the preview or the extension of the file. */
 function label(a: ChatAttachment, kind: PreviewKind | null): string {
   if (kind === "pdf") return "PDF";
   if (kind === "markdown") return "MD";
+  if (kind === "html") return "HTML";
   const ext = /\.([a-z0-9]{1,5})$/i.exec(a.fileName)?.[1]?.toUpperCase();
   return ext ?? (kind ? "TXT" : "FILE");
 }
@@ -61,6 +65,34 @@ export function fileSize(bytes: number, language: string): string {
   return new Intl.NumberFormat(intlLocale(language), {
     style: "unit", unit: units[i], unitDisplay: "short", maximumFractionDigits: i === 0 ? 0 : 1,
   }).format(v);
+}
+
+/** The policy put into a previewed HTML page: nothing is loaded from outside and nothing runs; images and
+ * fonts inside the file and its own styles stay. */
+const HTML_POLICY = "default-src 'none'; img-src data: blob:; media-src data: blob:; font-src data:; style-src 'unsafe-inline' data:";
+
+/** The document of a previewed HTML page: the policy first, after the doctype of the file if it has one, so the
+ * page keeps its standards mode. A meta of CSP is honoured only in the head, and the parser puts a meta that comes
+ * before any content into the head. */
+export function htmlDocument(text: string): string {
+  const meta = `<meta http-equiv="Content-Security-Policy" content="${HTML_POLICY}">`;
+  const doctype = /^\s*<!doctype[^>]*>/i.exec(text)?.[0] ?? "";
+  return doctype + meta + text.slice(doctype.length);
+}
+
+// The types of the previews by the extension: a file whose type is unknown (a file of a space comes as
+// application/octet-stream) is drawn by the type of its name.
+const TYPE_BY_EXT: Record<string, string> = {
+  png: "image/png", jpg: "image/jpeg", jpeg: "image/jpeg", gif: "image/gif", webp: "image/webp", svg: "image/svg+xml",
+  pdf: "application/pdf", md: "text/markdown", markdown: "text/markdown", csv: "text/csv", tsv: "text/tab-separated-values",
+  html: "text/html", htm: "text/html",
+};
+
+/** The type a preview draws a file with: its own, else the one of its extension. */
+export function previewType(a: Pick<ChatAttachment, "fileName" | "mimeType">): string | undefined {
+  const own = (a.mimeType ?? "").split(";")[0].trim().toLowerCase();
+  if (own && own !== "application/octet-stream") return own;
+  return TYPE_BY_EXT[/\.([a-z0-9]+)$/i.exec(a.fileName)?.[1]?.toLowerCase() ?? ""] ?? (own || undefined);
 }
 
 /** The rows of CSV (quotes by RFC 4180) or TSV. */
@@ -109,7 +141,8 @@ function useBlob(a: ChatAttachment, load: LoadAttachment, enabled = true) {
     load({ id, href, fileName, mimeType, size }).then((blob) => {
       if (!live) return;
       // the type of the product's metadata: a blob of a download is often untyped
-      const typed = mimeType && blob.type !== mimeType ? new Blob([blob], { type: mimeType }) : blob;
+      const type = previewType({ fileName, mimeType });
+      const typed = type && blob.type !== type ? new Blob([blob], { type }) : blob;
       url = URL.createObjectURL(typed);
       setState({ url, blob: typed });
     }, () => live && setState({ failed: true }));
@@ -192,7 +225,8 @@ export function AttachmentPreview({ a, load, onClose }: { a: ChatAttachment; loa
   const t = useKitT();
   const { i18n } = useTranslation(UIKIT_NS);
   const kind = previewKind(a);
-  const textual = kind === "markdown" || kind === "table" || kind === "text";
+  const textual = kind === "markdown" || kind === "table" || kind === "html" || kind === "text";
+  const [source, setSource] = useState(false);
   // a known size over the limit is not loaded at all
   const knownTooLarge = textual && (a.size ?? 0) > TEXT_PREVIEW_MAX;
   const { url, blob, failed } = useBlob(a, load, !knownTooLarge);
@@ -219,11 +253,18 @@ export function AttachmentPreview({ a, load, onClose }: { a: ChatAttachment; loa
   else if (kind === "pdf") body = <object className="att-pdf" data={url} type="application/pdf" aria-label={a.fileName}><div className="att-msg">{t("chat.files.failed")}</div></object>;
   else if (kind === "markdown") body = <div className="att-md"><Markdown text={text ?? ""} /></div>;
   else if (kind === "table") body = <TableView text={text ?? ""} tab={/\.tsv$/i.test(a.fileName) || a.mimeType === "text/tab-separated-values"} />;
+  // a page: a frame with no permissions — no scripts, forms or access to the site — and no loads from outside
+  else if (kind === "html" && !source) body = <iframe className="att-html" sandbox="" srcDoc={htmlDocument(text ?? "")} title={a.fileName} referrerPolicy="no-referrer" />;
   else body = <pre className="att-text">{text}</pre>;
   return (
     <Modal wide onClose={onClose}
       title={<span className="att-title"><span className="att-name">{a.fileName}</span>{a.size != null && <span className="muted small">{fileSize(a.size, i18n.language)}</span>}</span>}
       footer={<>
+        {kind === "html" && (
+          <button type="button" className="btn ghost" onClick={() => setSource((v) => !v)}>
+            <Icon name={source ? "globe" : "code"} size={14} /> {t(source ? "chat.files.page" : "chat.files.source")}
+          </button>
+        )}
         <a className="btn ghost" href={url ?? a.href} download={a.fileName}><Icon name="download" size={14} /> {t("chat.files.download")}</a>
         <button type="button" className="btn primary" onClick={onClose}>{t("close")}</button>
       </>}>

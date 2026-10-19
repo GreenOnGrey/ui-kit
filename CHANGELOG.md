@@ -4,6 +4,23 @@ Versions follow semver. A visible change of the look is at least a minor (FTR.NA
 Since `1.0.0` the contract of the kit — class names, tokens, props, icon names, keys of strings — changes only
 in a major.
 
+## 1.4.0
+
+A visible change (FTR.NAB.CHAT-0001 R34, design §3.6).
+
+- Chat: an HTML file is previewed as a page: a frame with no permissions (`sandbox=""` — no scripts, forms or access
+  to the site) whose document starts with a policy that loads nothing from outside; «Code» shows its source. The tile
+  has the `globe` icon and the label HTML. Strings `chat.files.source`, `chat.files.page`; `previewKind` gains `html`;
+  a file without a type is drawn by the type of its extension; new export `previewIcon` (the icon of a kind of preview,
+  for the products' lists of files).
+- Chat: the field of the composer grows with its lines up to three, then scrolls; on a touch screen (`hover: none`,
+  `pointer: coarse`) Enter breaks the line and the message goes by its button (FTR.NAB.CHAT-0001 design §3.1).
+- Top bar: `menu` (`{ label, render(close) }`) puts the navigation of a part of the product (the administration) behind the burger of a phone in
+  place of the sections; a side panel marked `.side.in-burger` is hidden on a phone, and `.side` inside the burger is
+  a column with its title (FTR.NAB.CMN-0005 design §4).
+- Modals stay within the screen: the column of `.overlay` is `minmax(0, 1fr)`, so wide content — the preview of code
+  or of a table — scrolls inside the modal instead of pushing it past the edges of a phone.
+
 ## 1.3.0
 
 A visible change (FTR.NAB.CHAT-0001 design §3.1).

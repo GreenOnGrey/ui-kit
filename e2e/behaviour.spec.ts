@@ -87,6 +87,23 @@ test("CMP-11 the sign-in screen reports the chosen language", async ({ page }) =
   await expect(page.getByRole("button", { name: "RU" })).not.toHaveClass(/\bon\b/);
 });
 
+test("CMP-12 in the administration the burger of a phone holds its subsections in place of the sections", async ({ page }, info) => {
+  test.skip(info.project.name === "desktop", "the burger is a phone's");
+  const s = await openSection(page, "topbar");
+  const demoBox = s.locator(".topbar").nth(2).locator("..");
+  const bar = demoBox.locator(".topbar");
+  // the side panel of the administration is not on the page of a phone: its sections are behind the burger
+  await expect(demoBox.locator(".side.in-burger")).toBeHidden();
+  await bar.getByRole("button", { name: "Администрирование" }).click();
+  const menu = bar.locator(".navmenu");
+  await expect(menu.locator(".side a .i")).toHaveCount(4);
+  await expect(menu.getByRole("navigation", { name: "Администрирование" })).toBeVisible();
+  await expect(menu.getByText("Аудит")).toHaveClass(/active/);
+  await expect(menu.getByText("Память")).toHaveCount(0);
+  await menu.getByText("Группы").click();
+  await expect(menu).toHaveCount(0);
+});
+
 test("CMP-07, CMP-08 on a phone the sections live behind the burger, never open with the profile menu", async ({ page }, info) => {
   const s = await openSection(page, "topbar");
   const bar = s.locator(".topbar").first();
@@ -208,6 +225,43 @@ test.describe("chat", () => {
     await expect(page.getByRole("dialog")).toContainText("Показаны 500 из 620 строк");
     await page.keyboard.press("Escape");
     await expect(chat.getByRole("link", { name: "Скачать data.zip" })).toHaveAttribute("download", "data.zip");
+  });
+
+  test("FTR.NAB.CHAT-0001 ATT-20, SEC-04 an HTML page is drawn in a frame without permissions; «Code» shows its source", async ({ page }) => {
+    const outside: string[] = [];
+    page.on("request", (r) => { if (r.url().includes("tracker.invalid")) outside.push(r.url()); });
+    const s = await openSection(page, "chat");
+    await demo(s, "files").getByRole("button", { name: "Открыть slides.html" }).click();
+    const dialog = page.getByRole("dialog");
+    const frame = dialog.locator("iframe.att-html");
+    await expect(frame).toHaveAttribute("sandbox", "");
+    // the script of the page did not run
+    await expect(dialog.frameLocator("iframe.att-html").getByRole("heading", { name: "Релиз 1.3" })).toBeVisible();
+    // nothing is loaded from outside
+    expect(outside).toEqual([]);
+    await dialog.getByRole("button", { name: "Код" }).click();
+    await expect(dialog.locator("pre.att-text")).toContainText("<h1>Релиз 1.3</h1>");
+    await dialog.getByRole("button", { name: "Страница" }).click();
+    await expect(frame).toBeVisible();
+  });
+
+  test("FTR.NAB.CHAT-0001 ATT-19 the preview of wide text and a table stays within the screen; they scroll inside", async ({ page }, info) => {
+    test.skip(info.project.name !== "phone", "the width of a phone");
+    const s = await openSection(page, "chat");
+    const chat = demo(s, "files");
+    for (const file of ["build.log", "metrics.csv"]) {
+      await chat.getByRole("button", { name: `Открыть ${file}` }).click();
+      const dialog = page.getByRole("dialog");
+      await expect(dialog.getByText(file)).toBeVisible();
+      const box = await dialog.boundingBox();
+      const width = page.viewportSize()?.width ?? 0;
+      expect(box && box.x >= 0 && box.x + box.width <= width).toBe(true);
+      // the content scrolls inside the modal: the table of 500 rows, the log wrapped within its width
+      const inner = dialog.locator(file.endsWith(".csv") ? ".att-table" : ".att-text");
+      expect(await inner.evaluate((el) => el.scrollWidth <= el.clientWidth + 1 || el.scrollHeight > el.clientHeight)).toBe(true);
+      if (file.endsWith(".csv")) expect(await inner.evaluate((el) => el.scrollHeight > el.clientHeight)).toBe(true);
+      await page.keyboard.press("Escape");
+    }
   });
 
   test("SKL-01 «/» opens the palette, arrows and Enter pick a skill, Backspace takes it off", async ({ page }) => {
@@ -367,4 +421,40 @@ test.describe("chat", () => {
     await expect(chat.locator(".m.a .bub").last()).toHaveText("Готово.");
     expect(requests).toEqual([]);
   });
+});
+
+// FTR.NAB.CHAT-0001 design §3.1: the composer of a touch screen
+test.describe("chat on a touch screen", () => {
+  test.use({ isMobile: true, hasTouch: true });
+
+  test("FTR.NAB.CHAT-0001 INP-01 Enter breaks the line and does not send; the button sends", async ({ page }, info) => {
+    test.skip(info.project.name !== "phone", "a phone's keyboard");
+    const s = await openSection(page, "chat");
+    const chat = demo(s, "history");
+    const before = await chat.locator(".m.u").count();
+    const input = chat.getByRole("textbox");
+    await input.click();
+    await input.pressSequentially("первая");
+    await input.press("Enter");
+    await input.pressSequentially("вторая");
+    await expect(input).toHaveValue("первая\nвторая");
+    await expect(chat.locator(".m.u")).toHaveCount(before);
+    await chat.getByRole("button", { name: "Отправить" }).click();
+    await expect(chat.locator(".m.u")).toHaveCount(before + 1);
+  });
+});
+
+test("FTR.NAB.CHAT-0001 INP-02 the field grows with its lines up to three, then scrolls", async ({ page }) => {
+  const s = await openSection(page, "chat");
+  const input = demo(s, "history").getByRole("textbox");
+  const height = async (lines: number) => {
+    await input.fill(Array.from({ length: lines }, (_, i) => `строка ${i + 1}`).join("\n"));
+    return (await input.boundingBox())?.height ?? 0;
+  };
+  const [one, two, three, five] = [await height(1), await height(2), await height(3), await height(5)];
+  expect(two).toBeGreaterThan(one);
+  expect(three).toBeGreaterThan(two);
+  expect(five).toBe(three);
+  expect(await input.evaluate((el) => el.scrollHeight > el.clientHeight)).toBe(true);
+  expect(await height(1)).toBe(one);
 });

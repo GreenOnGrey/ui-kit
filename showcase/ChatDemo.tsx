@@ -117,6 +117,7 @@ const demoFiles = [
   { id: "notes", fileName: "release-notes.md", href: "#", mimeType: "text/markdown", size: 220 },
   { id: "metrics", fileName: "metrics.csv", href: "#", mimeType: "text/csv", size: 14_200 },
   { id: "log", fileName: "build.log", href: "#", mimeType: "text/plain", size: 3_280 },
+  { id: "page", fileName: "slides.html", href: "#", mimeType: "text/html", size: 520 },
   { id: "logo", fileName: "logo.svg", href: "#", mimeType: "image/svg+xml", size: 410 },
   { id: "data", fileName: "data.zip", href: "#", mimeType: "application/zip", size: 1_204_000 },
 ];
@@ -139,7 +140,17 @@ async function loadDemoFile(a: { id: string }): Promise<Blob> {
     const rows = Array.from({ length: 620 }, (_, i) => `2026-10-${String((i % 28) + 1).padStart(2, "0")},${1200 + i},${(i % 9) / 10}`);
     return new Blob([["date,requests,errors", ...rows].join("\n")], { type: "text/csv" });
   }
-  if (a.id === "log") return new Blob(["$ npm run build\n> vite build\n✓ 412 modules transformed.\n✓ built in 1.61s\n"], { type: "text/plain" });
+  if (a.id === "log") {
+    // a long line without spaces: the preview wraps it within the screen
+    return new Blob(["$ npm run build\n> vite build\n✓ 412 modules transformed.\ndist/assets/index-" + "a1b2c3d4".repeat(24) + ".js\n✓ built in 1.61s\n"], { type: "text/plain" });
+  }
+  if (a.id === "page") {
+    return new Blob(['<!doctype html><title>Каркас презентации</title><style>body{font:16px system-ui;margin:24px;color:#1d1d2c}h1{color:#7c5cff}' +
+      '.card{border:1px solid #ddd;border-radius:12px;padding:16px}</style><h1>Релиз 1.3</h1><div class="card">Файлы агента и их просмотр</div>' +
+      // an outside picture: the policy of the preview does not load it
+      '<img src="https://tracker.invalid/pixel.png" alt="">' +
+      '<script>document.body.innerHTML = "скрипт выполнился"</script>'], { type: "text/html" });
+  }
   if (a.id === "logo") {
     return new Blob(['<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="#7c5cff"/><circle cx="32" cy="32" r="14" fill="#fff"/></svg>'], { type: "image/svg+xml" });
   }

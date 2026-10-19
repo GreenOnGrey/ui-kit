@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { html } from "../testing";
-import { AttachmentList, AttachmentPreview, fileSize, parseTable, previewKind } from "./Attachments";
+import { AttachmentList, AttachmentPreview, fileSize, htmlDocument, parseTable, previewKind, previewType } from "./Attachments";
 import type { ChatAttachment } from "./types";
 
 const att = (fileName: string, mimeType?: string, size?: number): ChatAttachment => ({ id: fileName, fileName, href: `/files/${fileName}`, mimeType, size });
@@ -16,7 +16,8 @@ describe("attachments", () => {
     expect(previewKind(att("README.markdown", "text/plain"))).toBe("markdown");
     expect(previewKind(att("metrics.csv", "text/csv"))).toBe("table");
     expect(previewKind(att("rows.tsv", "application/octet-stream"))).toBe("table");
-    expect(previewKind(att("page.html", "text/html"))).toBe("text");
+    expect(previewKind(att("page.html", "text/html"))).toBe("html");
+    expect(previewKind(att("index.HTM"))).toBe("html");
     expect(previewKind(att("data.json", "application/json"))).toBe("text");
     expect(previewKind(att("main.go", "application/octet-stream"))).toBe("text");
     expect(previewKind(att("build.log"))).toBe("text");
@@ -57,12 +58,29 @@ describe("attachments", () => {
     expect(out).toContain('role="dialog"');
   });
 
-  it("SEC-04 shows SVG only as an image and HTML only as text", () => {
+  it("SEC-04 shows SVG only as an image; an HTML page runs nothing and loads nothing from outside", () => {
     const out = html(<AttachmentList items={[att("logo.svg", "image/svg+xml"), att("page.html", "text/html")]} load={load} onOpen={() => {}} />);
     expect(out).toContain('class="att-thumb" aria-label="Open logo.svg"');
-    expect(out).toContain('class="att-tile text" aria-label="Open page.html"');
-    expect(out).not.toContain("<iframe");
-    expect(out).not.toContain("<object");
+    expect(out).toContain('class="att-tile html" aria-label="Open page.html"');
+    expect(out).toContain('<span class="att-kl">HTML</span>');
+    const doc = htmlDocument("<script>alert(1)</script><img src=\"https://x.test/t.png\">");
+    expect(doc.startsWith('<meta http-equiv="Content-Security-Policy" content="default-src \'none\';')).toBe(true);
+    // the policy allows no scripts and no network: only what is inside the file
+    const policy = /content="([^"]*)"/.exec(doc)?.[1] ?? "";
+    expect(policy).not.toMatch(/script-src|connect-src|https?:|\*/);
+  });
+
+  it("ATT-20 keeps the doctype of a page first: the page stays in its standards mode", () => {
+    const doc = htmlDocument("<!DOCTYPE html><title>x</title>");
+    expect(doc.startsWith('<!DOCTYPE html><meta http-equiv="Content-Security-Policy"')).toBe(true);
+    expect(htmlDocument("<p>x</p>").startsWith("<meta")).toBe(true);
+  });
+
+  it("ATT-21 draws a file without a type by the type of its extension", () => {
+    expect(previewType({ fileName: "logo.svg", mimeType: "application/octet-stream" })).toBe("image/svg+xml");
+    expect(previewType({ fileName: "scan.PDF" })).toBe("application/pdf");
+    expect(previewType({ fileName: "a.png", mimeType: "image/png; charset=binary" })).toBe("image/png");
+    expect(previewType({ fileName: "data.bin" })).toBeUndefined();
   });
 
   it("ATT-14 reads CSV with quotes and TSV", () => {

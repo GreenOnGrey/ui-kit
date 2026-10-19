@@ -31,7 +31,8 @@ for (const theme of ["light", "dark"] as const) {
 
   // FTR.NAB.CHAT-0001 R34: the preview of a file sent by the agent (PDF is left out: its viewer is the browser's)
   // the drawn Markdown shifts the headings by two levels: «#» is <h3>
-  for (const [name, file, ready] of [["preview-markdown", "release-notes.md", ".att-md :is(h1, h2, h3, h4, h5, h6)"], ["preview-table", "metrics.csv", "table"]]) {
+  for (const [name, file, ready] of [["preview-markdown", "release-notes.md", ".att-md :is(h1, h2, h3, h4, h5, h6)"], ["preview-table", "metrics.csv", "table"],
+    ["preview-html", "slides.html", "iframe.att-html"]]) {
     test(`${name} ${theme}`, async ({ page }) => {
       const s = await openSection(page, "chat", theme);
       await s.locator('[data-demo="files"]').getByRole("button", { name: `Открыть ${file}` }).click();
@@ -39,6 +40,14 @@ for (const theme of ["light", "dark"] as const) {
       await expect(page).toHaveScreenshot(`${name}-${theme}.png`);
     });
   }
+
+  // FTR.NAB.CMN-0005 R5: the burger of a phone in the administration
+  test(`admin burger ${theme}`, async ({ page }, info) => {
+    test.skip(info.project.name !== "phone", "the burger is a phone's");
+    const s = await openSection(page, "topbar", theme);
+    await s.getByRole("button", { name: "Администрирование" }).click();
+    await expect(page.locator(".navmenu .side")).toHaveScreenshot(`admin-burger-${theme}.png`);
+  });
 
   test(`shown toasts ${theme}`, async ({ page }) => {
     const s = await openSection(page, "toasts", theme);

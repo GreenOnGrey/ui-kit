@@ -83,7 +83,9 @@
       "tooLarge": "El archivo es demasiado grande para la vista previa: descárguelo",
       "save": "Descargar {name}",
       "notUtf8": "El archivo no está en UTF-8: descárguelo",
-      "rows": "Se muestran {shown} de {total, plural, one {# fila} other {# filas}}"
+      "rows": "Se muestran {shown} de {total, plural, one {# fila} other {# filas}}",
+      "source": "Código",
+      "page": "Página"
     }
   }
 }

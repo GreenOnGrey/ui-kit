@@ -210,6 +210,7 @@ function Sections() {
       <Section id="topbar" lead="Логотип и название, разделы, действия продукта, аватар с меню профиля. На телефоне разделы уходят под бургер после аватара.">
         <Example label="Nabu" box><BarDemo product="nabu" /></Example>
         <Example label="Hammurapi: поиск и «Новая задача» — действия продукта" box><BarDemo product="hammurapi" /></Example>
+        <Example label="Администрирование: на телефоне под бургером — его подразделы, а не разделы продукта" box><BarDemo product="nabu" admin /></Example>
       </Section>
 
       <Section id="login" lead="Тёмный экран в обеих темах. Логотип, название, девиз и поставщика входа передаёт продукт.">
@@ -416,7 +417,24 @@ function ToastDemo() {
 
 const profile = (close: () => void): ReactNode => <Menu onClose={close} label="Профиль">{profileSections}</Menu>;
 
-function BarDemo({ product }: { product: "nabu" | "hammurapi" }) {
+const ADMIN_DEMO = [["users", "Пользователи", "users"], ["groups", "Группы", "lock"], ["models", "Подключения к моделям", "cpu"], ["audit", "Аудит", "shield"]] as const;
+
+/** The navigation of the administration: the side panel on a desktop (`inBurger`: hidden on a phone), the burger
+ * on a phone. */
+function AdminNav({ on, onPick, inBurger }: { on: string; onPick?: () => void; inBurger?: boolean }) {
+  return (
+    <nav className={inBurger ? "side in-burger" : "side"} aria-label="Администрирование">
+      <div className="lab">Администрирование</div>
+      {ADMIN_DEMO.map(([k, l, icon]) => (
+        <a key={k} href="#topbar" className={k === on ? "active" : undefined} onClick={onPick}><Icon name={icon} />{l}</a>
+      ))}
+    </nav>
+  );
+}
+
+const adminMenu = { label: "Администрирование", render: (close: () => void): ReactNode => <AdminNav on="audit" onPick={close} /> };
+
+function BarDemo({ product, admin }: { product: "nabu" | "hammurapi"; admin?: boolean }) {
   const nabu = product === "nabu";
   const names = nabu ? ["Чат", "Память", "Пространство", "Задания"] : ["Общее", "Спецификация", "Исследование", "Разработка", "Поставка"];
   const [on, setOn] = useState(0);
@@ -430,7 +448,14 @@ function BarDemo({ product }: { product: "nabu" | "hammurapi" }) {
       <TopBar logo={nabu ? "./nabu.jpg" : "./hammurapi.png"} name={nabu ? "Nabu" : "Hammurapi"} Link={Link} avatar={<Avatar name="Ада Лавлейс" />} profileMenu={profile}
         sections={names.map((label, i) => ({ key: String(i), label, href: "#topbar", active: i === on }))}
         center={nabu ? undefined : <form className="search" role="search"><Icon name="search" /><input placeholder="Поиск" aria-label="Поиск" /></form>}
-        actions={nabu ? undefined : <button className="btn primary sm"><Icon name="plus" /><span className="hide-m">Новая задача</span></button>} />
+        actions={nabu ? undefined : <button className="btn primary sm"><Icon name="plus" /><span className="hide-m">Новая задача</span></button>}
+        menu={admin ? adminMenu : undefined} />
+      {admin && (
+        <div className="admin">
+          <AdminNav inBurger on="audit" />
+          <main className="main"><h2 style={{ margin: 0 }}>Аудит</h2></main>
+        </div>
+      )}
     </div>
   );
 }
