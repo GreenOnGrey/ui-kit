@@ -6,11 +6,13 @@ import { confirmations as fixtureConfirmations, conversations, history } from ".
 /** The chat of the showcase on invented data: the buttons work without a server
  * (design §3). `full` turns on what not every chat has — cancelling a turn and
  * confirming an action; `narrow` is the side panel of Hammurapi. */
-export function ChatDemo({ demo, narrow, full, empty, readOnly, wait, typing, historyError, listOpen = false, modes }: {
+export function ChatDemo({ demo, narrow, full, empty, readOnly, wait, typing, historyError, listOpen = false, modes, files }: {
   /** The name of the example: tests find the demo by it, not by its place on the page. */
   demo: string;
   narrow?: boolean; full?: boolean; empty?: boolean; readOnly?: boolean; wait?: "starting" | "queued"; typing?: boolean; historyError?: boolean;
   listOpen?: boolean; modes?: boolean;
+  /** The agent has sent files: a chart, a PDF and Markdown with their preview (FTR.NAB.CHAT-0001 R34). */
+  files?: boolean;
 }) {
   const initial: ChatMessage[] = empty ? [] : typing
     ? [...history.slice(0, 1), { id: "t", role: "assistant", text: "", createdAt: "2026-10-11T14:02:00", status: "streaming",
@@ -18,6 +20,9 @@ export function ChatDemo({ demo, narrow, full, empty, readOnly, wait, typing, hi
     : wait
     ? [...history.slice(0, 2), { id: "w", role: "user", text: "Собери перечень изменений", createdAt: "2026-10-11T14:12:00", status: "done",
         wait: wait === "queued" ? { state: "queued", position: 2 } : { state: "starting" } }]
+    : files
+    ? [...history.slice(0, 1), { id: "f", role: "assistant", text: "Готово: график, отчёт и заметки к релизу — во вложениях.", createdAt: "2026-10-11T14:03:00",
+        status: "done", attachments: demoFiles }]
     : history;
   const [messages, setMessages] = useState(initial);
   const [confirmations, setConfirmations] = useState(full ? fixtureConfirmations : []);
@@ -80,7 +85,12 @@ export function ChatDemo({ demo, narrow, full, empty, readOnly, wait, typing, hi
           ) : undefined}
           upload={{ maxBytes: 5_000_000 }} onSend={onSend} onRetry={onRetry}
           onUpload={async (f) => ({ id: f.name, fileName: f.name })}
-          onTranscribe={async () => "Расшифровка записи: проверьте перед отправкой."}
+          onTranscribe={async () => {
+            // the server takes a moment: the wave of FTR.NAB.CHAT-0001 design §3.1 is seen
+            await new Promise((ok) => window.setTimeout(ok, 1200));
+            return "Расшифровка записи: проверьте перед отправкой.";
+          }}
+          loadAttachment={files ? loadDemoFile : undefined}
           historyError={historyError ? "Не удалось загрузить историю. Проверьте соединение." : undefined} loadingOlder={historyError}
           hasOlder={!empty} onLoadOlder={() => setMessages((ms) => [{ id: `o${n.current++}`, role: "assistant", text: "Более раннее сообщение.", createdAt: "2026-10-10T09:00:00", status: "done" }, ...ms])}
           confirmations={confirmations}
@@ -99,4 +109,52 @@ export function ChatDemo({ demo, narrow, full, empty, readOnly, wait, typing, hi
       </ChatLayout>
     </div>
   );
+}
+
+const demoFiles = [
+  { id: "chart", fileName: "chart.png", href: "#", mimeType: "image/png", size: 48_210 },
+  { id: "report", fileName: "report.pdf", href: "#", mimeType: "application/pdf", size: 612 },
+  { id: "notes", fileName: "release-notes.md", href: "#", mimeType: "text/markdown", size: 220 },
+  { id: "metrics", fileName: "metrics.csv", href: "#", mimeType: "text/csv", size: 14_200 },
+  { id: "log", fileName: "build.log", href: "#", mimeType: "text/plain", size: 3_280 },
+  { id: "logo", fileName: "logo.svg", href: "#", mimeType: "image/svg+xml", size: 410 },
+  { id: "data", fileName: "data.zip", href: "#", mimeType: "application/zip", size: 1_204_000 },
+];
+
+const MINI_PDF = `%PDF-1.4
+1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj
+2 0 obj<</Type/Pages/Kids[3 0 R]/Count 1>>endobj
+3 0 obj<</Type/Page/Parent 2 0 R/MediaBox[0 0 300 120]/Contents 4 0 R/Resources<</Font<</F1 5 0 R>>>>>>endobj
+4 0 obj<</Length 44>>stream
+BT /F1 18 Tf 24 60 Td (Release report) Tj ET
+endstream endobj
+5 0 obj<</Type/Font/Subtype/Type1/BaseFont/Helvetica>>endobj
+trailer<</Root 1 0 R>>
+%%EOF`;
+
+/** The files of the showcase, made in the browser. */
+async function loadDemoFile(a: { id: string }): Promise<Blob> {
+  if (a.id === "report") return new Blob([MINI_PDF], { type: "application/pdf" });
+  if (a.id === "metrics") {
+    const rows = Array.from({ length: 620 }, (_, i) => `2026-10-${String((i % 28) + 1).padStart(2, "0")},${1200 + i},${(i % 9) / 10}`);
+    return new Blob([["date,requests,errors", ...rows].join("\n")], { type: "text/csv" });
+  }
+  if (a.id === "log") return new Blob(["$ npm run build\n> vite build\n✓ 412 modules transformed.\n✓ built in 1.61s\n"], { type: "text/plain" });
+  if (a.id === "logo") {
+    return new Blob(['<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="#7c5cff"/><circle cx="32" cy="32" r="14" fill="#fff"/></svg>'], { type: "image/svg+xml" });
+  }
+  if (a.id === "notes") return new Blob(["# Релиз 1.3\n\n- волна вместо микрофона\n- **предпросмотр** файлов\n"], { type: "text/markdown" });
+  const c = document.createElement("canvas");
+  c.width = 320;
+  c.height = 200;
+  const g = c.getContext("2d");
+  if (g) {
+    g.fillStyle = "#f6f5fa";
+    g.fillRect(0, 0, 320, 200);
+    [60, 110, 80, 150, 130].forEach((h, i) => {
+      g.fillStyle = "#7c5cff";
+      g.fillRect(30 + i * 56, 180 - h, 36, h);
+    });
+  }
+  return new Promise((ok, fail) => c.toBlob((b) => (b ? ok(b) : fail(new Error("canvas"))), "image/png"));
 }

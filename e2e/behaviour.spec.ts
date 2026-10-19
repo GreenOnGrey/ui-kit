@@ -140,7 +140,7 @@ test.describe("chat", () => {
     await expect(input).toHaveValue("に");
   });
 
-  test("CHAT-10, VOC-06 a click records, «Stop» puts the transcript into the composer (FTR.NAB.CHAT-0001 R20)", async ({ page }) => {
+  test("CHAT-10, VOC-06, VOC-15 a click records, «Stop» puts the transcript into the composer (FTR.NAB.CHAT-0001 R20)", async ({ page }) => {
     const s = await openSection(page, "chat");
     const chat = demo(s, "history");
     await chat.getByRole("button", { name: "Записать голосом" }).click();
@@ -148,7 +148,13 @@ test.describe("chat", () => {
     await page.waitForTimeout(400);
     await chat.locator(".recbar").getByRole("button", { name: "Стоп" }).click();
     const input = chat.getByRole("textbox");
+    // VOC-15: while the server recognizes — a wave instead of the microphone, the field and «Send» are off
+    await expect(chat.getByRole("status", { name: "Распознаём…" })).toBeVisible();
+    await expect(chat.getByRole("button", { name: "Записать голосом" })).toHaveCount(0);
+    await expect(input).toBeDisabled();
+    await expect(chat.getByRole("button", { name: "Отправить" })).toBeDisabled();
     await expect(input).toHaveValue(/Расшифровка записи/);
+    await expect(chat.getByRole("button", { name: "Записать голосом" })).toBeVisible();
     await input.press("Enter");
     await expect(chat.locator(".m.u").last()).toContainText("Расшифровка записи");
     await expect(chat.locator(".m.u .chan").last()).toContainText("голосом");
@@ -182,6 +188,26 @@ test.describe("chat", () => {
     const mic = demo(s, "history").getByRole("button", { name: "Записать голосом" });
     await expect(mic).toBeDisabled();
     await expect(mic).toHaveAttribute("title", "Голосовой ввод не поддерживается этим браузером");
+  });
+
+  test("FTR.NAB.CHAT-0001 ATT-08, ATT-09 an image is a thumbnail; PDF, Markdown and a table open in the preview, Escape closes it; the rest downloads", async ({ page }) => {
+    const s = await openSection(page, "chat");
+    const chat = demo(s, "files");
+    await expect(chat.locator(".att-thumb img")).toBeVisible();
+    await chat.getByRole("button", { name: "Открыть release-notes.md" }).click();
+    const dialog = page.getByRole("dialog");
+    await expect(dialog.getByRole("heading", { name: "Релиз 1.3" })).toBeVisible();
+    await expect(dialog.getByRole("link", { name: "Скачать" })).toHaveAttribute("download", "release-notes.md");
+    await page.keyboard.press("Escape");
+    await expect(dialog).toHaveCount(0);
+    await chat.getByRole("button", { name: "Открыть report.pdf" }).click();
+    await expect(page.getByRole("dialog").locator("object[type='application/pdf']")).toBeVisible();
+    await page.getByRole("dialog").getByRole("button", { name: "Закрыть" }).click();
+    await chat.getByRole("button", { name: "Открыть metrics.csv" }).click();
+    await expect(page.getByRole("dialog").getByRole("columnheader", { name: "requests" })).toBeVisible();
+    await expect(page.getByRole("dialog")).toContainText("Показаны 500 из 620 строк");
+    await page.keyboard.press("Escape");
+    await expect(chat.getByRole("link", { name: "Скачать data.zip" })).toHaveAttribute("download", "data.zip");
   });
 
   test("SKL-01 «/» opens the palette, arrows and Enter pick a skill, Backspace takes it off", async ({ page }) => {

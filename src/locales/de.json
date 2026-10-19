@@ -75,6 +75,15 @@
     },
     "event": {
       "details": "Zusammenfassung"
+    },
+    "files": {
+      "open": "{name} öffnen",
+      "download": "Herunterladen",
+      "failed": "Die Datei konnte nicht geöffnet werden",
+      "tooLarge": "Die Datei ist zu groß für die Vorschau — bitte herunterladen",
+      "save": "{name} herunterladen",
+      "notUtf8": "Die Datei ist nicht in UTF-8 — bitte herunterladen",
+      "rows": "{shown} von {total, plural, one {# Zeile} other {# Zeilen}} angezeigt"
     }
   }
 }

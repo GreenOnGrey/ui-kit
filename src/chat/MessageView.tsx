@@ -3,10 +3,10 @@ import { useTranslation } from "react-i18next";
 import { Icon } from "../components/Icon";
 import { Markdown } from "../components/Markdown";
 import { UIKIT_NS } from "../i18n";
-import type { ChatMessage, ChatStep } from "./types";
+import { AttachmentList, type LoadAttachment } from "./Attachments";
+import { intlLocale } from "./intl";
+import type { ChatAttachment, ChatMessage, ChatStep } from "./types";
 
-/** The locale of Intl formatting for a language code of the products. */
-const intlLocale = (lng: string) => (lng === "zh" ? "zh-CN" : lng);
 
 /** The time of a caption: hours and minutes in the language of the interface. */
 export function markTime(iso: string, language: string): string {
@@ -26,16 +26,18 @@ const STEP = {
 } as const;
 
 /** One message of the conversation (design §6.4). */
-export function MessageView({ m, busy, onRetry }: { m: ChatMessage; busy: boolean; onRetry?: () => void }) {
+export function MessageView({ m, busy, onRetry, loadAttachment, onOpenAttachment }: {
+  m: ChatMessage; busy: boolean; onRetry?: () => void;
+  /** R34: the preview of the files; without it they are links. */
+  loadAttachment?: LoadAttachment; onOpenAttachment?: (a: ChatAttachment) => void;
+}) {
   const { t, i18n } = useTranslation(UIKIT_NS);
   const [open, setOpen] = useState(false);
   if (m.role === "note") return <div className="sysnote">{m.text}</div>;
   if (m.role === "event" && m.event) return <EventDivider m={m} />;
   const mark = m.mark && <div className="chan"><Icon name={m.mark.icon} size={12} /> {m.mark.text} · {markTime(m.createdAt, i18n.language)}</div>;
   const atts = m.attachments && m.attachments.length > 0 && (
-    <div className="atts">
-      {m.attachments.map((a) => <a key={a.id} href={a.href}><Icon name="clip" size={12} /> {a.fileName}</a>)}
-    </div>
+    <AttachmentList items={m.attachments} load={loadAttachment} onOpen={onOpenAttachment} />
   );
   if (m.role === "user") {
     return (

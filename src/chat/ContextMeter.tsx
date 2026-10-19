@@ -4,10 +4,11 @@ import { Icon } from "../components/Icon";
 import { useOutside } from "../components/ui";
 import { UIKIT_NS, useKitT } from "../i18n";
 import type { ChatContext } from "./types";
+import { intlLocale } from "./intl";
 
 /** A number of tokens shortly: 42K, 1.2M in the language of the interface. */
 export function tokens(n: number, lng: string): string {
-  return new Intl.NumberFormat(lng === "zh" ? "zh-CN" : lng, { notation: "compact", maximumFractionDigits: 1 }).format(n);
+  return new Intl.NumberFormat(intlLocale(lng), { notation: "compact", maximumFractionDigits: 1 }).format(n);
 }
 
 /** The fill of the context window by a ring next to the send button

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { html } from "../testing";
 import { AgentButton, AgentMenu } from "./AgentMenu";
-import { Chat } from "./Chat";
+import { Chat, VoiceButton } from "./Chat";
 import { ConversationList } from "./ConversationList";
 import { MessageView, markTime, visibleSteps } from "./MessageView";
 import type { ChatMessage, ChatStep } from "./types";
@@ -79,6 +79,15 @@ describe("chat", () => {
     expect(out).toContain("The agent wants to perform: send a letter");
     expect(out).toContain("<pre>{}</pre>");
     for (const label of ["Attach files", "Earlier messages", "Execute", "Reject"]) expect(out, label).toContain(label);
+  });
+
+  it("FTR.NAB.CHAT-0001 VOC-15 shows a wave instead of the microphone while the voice is recognized", () => {
+    const idle = html(<VoiceButton supported recognizing={false} onStart={() => {}} />);
+    expect(idle).toContain('aria-label="Record a voice message"');
+    expect(idle).not.toContain("voicewait");
+    const busy = html(<VoiceButton supported recognizing onStart={() => {}} />);
+    expect(busy).toContain('class="voicewait" role="status" aria-label="Recognizing…"');
+    expect(busy).not.toContain("<button");
   });
 
   it("CHAT-17 shows the reason instead of the composer when one cannot write", () => {

@@ -75,6 +75,15 @@
     },
     "event": {
       "details": "摘要"
+    },
+    "files": {
+      "open": "打开 {name}",
+      "download": "下载",
+      "failed": "无法打开文件",
+      "tooLarge": "文件太大，无法预览，请下载",
+      "save": "下载 {name}",
+      "notUtf8": "文件不是 UTF-8 编码，请下载",
+      "rows": "显示 {total} 行中的 {shown} 行"
     }
   }
 }

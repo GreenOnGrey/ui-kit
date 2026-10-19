@@ -5,7 +5,7 @@ import {
 } from "../src";
 import { ICON_NAMES } from "../src/components/Icon";
 import tokensCss from "../src/styles/tokens.css?raw";
-import { AgentButton, AgentMenu, CommandPalette, ContextMeter, MessageView, type ChatCommand } from "../src/chat";
+import { AgentButton, AgentMenu, CommandPalette, ContextMeter, MessageView, VoiceButton, type ChatCommand } from "../src/chat";
 import { LoginScreen } from "../src/login";
 import pkg from "../package.json";
 import { ChatDemo } from "./ChatDemo";
@@ -219,9 +219,16 @@ function Sections() {
 
       <Section id="chat" lead="Данные вымышленные, кнопки работают без сервера. Отмена хода, подтверждение, вложения и голос есть, только когда продукт передал обработчик.">
         <Example label="История: подписи, шаги, вложения, ошибка с повтором" box><ChatDemo demo="history" /></Example>
+        <Example label="Файлы агента: миниатюры, плитки просмотра по типу, плитка скачивания" box><ChatDemo demo="files" files /></Example>
         <Example label="Пустой разговор" box><ChatDemo demo="empty" empty /></Example>
         <Example label="Агент печатает: шаг выполняется, текста ещё нет" box><ChatDemo demo="typing" typing /></Example>
         <Example label="История не загрузилась; ранние сообщения подгружаются" box><ChatDemo demo="history-error" historyError /></Example>
+        <Example label="Кнопка голоса: готова и распознаёт запись (волна вместо микрофона)">
+          <div className="row" style={{ gap: 12 }}>
+            <VoiceButton supported recognizing={false} onStart={() => {}} />
+            <VoiceButton supported recognizing onStart={() => {}} />
+          </div>
+        </Example>
         <Example label="Агент запускается" box><ChatDemo demo="starting" wait="starting" /></Example>
         <Example label="В очереди" box><ChatDemo demo="queued" wait="queued" /></Example>
         <Example label="Отмена хода и подтверждение действия" box><ChatDemo demo="full" full /></Example>

@@ -1,12 +1,13 @@
-import { useEffect, useLayoutEffect, useRef, useState, type KeyboardEvent } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
 import { Icon } from "../components/Icon";
 import { useToast } from "../components/ui";
 import { useKitT } from "../i18n";
 import { CommandPalette, matchCommands } from "./CommandPalette";
 import { ContextMeter } from "./ContextMeter";
 import { MessageView } from "./MessageView";
+import { AttachmentPreview, type LoadAttachment } from "./Attachments";
 import { transcribe } from "./transcription";
-import type { ChatCommand, ChatProps, ChatUpload } from "./types";
+import type { ChatAttachment, ChatCommand, ChatProps, ChatUpload } from "./types";
 import { clock, useRecorder } from "./useRecorder";
 
 /** The conversation: the messages and the composer (FTR.NAB.CMN-0005 R11–R13,
@@ -24,6 +25,17 @@ export function Chat(props: ChatProps) {
   const [paletteClosed, setPaletteClosed] = useState(false);
   const [unknown, setUnknown] = useState<string | null>(null);
   const [recognizing, setRecognizing] = useState(false);
+  // FTR.NAB.CHAT-0001 R34: the file open in the preview. The product's loader may be a new function on
+  // every render; the chat gives the thumbnails one stable function while the product has a loader
+  const [viewing, setViewing] = useState<ChatAttachment | null>(null);
+  const latestLoader = useRef(props.loadAttachment);
+  useEffect(() => {
+    latestLoader.current = props.loadAttachment;
+  });
+  const canLoad = !!props.loadAttachment;
+  const loadFile = useMemo<LoadAttachment | undefined>(() => canLoad
+    ? (a: ChatAttachment) => latestLoader.current ? latestLoader.current(a) : Promise.reject(new Error("no loader"))
+    : undefined, [canLoad]);
   const voice = useRef(false);
   const listRef = useRef<HTMLDivElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -195,7 +207,8 @@ export function Chat(props: ChatProps) {
         {messages.length === 0 && !props.loading && !props.historyError && (
           <div className="empty"><div className="ic"><Icon name="spark" /></div><b>{t("chat.emptyTitle", { name: props.agentName })}</b>{props.emptyHint}</div>
         )}
-        {messages.map((m) => <MessageView key={m.id} m={m} busy={busy} onRetry={props.onRetry && (() => props.onRetry?.(m.id))} />)}
+        {messages.map((m) => <MessageView key={m.id} m={m} busy={busy} onRetry={props.onRetry && (() => props.onRetry?.(m.id))}
+          loadAttachment={loadFile} onOpenAttachment={setViewing} />)}
         {props.onConfirm && (props.confirmations ?? []).map((c) => (
           <div className="confirm" key={c.id} role="group" aria-label={t("chat.confirm.title")}>
             <div className="h"><Icon name="alert" size={16} />{t("chat.confirm.title")}</div>
@@ -249,7 +262,7 @@ export function Chat(props: ChatProps) {
                 <button type="button" className="btn primary sm" onKeyDown={voiceKey} onClick={() => void stopAndTranscribe()}>{t("chat.voice.done")}</button>
               </div>
             ) : (
-              <div className={`field${skill ? " with-skill" : ""}`}>
+              <div className={`field${skill ? " with-skill" : ""}${recognizing ? " recognizing" : ""}`} aria-busy={recognizing || undefined}>
                 {skill && (
                   <span className="chip skill-chip">
                     <Icon name="spark" size={12} />{skill}
@@ -264,16 +277,12 @@ export function Chat(props: ChatProps) {
             )}
             {props.context && !recorder.recording && <ContextMeter context={props.context} onCompact={props.onCompact} onReset={props.onReset} />}
             {props.onTranscribe && !recorder.recording && (
-              <button className="iconbtn" disabled={!recorder.supported || recognizing}
-                aria-label={t("chat.voice.start")} title={recorder.supported ? t("chat.voice.start") : t("chat.voice.unsupported")}
-                onClick={() => void recorder.start()}>
-                <Icon name="mic" />
-              </button>
+              <VoiceButton supported={recorder.supported} recognizing={recognizing} onStart={() => void recorder.start()} />
             )}
             {!recorder.recording && (props.onCancel && busy ? (
               <button className="iconbtn fill" aria-label={t("chat.stop")} onClick={props.onCancel}><Icon name="stop" /></button>
             ) : (
-              <button className="iconbtn fill" aria-label={t("chat.send")} disabled={(!text.trim() && pending.length === 0 && !skill) || busy} onClick={() => send(text)}>
+              <button className="iconbtn fill" aria-label={t("chat.send")} disabled={(!text.trim() && pending.length === 0 && !skill) || busy || recognizing} onClick={() => send(text)}>
                 <Icon name="send" />
               </button>
             ))}
@@ -281,6 +290,27 @@ export function Chat(props: ChatProps) {
           {recorder.error && <div className="err-text" style={{ padding: "0 12px 8px" }}>{t("chat.voice.micDenied")}</div>}
         </div>
       )}
+      {viewing && loadFile && <AttachmentPreview a={viewing} load={loadFile} onClose={() => setViewing(null)} />}
     </section>
+  );
+}
+
+// design §3.1: while the server recognizes a recording the microphone gives way
+// to a wave, so the user sees the voice is being processed
+export function VoiceButton({ supported, recognizing, onStart }: { supported: boolean; recognizing: boolean; onStart: () => void }) {
+  const t = useKitT();
+  if (recognizing) {
+    return (
+      <span className="voicewait" role="status" aria-label={t("chat.voice.recognizing")} title={t("chat.voice.recognizing")}>
+        <i /><i /><i /><i /><i />
+      </span>
+    );
+  }
+  return (
+    <button className="iconbtn" disabled={!supported}
+      aria-label={t("chat.voice.start")} title={supported ? t("chat.voice.start") : t("chat.voice.unsupported")}
+      onClick={onStart}>
+      <Icon name="mic" />
+    </button>
   );
 }

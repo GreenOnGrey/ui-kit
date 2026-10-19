@@ -18,7 +18,9 @@ export interface ChatConversation {
 /** A file the user has attached to the message being written. */
 export interface ChatUpload { id: string; fileName: string }
 
-export interface ChatAttachment extends ChatUpload { href: string }
+/** A file of a message: `href` downloads it; the type and the size choose and caption its preview
+ * (FTR.NAB.CHAT-0001 R34). */
+export interface ChatAttachment extends ChatUpload { href: string; mimeType?: string; size?: number }
 
 export interface ChatStep { id: string; text: string; title?: string; status: "running" | "done" | "error" }
 
@@ -114,6 +116,8 @@ export interface ChatProps {
   onConfirm?(id: string, approve: boolean): void;
   /** `null`: the upload failed and the product has told the user. */
   onUpload?(file: File): Promise<ChatUpload | null>;
+  /** Loads a file of a message for its preview (R34): images, PDF and Markdown open in the chat. Without it files are links. */
+  loadAttachment?(attachment: ChatAttachment): Promise<Blob>;
   /** The files attached to the message being written, after every change. */
   onPendingChange?(uploads: ChatUpload[]): void;
   /** The text of a recording; `null`: it failed and the product has told the user. A rejection

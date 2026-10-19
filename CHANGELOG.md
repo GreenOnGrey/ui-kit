@@ -4,6 +4,19 @@ Versions follow semver. A visible change of the look is at least a minor (FTR.NA
 Since `1.0.0` the contract of the kit — class names, tokens, props, icon names, keys of strings — changes only
 in a major.
 
+## 1.3.0
+
+A visible change (FTR.NAB.CHAT-0001 design §3.1).
+
+- Chat: while a recording is recognized the microphone gives way to a wave (`.voicewait`, `role="status"`), the field
+  is dimmed and «Send» is off — the recording cannot be recognized twice and the text cannot be sent half-made.
+- Chat: the files of a message are previewed (FTR.NAB.CHAT-0001 R34) when the product gives `loadAttachment`:
+  images and SVG as thumbnails; PDF (the browser's viewer), Markdown, CSV/TSV (a table, 500 rows) and text or code
+  (HTML as its source) as tiles with the icon of the preview; the rest as tiles that download. The preview names the
+  file and its size and offers «Download». `ChatAttachment` gains `mimeType` and `size`; new exports
+  `AttachmentList`, `AttachmentPreview`, `previewKind`, `parseTable`, `fileSize`; icons `pdf`, `markdown`, `source`;
+  strings `chat.files.*`. Without `loadAttachment` every file is a download tile.
+
 ## 1.2.0
 
 A visible change (FTR.NAB.CHAT-0001 design §3.1).
