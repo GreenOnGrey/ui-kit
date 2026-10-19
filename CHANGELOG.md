@@ -4,6 +4,14 @@ Versions follow semver. A visible change of the look is at least a minor (FTR.NA
 Since `1.0.0` the contract of the kit — class names, tokens, props, icon names, keys of strings — changes only
 in a major.
 
+## 1.5.0
+
+A visible change (FTR.NAB.CHAT-0001 R34, design §3.6).
+
+- Chat: the preview of an HTML page lays it out at the width of a desktop (1280 px) and scales it to
+  the width of the modal, so a page made for a screen — a deck of slides — is seen whole instead of cut; the modal of
+  an HTML page or a PDF is 1100 px wide (within the screen).
+
 ## 1.4.0
 
 A visible change (FTR.NAB.CHAT-0001 R34, design §3.6).

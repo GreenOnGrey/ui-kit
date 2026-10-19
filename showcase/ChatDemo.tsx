@@ -145,8 +145,11 @@ async function loadDemoFile(a: { id: string }): Promise<Blob> {
     return new Blob(["$ npm run build\n> vite build\n✓ 412 modules transformed.\ndist/assets/index-" + "a1b2c3d4".repeat(24) + ".js\n✓ built in 1.61s\n"], { type: "text/plain" });
   }
   if (a.id === "page") {
-    return new Blob(['<!doctype html><title>Каркас презентации</title><style>body{font:16px system-ui;margin:24px;color:#1d1d2c}h1{color:#7c5cff}' +
-      '.card{border:1px solid #ddd;border-radius:12px;padding:16px}</style><h1>Релиз 1.3</h1><div class="card">Файлы агента и их просмотр</div>' +
+    // a slide of a fixed width, as a deck is made: the preview scales it to the modal instead of cutting it
+    return new Blob(['<!doctype html><title>Каркас презентации</title><style>body{margin:0;font:16px system-ui;color:#fff;background:#1d1838}' +
+      '.slide{width:1280px;height:720px;box-sizing:border-box;padding:96px;background:linear-gradient(135deg,#2a2150,#3b2d7a)}h1{font-size:72px;margin:0 0 24px}' +
+      '.card{display:inline-block;border:1px solid #7c5cff;border-radius:12px;padding:16px 24px;font-size:28px}</style>' +
+      '<div class="slide"><h1>Релиз 1.3</h1><div class="card">Файлы агента и их просмотр</div></div>' +
       // an outside picture, a relative one (it would go to the site) and a refresh: the preview loads none of them
       '<img src="https://tracker.invalid/pixel.png" alt=""><img src="leak.png" alt="">' +
       '<meta http-equiv="refresh" content="0;url=https://tracker.invalid/">' +

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Icon, type IconName } from "../components/Icon";
 import { Markdown } from "../components/Markdown";
@@ -246,6 +246,34 @@ function TableView({ text, tab }: { text: string; tab: boolean }) {
   );
 }
 
+/** The width a previewed page is laid out at: the one of a desktop. A narrower frame shows it scaled down, so a
+ * page made for a screen (a deck of slides) is seen whole instead of cut. */
+export const PAGE_WIDTH = 1280;
+
+/** A previewed HTML page: a frame with no permissions — no scripts, forms or access to the site — and nothing
+ * from outside, laid out at PAGE_WIDTH and scaled to the width of the preview. */
+function HtmlPage({ text, title }: { text: string; title: string }) {
+  const box = useRef<HTMLDivElement>(null);
+  const [scale, setScale] = useState(1);
+  useEffect(() => {
+    const el = box.current;
+    if (!el) return;
+    const fit = () => setScale(Math.min(1, el.clientWidth / PAGE_WIDTH));
+    fit();
+    if (typeof ResizeObserver === "undefined") return;
+    const ro = new ResizeObserver(fit);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+  const doc = useMemo(() => htmlDocument(text), [text]);
+  return (
+    <div className="att-htmlbox" ref={box}>
+      <iframe className="att-html" sandbox="" srcDoc={doc} title={title} referrerPolicy="no-referrer"
+        style={{ width: PAGE_WIDTH, height: `${100 / scale}%`, transform: `scale(${scale})` }} />
+    </div>
+  );
+}
+
 /** The text of a file, or null when it is not UTF-8. */
 type Text = { text: string | null };
 
@@ -283,7 +311,7 @@ export function AttachmentPreview({ a, load, onClose }: { a: ChatAttachment; loa
   else if (kind === "markdown") body = <div className="att-md"><Markdown text={text ?? ""} /></div>;
   else if (kind === "table") body = <TableView text={text ?? ""} tab={/\.tsv$/i.test(a.fileName) || a.mimeType === "text/tab-separated-values"} />;
   // a page: a frame with no permissions — no scripts, forms or access to the site — and no loads from outside
-  else if (kind === "html" && !source) body = <iframe className="att-html" sandbox="" srcDoc={htmlDocument(text ?? "")} title={a.fileName} referrerPolicy="no-referrer" />;
+  else if (kind === "html" && !source) body = <HtmlPage text={text ?? ""} title={a.fileName} />;
   else body = <pre className="att-text">{text}</pre>;
   return (
     <Modal wide onClose={onClose}

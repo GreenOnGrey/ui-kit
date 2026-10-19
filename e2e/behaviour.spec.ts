@@ -239,6 +239,9 @@ test.describe("chat", () => {
     await expect(dialog.frameLocator("iframe.att-html").getByRole("heading", { name: "Релиз 1.3" })).toBeVisible();
     // nothing is loaded from outside
     expect(outside).toEqual([]);
+    // a slide of 1280 px is scaled to the modal, not cut: the frame is no wider than its box
+    const [frameBox, holder] = [await frame.boundingBox(), await dialog.locator(".att-htmlbox").boundingBox()];
+    expect(frameBox && holder && frameBox.width <= holder.width + 1).toBe(true);
     await dialog.getByRole("button", { name: "Код" }).click();
     await expect(dialog.locator("pre.att-text")).toContainText("<h1>Релиз 1.3</h1>");
     await dialog.getByRole("button", { name: "Страница" }).click();
