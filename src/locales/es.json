@@ -39,7 +39,11 @@
       "review": "Revise la transcripción antes de enviar",
       "notRecognized": "No se reconoció la voz",
       "micDenied": "Sin acceso al micrófono",
-      "unsupported": "Este navegador no admite la entrada de voz"
+      "unsupported": "Este navegador no admite la entrada de voz",
+      "start": "Grabar un mensaje de voz",
+      "done": "Detener",
+      "recognizing": "Reconociendo…",
+      "recordingNow": "Grabando"
     },
     "confirm": {
       "title": "Confirme la acción",
@@ -50,6 +54,25 @@
     "wait": {
       "starting": "El agente se está iniciando…",
       "queued": "{count, plural, =0 {En cola · usted es el siguiente} other {En cola · # por delante}}"
+    },
+    "palette": {
+      "title": "Comandos y skills",
+      "commands": "Comandos",
+      "skills": "Skills",
+      "noSkills": "No tiene skills disponibles",
+      "empty": "No se encontró nada"
+    },
+    "unknownCommand": "Comando desconocido {name}",
+    "sendAsText": "Enviar como texto",
+    "skillPlaceholder": "¿Qué hacer con el skill?",
+    "context": {
+      "meter": "Contexto: {used} de {total} tokens ({pct} %)",
+      "full": "Las respuestas se encarecen y el agente puede confundirse.",
+      "compact": "Compactar",
+      "reset": "Empezar de nuevo"
+    },
+    "event": {
+      "details": "Resumen"
     }
   }
 }

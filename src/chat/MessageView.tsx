@@ -30,6 +30,7 @@ export function MessageView({ m, busy, onRetry }: { m: ChatMessage; busy: boolea
   const { t, i18n } = useTranslation(UIKIT_NS);
   const [open, setOpen] = useState(false);
   if (m.role === "note") return <div className="sysnote">{m.text}</div>;
+  if (m.role === "event" && m.event) return <EventDivider m={m} />;
   const mark = m.mark && <div className="chan"><Icon name={m.mark.icon} size={12} /> {m.mark.text} · {markTime(m.createdAt, i18n.language)}</div>;
   const atts = m.attachments && m.attachments.length > 0 && (
     <div className="atts">
@@ -70,7 +71,7 @@ export function MessageView({ m, busy, onRetry }: { m: ChatMessage; busy: boolea
         </div>
       ))}
       {waiting && <div className="bub"><span className="typing" aria-label={t("chat.typing")}><i /><i /><i /></span></div>}
-      {m.content ?? (m.text && <div className="bub"><Markdown text={m.text} /></div>)}
+      {m.content ?? (m.text && <div className="bub" title={m.hint}><Markdown text={m.text} /></div>)}
       {atts}
       {m.error && (
         <div className={`llmerr${m.error.transient ? " amber" : ""}`} role="alert" style={{ marginTop: 6 }}>
@@ -82,6 +83,30 @@ export function MessageView({ m, busy, onRetry }: { m: ChatMessage; busy: boolea
           )}
         </div>
       )}
+    </div>
+  );
+}
+
+/** An event of the conversation: a line with a chip; the details unfold
+ * (FTR.NAB.CHAT-0001 design §3.2). */
+function EventDivider({ m }: { m: ChatMessage }) {
+  const { t, i18n } = useTranslation(UIKIT_NS);
+  const [open, setOpen] = useState(false);
+  const ev = m.event!;
+  return (
+    <div className="evdiv">
+      <div className="evline" role="separator">
+        <span className="evchip">
+          <Icon name={ev.icon} size={12} />
+          {ev.text} · {markTime(m.createdAt, i18n.language)}
+          {ev.details && (
+            <button type="button" className="textbtn" aria-expanded={open} onClick={() => setOpen((v) => !v)}>
+              {t("chat.event.details")} {open ? "▴" : "▾"}
+            </button>
+          )}
+        </span>
+      </div>
+      {open && ev.details && <div className="evdetails">{ev.details}</div>}
     </div>
   );
 }

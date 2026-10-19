@@ -24,7 +24,7 @@
 .tool .er{color:var(--red)}
 .tool .run{color:var(--muted)}
 .tool .tx{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
-.tools-fold{font-size:12px;color:var(--muted);border:0;background:none;padding:2px 0;margin-bottom:4px}
+.tools-fold{display:block;font-size:12px;color:var(--muted);border:0;background:none;padding:2px 0;margin-bottom:4px}
 .ok-t{color:var(--green)}
 .err-t{color:var(--red)}
 .warn-t{color:var(--amber)}
@@ -110,3 +110,56 @@
 .nb-app.narrow .nb-side.open{display:block;position:absolute;inset:0 30% 0 0;z-index:15;box-shadow:var(--shadow)}
 .nb-app.narrow .nb-scrim{display:block;position:absolute;inset:0;z-index:14;border:0;padding:0;background:rgba(0,0,0,.25)}
 .nb-app.narrow .nb-chat .m,.nb-app.narrow .nb-chat .m.u{max-width:92%}
+/* FTR.NAB.CHAT-0001 design §1, §3: the palette of commands, the skill of a message, the fill of the context,
+   the dividers of events, the bar of a recording, the models of the agent. */
+.composer-wrap{position:relative;border-top:1px solid var(--border)}
+.composer-wrap .composer{border-top:0}
+.composer .field{flex:1;display:flex;align-items:flex-end;gap:6px;min-width:0}
+.composer .field textarea{min-width:0}
+.composer .field.with-skill{flex-wrap:wrap}
+.skill-chip{background:var(--violet-soft);color:var(--violet-text);border-color:transparent;align-self:center}
+.palette{position:absolute;left:10px;right:10px;bottom:calc(100% - 4px);z-index:15;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-m);box-shadow:var(--shadow-l, 0 12px 32px rgba(0,0,0,.18));padding:6px;max-height:300px;overflow-y:auto}
+.palette-h{font-size:11px;color:var(--muted);padding:6px 10px 4px;text-transform:uppercase;letter-spacing:.04em}
+.palette-row{display:grid;grid-template-columns:18px minmax(110px,auto) 1fr auto;gap:8px;align-items:center;width:100%;padding:7px 10px;border:0;border-radius:var(--r-s);background:none;color:var(--text);font-size:13px;text-align:left}
+.palette-row.on{background:var(--violet-soft)}
+.palette-row .slash{font-family:var(--mono);color:var(--muted);text-align:center}
+.palette-row .nm{font-family:var(--mono);white-space:nowrap}
+.palette-row .ds{color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.palette-row .src{font-size:11px;color:var(--muted);white-space:nowrap}
+.palette-empty{font-size:13px;color:var(--muted);padding:6px 10px}
+.cmd-unknown{display:flex;gap:10px;align-items:center;font-size:13px;color:var(--amber);padding:8px 12px 0}
+.textbtn{border:0;background:none;padding:0;color:var(--violet-text);font:inherit;cursor:pointer}
+.ctxmeter{position:relative;align-self:center}
+.ctxring{width:26px;height:26px;display:grid;place-items:center;border:0;background:none;padding:0;border-radius:50%}
+.ctxring svg{width:18px;height:18px}
+.ctxring circle{fill:none;stroke-width:3}
+.ctxring .bg{stroke:var(--border)}
+.ctxring .fg{stroke:var(--muted)}
+.ctxring.warn .fg{stroke:var(--amber)}
+.ctxring.full .fg{stroke:var(--red)}
+.ctxtip{position:absolute;right:0;bottom:calc(100% + 8px);z-index:16;width:260px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-m);box-shadow:var(--shadow-l, 0 12px 32px rgba(0,0,0,.18));padding:10px 12px;font-size:13px}
+.evdiv{display:flex;flex-direction:column;align-items:center;gap:6px}
+.evline{display:flex;align-items:center;gap:10px;width:100%;color:var(--muted);font-size:12px}
+.evline::before,.evline::after{content:"";flex:1;height:1px;background:var(--border)}
+.evchip{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:999px;background:var(--surface);border:1px solid var(--border);white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis}
+.evdetails{max-width:560px;font-size:13px;color:var(--text-2);background:var(--surface-2);border-radius:var(--r-m);padding:10px 12px;white-space:pre-wrap}
+.recbar{flex:1;display:flex;align-items:center;gap:10px;border:1px solid var(--red);border-radius:var(--r-m);padding:5px 8px 5px 12px;background:var(--red-soft);min-width:0}
+.recbar .dot{width:10px;height:10px;border-radius:50%;background:var(--red);flex:none;animation:blink 1.2s infinite}
+.recbar .tm{font-family:var(--mono);font-size:13px;white-space:nowrap}
+.recbar .lvl{flex:1;height:6px;border-radius:3px;background:var(--border);overflow:hidden;min-width:20px}
+.recbar .lvl i{display:block;height:100%;background:var(--red);transform-origin:left;transition:transform .1s linear}
+.recbar.ending{border-color:var(--amber);background:var(--amber-soft)}
+.recbar.ending .tm{color:var(--amber)}
+.recbar.ending .dot,.recbar.ending .lvl i{background:var(--amber)}
+.agentmodels{display:flex;flex-direction:column;gap:4px}
+.agentmodel{display:flex;gap:10px;align-items:flex-start;width:100%;padding:8px;border:0;border-radius:var(--r-m);background:none;color:var(--text);text-align:left}
+.agentmodel.on{background:var(--violet-soft)}
+.agentmodel:disabled{cursor:default}
+.agentmodel .radio{width:16px;height:16px;border-radius:50%;border:1.5px solid var(--border-strong);margin-top:2px;flex:none}
+.agentmodel .radio.on{border:5px solid var(--violet)}
+.agentmodel .body{display:flex;flex-direction:column;gap:2px;min-width:0}
+.agentmodel .nm{font-size:14px;font-weight:500}
+.agentmodel .sub{font-size:12px;color:var(--muted)}
+.agentmodel .badges{display:flex;gap:4px;flex-wrap:wrap;margin-top:2px}
+.agentmodel .cap{display:inline-flex;align-items:center;gap:3px;font-size:11px;padding:1px 7px;border-radius:999px;background:var(--surface-2);color:var(--text-2)}
+.agentmodel .warn{font-size:12px;color:var(--amber);margin-top:2px}

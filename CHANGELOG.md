@@ -4,6 +4,27 @@ Versions follow semver. A visible change of the look is at least a minor (FTR.NA
 Since `1.0.0` the contract of the kit — class names, tokens, props, icon names, keys of strings — changes only
 in a major.
 
+## 1.1.0
+
+A visible change (FTR.NAB.CHAT-0001 design §3).
+
+- Chat: «N more steps» of an answer stands on its own line under the channel mark; it used to follow the mark on
+  the same line («Telegram · 22:08 8 more steps»).
+- Chat: the palette of «/» over the composer — `commands` (commands of the conversation and skills) with
+  `onCommand`; a picked skill is a chip in the composer and comes to `onSend` as its fourth argument; a command
+  the product does not know offers «Send as text».
+- Chat: the fill of the context next to the send button — `context`, with `onCompact` and `onReset` offered when
+  the context is full (`ContextMeter`).
+- Chat: events of the conversation — a message with `role: "event"` and `event` is a divider with its time; its
+  `details` unfold.
+- Chat: voice input is started and stopped by a click, not held: a bar with the timer, the level of the voice,
+  «Cancel» and «Stop»; the recording stops by itself at `voiceMaxSeconds` (300), the last 15 seconds are amber.
+  The recognized text goes into the composer; the separate review of the transcript is gone (its strings stay).
+- `AgentMenu`: the block of the model after the options — `models`.
+- Chat: `ChatMessage.hint` is the tooltip of the bubble of an answer (the model); `onPendingChange` reports the files
+  attached to the message being written.
+- Icons: `image`, `compress`.
+
 ## 1.0.1
 
 The first published version of the stable contract: the package is the one described under 1.0.0.

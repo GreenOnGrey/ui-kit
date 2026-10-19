@@ -39,7 +39,11 @@
       "review": "Prüfen Sie die Transkription vor dem Senden",
       "notRecognized": "Die Sprache wurde nicht erkannt",
       "micDenied": "Kein Zugriff auf das Mikrofon",
-      "unsupported": "Spracheingabe wird von diesem Browser nicht unterstützt"
+      "unsupported": "Spracheingabe wird von diesem Browser nicht unterstützt",
+      "start": "Sprachnachricht aufnehmen",
+      "done": "Stopp",
+      "recognizing": "Wird erkannt…",
+      "recordingNow": "Aufnahme"
     },
     "confirm": {
       "title": "Aktion bestätigen",
@@ -50,6 +54,25 @@
     "wait": {
       "starting": "Der Agent startet…",
       "queued": "{count, plural, =0 {In der Warteschlange · Sie sind als Nächstes dran} other {In der Warteschlange · # vor Ihnen}}"
+    },
+    "palette": {
+      "title": "Befehle und Skills",
+      "commands": "Befehle",
+      "skills": "Skills",
+      "noSkills": "Ihnen ist kein Skill freigegeben",
+      "empty": "Nichts gefunden"
+    },
+    "unknownCommand": "Unbekannter Befehl {name}",
+    "sendAsText": "Als Text senden",
+    "skillPlaceholder": "Was soll mit dem Skill getan werden?",
+    "context": {
+      "meter": "Kontext: {used} von {total} Tokens ({pct} %)",
+      "full": "Antworten werden teurer, der Agent kann durcheinanderkommen.",
+      "compact": "Komprimieren",
+      "reset": "Neu beginnen"
+    },
+    "event": {
+      "details": "Zusammenfassung"
     }
   }
 }

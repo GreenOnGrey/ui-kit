@@ -140,41 +140,37 @@ test.describe("chat", () => {
     await expect(input).toHaveValue("に");
   });
 
-  test("CHAT-10 holding the button records, releasing gives the transcript to check", async ({ page }) => {
+  test("CHAT-10, VOC-06 a click records, «Stop» puts the transcript into the composer (FTR.NAB.CHAT-0001 R20)", async ({ page }) => {
     const s = await openSection(page, "chat");
     const chat = demo(s, "history");
-    const mic = chat.getByRole("button", { name: "Удерживайте для записи" });
-    await mic.dispatchEvent("pointerdown");
-    await expect(chat.locator(".rec-box")).toContainText("Запись");
+    await chat.getByRole("button", { name: "Записать голосом" }).click();
+    await expect(chat.locator(".recbar")).toContainText("/ 5:00");
     await page.waitForTimeout(400);
-    await chat.getByRole("button", { name: "Остановить запись" }).dispatchEvent("pointerup");
-    const review = chat.getByLabel("Проверьте расшифровку перед отправкой");
-    await expect(review).toHaveValue(/Расшифровка записи/);
-    await chat.locator(".transcript").getByRole("button", { name: "Отправить" }).click();
+    await chat.locator(".recbar").getByRole("button", { name: "Стоп" }).click();
+    const input = chat.getByRole("textbox");
+    await expect(input).toHaveValue(/Расшифровка записи/);
+    await input.press("Enter");
     await expect(chat.locator(".m.u").last()).toContainText("Расшифровка записи");
     await expect(chat.locator(".m.u .chan").last()).toContainText("голосом");
   });
 
-  test("CHAT-11 Space starts and stops the recording", async ({ page }) => {
+  test("CHAT-11, VOC-06 «Cancel» drops the recording", async ({ page }) => {
     const s = await openSection(page, "chat");
     const chat = demo(s, "history");
-    await chat.getByRole("button", { name: "Удерживайте для записи" }).focus();
-    await page.keyboard.press("Space");
-    await expect(chat.locator(".rec-box")).toBeVisible();
-    await page.waitForTimeout(400);
-    await page.keyboard.press("Space");
-    await expect(chat.locator(".transcript")).toBeVisible();
-    await chat.locator(".transcript").getByRole("button", { name: "Удалить" }).click();
-    await expect(chat.getByRole("textbox")).toBeVisible();
+    await chat.getByRole("button", { name: "Записать голосом" }).click();
+    await expect(chat.locator(".recbar")).toBeVisible();
+    await chat.locator(".recbar").getByRole("button", { name: "Отмена" }).click();
+    await expect(chat.locator(".recbar")).toHaveCount(0);
+    await expect(chat.getByRole("textbox")).toHaveValue("");
   });
 
-  test("CHAT-12 a refused microphone is told under the composer", async ({ page }) => {
+  test("CHAT-12, VOC-07 a refused microphone is told under the composer", async ({ page }) => {
     await page.addInitScript(() => {
       navigator.mediaDevices.getUserMedia = () => Promise.reject(new DOMException("denied", "NotAllowedError"));
     });
     const s = await openSection(page, "chat");
     const chat = demo(s, "history");
-    await chat.getByRole("button", { name: "Удерживайте для записи" }).dispatchEvent("pointerdown");
+    await chat.getByRole("button", { name: "Записать голосом" }).click();
     await expect(chat.locator(".err-text").filter({ hasText: "Нет доступа к микрофону" })).toBeVisible();
   });
 
@@ -183,9 +179,48 @@ test.describe("chat", () => {
       delete (window as { MediaRecorder?: unknown }).MediaRecorder;
     });
     const s = await openSection(page, "chat");
-    const mic = demo(s, "history").getByRole("button", { name: "Удерживайте для записи" });
+    const mic = demo(s, "history").getByRole("button", { name: "Записать голосом" });
     await expect(mic).toBeDisabled();
     await expect(mic).toHaveAttribute("title", "Голосовой ввод не поддерживается этим браузером");
+  });
+
+  test("SKL-01 «/» opens the palette, arrows and Enter pick a skill, Backspace takes it off", async ({ page }) => {
+    const s = await openSection(page, "chat");
+    const chat = demo(s, "full");
+    const input = chat.getByRole("textbox");
+    await input.fill("/");
+    await expect(chat.locator(".palette")).toContainText("contract-review");
+    await input.fill("/contr");
+    await expect(chat.locator(".palette-row")).toHaveCount(1);
+    await input.press("Enter");
+    await expect(chat.locator(".skill-chip")).toContainText("contract-review");
+    await input.press("Backspace");
+    await expect(chat.locator(".skill-chip")).toHaveCount(0);
+    await input.fill("/");
+    await input.press("Escape");
+    await expect(chat.locator(".palette")).toHaveCount(0);
+  });
+
+  test("SKL-02 an unknown command is not sent; a known one runs", async ({ page }) => {
+    const s = await openSection(page, "chat");
+    const chat = demo(s, "full");
+    const input = chat.getByRole("textbox");
+    const sent = await chat.locator(".m.u").count();
+    await input.fill("/foo bar");
+    await input.press("Enter");
+    await expect(chat.locator(".cmd-unknown")).toContainText("Неизвестная команда /foo");
+    await expect(chat.locator(".m.u")).toHaveCount(sent);
+    await input.fill("/new");
+    await input.press("Escape");
+    await input.press("Enter");
+    await expect(chat.locator(".evdiv").last()).toContainText("Контекст сброшен");
+  });
+
+  test("CTX-10 the ring shows the numbers on a click", async ({ page }) => {
+    const s = await openSection(page, "chat");
+    const chat = demo(s, "full");
+    await chat.locator(".ctxring").click();
+    await expect(chat.locator(".ctxtip")).toContainText("из");
   });
 
   test("CHAT-02 earlier messages keep the place of the list", async ({ page }) => {

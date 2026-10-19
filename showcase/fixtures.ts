@@ -22,7 +22,7 @@ export const history: ChatMessage[] = [
     text: "Без тестов остаются три требования:\n\n- **R17** — перечень изменений\n- **R23** — запрет переопределений\n- **R26** — отставание версии\n\n| Требование | Тест |\n|---|---|\n| R17 | `HMR-01` |\n| R23 | `CHK-01` |" },
   { id: "u2", role: "user", text: "Напомни завтра в 10 про ревью", createdAt: at("14:10"), status: "done",
     mark: { icon: "tg", text: "Telegram" }, attachments: [{ id: "f1", fileName: "план.pdf", href: "#" }] },
-  { id: "a2", role: "assistant", createdAt: at("14:10"), status: "done",
+  { id: "a2", role: "assistant", createdAt: at("14:10"), status: "done", mark: { icon: "tg", text: "Telegram" },
     steps: [1, 2, 3, 4, 5].map((n) => ({ id: `t${n}`, text: `Задания: шаг ${n}`, status: n === 4 ? "error" as const : "done" as const })),
     text: "Готово: напомню завтра в 10:00." },
   { id: "n1", role: "note", text: "Вы подтвердили: отправка письма", createdAt: at("14:11"), status: "done" },

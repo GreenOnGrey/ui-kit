@@ -27,10 +27,21 @@ export interface ChatMark { icon: IconName; text: string }
 
 export type ChatWait = { state: "starting" } | { state: "queued"; position: number };
 
+/** An event of the conversation shown as a divider (FTR.NAB.CHAT-0001 design §3.2):
+ * a reset of the context, a compaction, a change of the model. */
+export interface ChatEvent {
+  icon: IconName;
+  text: string;
+  /** Unfolded by a click: the summary of a compaction. */
+  details?: string;
+}
+
 export interface ChatMessage {
   id: string;
-  /** `note` is a line of the system without a bubble: the outcome of a confirmation, a cancelled turn. */
-  role: "user" | "assistant" | "note";
+  /** `note` is a line of the system without a bubble: the outcome of a confirmation, a cancelled turn.
+   * `event` is a divider of the conversation (`event` is set). */
+  role: "user" | "assistant" | "note" | "event";
+  event?: ChatEvent;
   text: string;
   /** ISO time. */
   createdAt: string;
@@ -42,9 +53,27 @@ export interface ChatMessage {
   error?: { text: string; transient: boolean };
   /** The content of the product inside the message: a mail card, a digest. */
   content?: ReactNode;
+  /** The tooltip of the bubble: the model of an answer (FTR.NAB.CHAT-0001 R18). */
+  hint?: string;
 }
 
 export interface ChatConfirmation { id: string; summary: string; preview?: string }
+
+/** An item of the palette of commands (FTR.NAB.CHAT-0001 R4): a command of the
+ * conversation or a skill. */
+export interface ChatCommand {
+  kind: "command" | "skill";
+  /** What is typed after "/": `new`, `compact`; the name of a skill. */
+  name: string;
+  description?: string;
+  /** The source of a skill: the item of the catalog. */
+  source?: string;
+  /** A command that takes a text after it (`/compact <what to keep>`). */
+  takesText?: boolean;
+}
+
+/** The fill of the context window of the conversation (R3). */
+export interface ChatContext { tokens: number; window: number }
 
 /** Give the chat a `key` of the conversation: its composer and its scroll belong to one conversation. */
 export interface ChatProps {
@@ -66,14 +95,27 @@ export interface ChatProps {
   /** Over the composer: the modes of the chat of Hammurapi. */
   aboveComposer?: ReactNode;
   upload?: { maxBytes: number; accept?: string };
-  /** Resolves when the message is accepted (the composer is cleared); rejects to keep the text. */
-  onSend(text: string, attachmentIds: string[], voice: boolean): Promise<void>;
+  /** The palette of "/": commands and skills; without it "/" is plain text. */
+  commands?: ChatCommand[];
+  /** Runs a command of the palette or one typed in full; rejects to keep the text. */
+  onCommand?(name: string, text: string): Promise<void>;
+  /** The fill of the context; with `onCompact` and `onReset` a full context offers them. */
+  context?: ChatContext;
+  onCompact?(): void;
+  onReset?(): void;
+  /** The longest recording in seconds (the recording stops by itself). */
+  voiceMaxSeconds?: number;
+  /** Resolves when the message is accepted (the composer is cleared); rejects to keep the text.
+   * `skill` is the skill the user picked in the palette. */
+  onSend(text: string, attachmentIds: string[], voice: boolean, skill?: string): Promise<void>;
   onLoadOlder?(): void;
   onRetry?(messageId: string): void;
   onCancel?(): void;
   onConfirm?(id: string, approve: boolean): void;
   /** `null`: the upload failed and the product has told the user. */
   onUpload?(file: File): Promise<ChatUpload | null>;
+  /** The files attached to the message being written, after every change. */
+  onPendingChange?(uploads: ChatUpload[]): void;
   /** The text of a recording; `null`: it failed and the product has told the user. */
   onTranscribe?(recording: Blob): Promise<string | null>;
 }

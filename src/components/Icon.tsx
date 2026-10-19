@@ -74,6 +74,8 @@ const PATHS = {
   download: '<path d="M12 4v12M7 11l5 5 5-5M5 20h14"/>',
   pin: '<path d="M9 4h6l-1 6 4 4H6l4-4zM12 14v6"/>',
   edit: '<path d="M4 20h4L19 9l-4-4L4 16zM14 6l4 4"/>',
+  image: '<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="m21 16-5-5-9 9"/>',
+  compress: '<path d="M4 14h6v6M20 10h-6V4M14 10l7-7M3 21l7-7"/>',
 } as const;
 
 export type IconName = keyof typeof PATHS;

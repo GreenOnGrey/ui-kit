@@ -37,12 +37,12 @@ export function ChatDemo({ demo, narrow, full, empty, readOnly, wait, typing, hi
       setBusy(false);
     }, 1500);
   };
-  const onSend = async (text: string, attachmentIds: string[], voice: boolean) => {
+  const onSend = async (text: string, attachmentIds: string[], voice: boolean, skill?: string) => {
     const id = `m${n.current++}`;
     setBusy(true);
     setMessages((ms) => [...ms,
       { id: `u${id}`, role: "user", text, createdAt: new Date().toISOString(), status: "done",
-        mark: voice ? { icon: "mic", text: "голосом" } : undefined,
+        mark: skill ? { icon: "spark", text: skill } : voice ? { icon: "mic", text: "голосом" } : undefined,
         attachments: attachmentIds.map((a) => ({ id: a, fileName: a, href: "#" })) },
       { id, role: "assistant", text: "", createdAt: new Date().toISOString(), status: "pending" }]);
     answer(id);
@@ -85,7 +85,17 @@ export function ChatDemo({ demo, narrow, full, empty, readOnly, wait, typing, hi
           hasOlder={!empty} onLoadOlder={() => setMessages((ms) => [{ id: `o${n.current++}`, role: "assistant", text: "Более раннее сообщение.", createdAt: "2026-10-10T09:00:00", status: "done" }, ...ms])}
           confirmations={confirmations}
           onConfirm={full ? (id, approve) => { setConfirmations((c) => c.filter((x) => x.id !== id)); setMessages((ms) => [...ms, note(approve ? "Вы подтвердили: отправка письма" : "Вы отклонили: отправка письма")]); } : undefined}
-          onCancel={full ? onCancel : undefined} />
+          onCancel={full ? onCancel : undefined}
+          commands={full ? [
+            { kind: "command", name: "new", description: "Начать с чистого контекста" },
+            { kind: "command", name: "compact", description: "Сжать контекст", takesText: true },
+            { kind: "skill", name: "contract-review", description: "Проверка договора", source: "Юристы" },
+          ] : undefined}
+          onCommand={full ? async (name) => {
+            setMessages((ms) => [...ms, { id: `e${n.current++}`, role: "event", text: "", createdAt: new Date().toISOString(), status: "done",
+              event: name === "new" ? { icon: "undo", text: "Контекст сброшен" } : { icon: "compress", text: "Контекст сжат: 42 тыс. → 3 тыс. токенов", details: "Изложение разговора." } }]);
+          } : undefined}
+          context={full ? { tokens: 42_000, window: 1_000_000 } : undefined} />
       </ChatLayout>
     </div>
   );

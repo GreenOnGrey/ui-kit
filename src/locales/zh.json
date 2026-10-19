@@ -39,7 +39,11 @@
       "review": "发送前请检查转写文本",
       "notRecognized": "未能识别语音",
       "micDenied": "无法访问麦克风",
-      "unsupported": "此浏览器不支持语音输入"
+      "unsupported": "此浏览器不支持语音输入",
+      "start": "录制语音",
+      "done": "停止",
+      "recognizing": "正在识别…",
+      "recordingNow": "录音中"
     },
     "confirm": {
       "title": "确认操作",
@@ -50,6 +54,25 @@
     "wait": {
       "starting": "代理正在启动…",
       "queued": "{count, plural, =0 {排队中 · 您是下一位} other {排队中 · 前面还有 # 位}}"
+    },
+    "palette": {
+      "title": "命令和技能",
+      "commands": "命令",
+      "skills": "技能",
+      "noSkills": "您没有可用的技能",
+      "empty": "未找到"
+    },
+    "unknownCommand": "未知命令 {name}",
+    "sendAsText": "作为文本发送",
+    "skillPlaceholder": "用这个技能做什么？",
+    "context": {
+      "meter": "上下文：{used} / {total} 个令牌（{pct}%）",
+      "full": "回答变得更贵，代理可能会混淆。",
+      "compact": "压缩",
+      "reset": "重新开始"
+    },
+    "event": {
+      "details": "摘要"
     }
   }
 }

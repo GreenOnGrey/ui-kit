@@ -39,7 +39,11 @@
       "review": "Check the transcript before sending",
       "notRecognized": "The speech was not recognized",
       "micDenied": "No access to the microphone",
-      "unsupported": "Voice input is not supported in this browser"
+      "unsupported": "Voice input is not supported in this browser",
+      "start": "Record a voice message",
+      "done": "Stop",
+      "recognizing": "Recognizing…",
+      "recordingNow": "Recording"
     },
     "confirm": {
       "title": "Confirm the action",
@@ -50,6 +54,25 @@
     "wait": {
       "starting": "The agent is starting…",
       "queued": "{count, plural, =0 {In the queue · you are next} one {In the queue · # ahead of you} other {In the queue · # ahead of you}}"
+    },
+    "palette": {
+      "title": "Commands and skills",
+      "commands": "Commands",
+      "skills": "Skills",
+      "noSkills": "No skills are granted to you",
+      "empty": "Nothing found"
+    },
+    "unknownCommand": "Unknown command {name}",
+    "sendAsText": "Send as text",
+    "skillPlaceholder": "What to do with the skill?",
+    "context": {
+      "meter": "Context: {used} of {total} tokens ({pct}%)",
+      "full": "Answers get more expensive and the agent may get confused.",
+      "compact": "Compact",
+      "reset": "Start over"
+    },
+    "event": {
+      "details": "Summary"
     }
   }
 }

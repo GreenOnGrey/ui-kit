@@ -1,25 +1,37 @@
-import { useLayoutEffect, useRef, useState, type KeyboardEvent } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type KeyboardEvent } from "react";
 import { Icon } from "../components/Icon";
 import { useToast } from "../components/ui";
 import { useKitT } from "../i18n";
+import { CommandPalette, matchCommands } from "./CommandPalette";
+import { ContextMeter } from "./ContextMeter";
 import { MessageView } from "./MessageView";
-import type { ChatProps, ChatUpload } from "./types";
-import { useRecorder } from "./useRecorder";
+import type { ChatCommand, ChatProps, ChatUpload } from "./types";
+import { clock, useRecorder } from "./useRecorder";
 
 /** The conversation: the messages and the composer (FTR.NAB.CMN-0005 R11–R13,
- * design §6). The behaviour is the one of the chat of Nabu. A control exists
- * only when the product gave its handler: no `onCancel` — no cancel button. */
+ * design §6; FTR.NAB.CHAT-0001 design §3.1). The behaviour is the one of the
+ * chat of Nabu. A control exists only when the product gave its handler: no
+ * `onCancel` — no cancel button, no `commands` — no palette. */
 export function Chat(props: ChatProps) {
   const t = useKitT();
   const toast = useToast();
   const [text, setText] = useState("");
   const [pending, setPending] = useState<ChatUpload[]>([]);
   const [uploading, setUploading] = useState(false);
-  const [transcript, setTranscript] = useState<string | null>(null);
+  const [skill, setSkill] = useState<string | null>(null);
+  const [active, setActive] = useState(0);
+  const [paletteClosed, setPaletteClosed] = useState(false);
+  const [unknown, setUnknown] = useState<string | null>(null);
+  const [recognizing, setRecognizing] = useState(false);
+  const voice = useRef(false);
   const listRef = useRef<HTMLDivElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
-  const recorder = useRecorder();
+  const fieldRef = useRef<HTMLTextAreaElement>(null);
+  const maxSeconds = props.voiceMaxSeconds ?? 300;
+  const recorder = useRecorder(maxSeconds, () => void stopAndTranscribe());
   const { messages, busy = false } = props;
+  const onPendingChange = props.onPendingChange;
+  useEffect(() => onPendingChange?.(pending), [pending, onPendingChange]);
 
   const first = messages[0]?.id;
   const tail = messages[messages.length - 1];
@@ -42,16 +54,89 @@ export function Chat(props: ChatProps) {
     // oxlint-disable-next-line react/exhaustive-effect-dependencies -- the length and the growth of the tail only trigger
   }, [messages.length, first, last, tailText, tailSteps]);
 
-  const send = async (body: string, voice: boolean) => {
-    const msg = body.trim();
-    if ((!msg && pending.length === 0) || busy || props.readOnly) return;
+  // R4: "/" at the start of the field without a space opens the palette
+  const query = props.commands && !skill && text.startsWith("/") && !/\s/.test(text) ? text.slice(1) : null;
+  const items = query !== null ? matchCommands(props.commands ?? [], query) : [];
+  const paletteOpen = query !== null && !paletteClosed;
+
+  const clear = () => {
+    setText("");
+    setPending([]);
+    setSkill(null);
+    setUnknown(null);
+    voice.current = false;
+  };
+
+  const runCommand = async (name: string, rest: string) => {
+    if (!props.onCommand) return;
     try {
-      await props.onSend(msg, pending.map((f) => f.id), voice);
-      setText("");
-      setPending([]);
-      setTranscript(null);
+      await props.onCommand(name, rest);
+      clear();
+    } catch {
+      // the product has told the user; the text stays
+    }
+  };
+
+  const send = async (body: string, asText = false) => {
+    const msg = body.trim();
+    if ((!msg && pending.length === 0 && !skill) || busy || props.readOnly) return;
+    // R4: a command typed in full runs; an unknown one waits for «Send as text»
+    if (!asText && !skill && props.commands && msg.startsWith("/")) {
+      const [word, ...rest] = msg.slice(1).split(/\s+/);
+      const cmd = props.commands.find((c) => c.kind === "command" && c.name === word);
+      if (cmd) return runCommand(cmd.name, rest.join(" "));
+      if (word && !msg.includes("\n")) {
+        setUnknown("/" + word);
+        return;
+      }
+    }
+    try {
+      await props.onSend(msg, pending.map((f) => f.id), voice.current, skill ?? undefined);
+      clear();
     } catch {
       // the product has told the user; the text stays in the composer
+    }
+  };
+
+  const pick = (c: ChatCommand) => {
+    setActive(0);
+    if (c.kind === "skill") {
+      setSkill(c.name);
+      setText("");
+    } else if (c.takesText) {
+      setText("/" + c.name + " ");
+    } else {
+      void runCommand(c.name, "");
+    }
+    fieldRef.current?.focus();
+  };
+
+  const keys = (e: KeyboardEvent<HTMLTextAreaElement>) => {
+    if (paletteOpen && items.length > 0) {
+      if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+        e.preventDefault();
+        const d = e.key === "ArrowDown" ? 1 : -1;
+        setActive((a) => (a + d + items.length) % items.length);
+        return;
+      }
+      if ((e.key === "Enter" && !e.shiftKey) || e.key === "Tab") {
+        e.preventDefault();
+        pick(items[Math.min(active, items.length - 1)]);
+        return;
+      }
+    }
+    if (paletteOpen && e.key === "Escape") {
+      e.preventDefault();
+      setPaletteClosed(true);
+      return;
+    }
+    if (e.key === "Backspace" && skill && text === "") {
+      setSkill(null); // design §3.1: Backspace in the empty field takes the skill off
+      return;
+    }
+    if (e.key === "Enter" && !e.shiftKey && !e.nativeEvent.isComposing) {
+      e.preventDefault();
+      void send(text);
     }
   };
 
@@ -70,24 +155,32 @@ export function Chat(props: ChatProps) {
     if (fileRef.current) fileRef.current.value = "";
   };
 
-  const stopAndTranscribe = async () => {
+  // R20: the recognized text goes into the field; the user checks and sends it
+  async function stopAndTranscribe() {
     const blob = await recorder.stop();
     if (!blob || !props.onTranscribe) return;
+    setRecognizing(true);
     const r = await props.onTranscribe(blob).catch(() => null);
+    setRecognizing(false);
     if (r === null) return;
-    if (!r) toast({ kind: "error", title: t("chat.voice.notRecognized") });
-    else setTranscript(r);
-  };
-  // Without a pointer the same button starts and stops the recording (R18).
+    if (!r) {
+      toast({ kind: "error", title: t("chat.voice.notRecognized") });
+      return;
+    }
+    voice.current = true;
+    setText((x) => (x.trim() ? x.trimEnd() + " " + r : r));
+    fieldRef.current?.focus();
+  }
+
   const voiceKey = (e: KeyboardEvent) => {
-    if (e.key !== " " && e.key !== "Enter") return;
-    e.preventDefault();
-    if (e.repeat) return;
-    if (recorder.recording) void stopAndTranscribe();
-    else void recorder.start();
+    if (e.key === "Escape" && recorder.recording) {
+      e.preventDefault();
+      recorder.cancel();
+    }
   };
 
-  const placeholder = t("chat.placeholder", { name: props.agentName });
+  const placeholder = skill ? t("chat.skillPlaceholder") : t("chat.placeholder", { name: props.agentName });
+  const left = maxSeconds - recorder.seconds;
   return (
     <section className="nb-chat" aria-label={t("chat.title")}>
       {props.header}
@@ -118,17 +211,9 @@ export function Chat(props: ChatProps) {
 
       {props.readOnly ? (
         <div className="composer" style={{ justifyContent: "space-between", alignItems: "center" }}>{props.readOnly}</div>
-      ) : transcript !== null ? (
-        <div className="transcript" style={{ margin: 10 }}>
-          <div className="small muted" style={{ marginBottom: 4 }}>{t("chat.voice.review")}</div>
-          <textarea className="inp" rows={3} value={transcript} onChange={(e) => setTranscript(e.target.value)} aria-label={t("chat.voice.review")} />
-          <div className="row2" style={{ marginTop: 8 }}>
-            <button className="btn ghost sm" onClick={() => setTranscript(null)}>{t("delete")}</button>
-            <button className="btn primary sm" disabled={!transcript.trim() || busy} onClick={() => send(transcript, true)}>{t("chat.send")}</button>
-          </div>
-        </div>
       ) : (
-        <>
+        <div className="composer-wrap">
+          {paletteOpen && <CommandPalette items={items} active={Math.min(active, Math.max(items.length - 1, 0))} onPick={pick} onHover={setActive} />}
           {props.aboveComposer}
           {pending.length > 0 && (
             <div className="pending-files">
@@ -141,45 +226,59 @@ export function Chat(props: ChatProps) {
               ))}
             </div>
           )}
+          {unknown && (
+            <div className="cmd-unknown" role="status">
+              {t("chat.unknownCommand", { name: unknown })}
+              <button type="button" className="textbtn" onClick={() => void send(text, true)}>{t("chat.sendAsText")}</button>
+            </div>
+          )}
           <div className="composer">
-            {props.onUpload && (
+            {props.onUpload && !recorder.recording && (
               <>
                 <button className="iconbtn" aria-label={t("chat.attach")} disabled={uploading} onClick={() => fileRef.current?.click()}><Icon name="clip" /></button>
                 <input ref={fileRef} type="file" multiple hidden accept={props.upload?.accept} onChange={(e) => attach(e.target.files)} />
               </>
             )}
             {recorder.recording ? (
-              <div className="rec-box">{t("chat.voice.recording", { seconds: recorder.seconds })}</div>
+              <div className={`recbar${left <= 15 ? " ending" : ""}`} role="status" aria-label={t("chat.voice.recordingNow")}>
+                <span className="dot" aria-hidden="true" />
+                <span className="tm">{clock(recorder.seconds)} / {clock(maxSeconds)}</span>
+                <span className="lvl" aria-hidden="true"><i style={{ transform: `scaleX(${Math.max(0.04, recorder.level)})` }} /></span>
+                <button type="button" className="btn ghost sm" onClick={recorder.cancel}>{t("cancel")}</button>
+                <button type="button" className="btn primary sm" onKeyDown={voiceKey} onClick={() => void stopAndTranscribe()}>{t("chat.voice.done")}</button>
+              </div>
             ) : (
-              <textarea rows={1} value={text} placeholder={placeholder} aria-label={placeholder} onChange={(e) => setText(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && !e.shiftKey && !e.nativeEvent.isComposing) {
-                    e.preventDefault();
-                    void send(text, false);
-                  }
-                }} />
+              <div className={`field${skill ? " with-skill" : ""}`}>
+                {skill && (
+                  <span className="chip skill-chip">
+                    <Icon name="spark" size={12} />{skill}
+                    <button className="iconbtn" style={{ width: 18, height: 18 }} aria-label={t("remove")} onClick={() => setSkill(null)}><Icon name="x" size={12} /></button>
+                  </span>
+                )}
+                <textarea ref={fieldRef} rows={1} value={text} placeholder={recognizing ? t("chat.voice.recognizing") : placeholder} aria-label={placeholder}
+                  disabled={recognizing} aria-expanded={paletteOpen} aria-autocomplete={props.commands ? "list" : undefined}
+                  onChange={(e) => { setText(e.target.value); setPaletteClosed(false); setActive(0); setUnknown(null); }}
+                  onKeyDown={keys} />
+              </div>
             )}
-            {props.onTranscribe && (
-              <button className={`iconbtn${recorder.recording ? " rec" : ""}`} disabled={!recorder.supported}
-                aria-label={recorder.recording ? t("chat.voice.stop") : t("chat.voice.hold")}
-                title={recorder.supported ? t("chat.voice.hold") : t("chat.voice.unsupported")}
-                onPointerDown={(e) => { e.preventDefault(); if (!recorder.recording) void recorder.start(); }}
-                onPointerUp={() => recorder.recording && stopAndTranscribe()}
-                onPointerLeave={() => recorder.recording && stopAndTranscribe()}
-                onKeyDown={voiceKey}>
+            {props.context && !recorder.recording && <ContextMeter context={props.context} onCompact={props.onCompact} onReset={props.onReset} />}
+            {props.onTranscribe && !recorder.recording && (
+              <button className="iconbtn" disabled={!recorder.supported || recognizing}
+                aria-label={t("chat.voice.start")} title={recorder.supported ? t("chat.voice.start") : t("chat.voice.unsupported")}
+                onClick={() => void recorder.start()}>
                 <Icon name="mic" />
               </button>
             )}
-            {props.onCancel && busy ? (
+            {!recorder.recording && (props.onCancel && busy ? (
               <button className="iconbtn fill" aria-label={t("chat.stop")} onClick={props.onCancel}><Icon name="stop" /></button>
             ) : (
-              <button className="iconbtn fill" aria-label={t("chat.send")} disabled={(!text.trim() && pending.length === 0) || busy} onClick={() => send(text, false)}>
+              <button className="iconbtn fill" aria-label={t("chat.send")} disabled={(!text.trim() && pending.length === 0 && !skill) || busy} onClick={() => send(text)}>
                 <Icon name="send" />
               </button>
-            )}
+            ))}
           </div>
           {recorder.error && <div className="err-text" style={{ padding: "0 12px 8px" }}>{t("chat.voice.micDenied")}</div>}
-        </>
+        </div>
       )}
     </section>
   );

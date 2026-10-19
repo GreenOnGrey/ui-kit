@@ -5,7 +5,7 @@ import {
 } from "../src";
 import { ICON_NAMES } from "../src/components/Icon";
 import tokensCss from "../src/styles/tokens.css?raw";
-import { AgentButton, AgentMenu } from "../src/chat";
+import { AgentButton, AgentMenu, CommandPalette, ContextMeter, MessageView, type ChatCommand } from "../src/chat";
 import { LoginScreen } from "../src/login";
 import pkg from "../package.json";
 import { ChatDemo } from "./ChatDemo";
@@ -227,22 +227,45 @@ function Sections() {
         <Example label="Отмена хода и подтверждение действия" box><ChatDemo demo="full" full /></Example>
         <Example label="Только чтение" box><ChatDemo demo="readonly" readOnly /></Example>
         <Example label="Кнопка агента и его меню: имя и выбор варианта, который задаёт продукт" box><AgentDemo /></Example>
-        <Example label="Запись голоса: вместо поля — отсчёт; доступ к микрофону запрещён — текст под полем" box>
+        <Example label="Запись голоса: полоса с таймером, уровнем, «Отмена» и «Стоп»; за 15 секунд до конца — янтарная" box>
           <div>
             <div className="composer">
-              <IconButton label="Прикрепить файлы"><Icon name="clip" /></IconButton>
-              <div className="rec-box">Запись… 0:07 с</div>
-              <IconButton label="Остановить запись" className="rec"><Icon name="mic" /></IconButton>
-              <IconButton label="Отправить" fill disabled><Icon name="send" /></IconButton>
+              <div className="recbar"><span className="dot" /><span className="tm">0:12 / 5:00</span><span className="lvl"><i style={{ transform: "scaleX(.6)" }} /></span>
+                <button className="btn ghost sm">Отмена</button><button className="btn primary sm">Стоп</button></div>
+            </div>
+            <div className="composer">
+              <div className="recbar ending"><span className="dot" /><span className="tm">4:47 / 5:00</span><span className="lvl"><i style={{ transform: "scaleX(.3)" }} /></span>
+                <button className="btn ghost sm">Отмена</button><button className="btn primary sm">Стоп</button></div>
             </div>
             <div className="err-text" style={{ padding: "0 12px 8px" }}>Нет доступа к микрофону</div>
           </div>
         </Example>
-        <Example label="Проверка расшифровки перед отправкой" box>
-          <div className="transcript" style={{ margin: 10 }}>
-            <div className="small muted" style={{ marginBottom: 4 }}>Проверьте расшифровку перед отправкой</div>
-            <textarea className="inp" rows={3} defaultValue="Напомни завтра в десять про ревью." aria-label="Проверьте расшифровку перед отправкой" />
-            <div className="row2" style={{ marginTop: 8 }}><button className="btn ghost sm">Удалить</button><button className="btn primary sm">Отправить</button></div>
+        <Example label="Палитра «/»: команды и скиллы, выбранная строка подсвечена" box>
+          <div style={{ position: "relative", paddingTop: 260 }}>
+            <div className="composer-wrap">
+              <CommandPalette items={DEMO_COMMANDS} active={2} onPick={() => {}} onHover={() => {}} />
+              <div className="composer"><div className="field"><textarea rows={1} defaultValue="/" aria-label="Сообщение" /></div></div>
+            </div>
+          </div>
+        </Example>
+        <Example label="Скилл в поле ввода, неизвестная команда, заполненность контекста: 4 %, 75 %, 91 %" box>
+          <div className="composer-wrap">
+            <div className="cmd-unknown">Неизвестная команда /foo<button className="textbtn">Отправить как текст</button></div>
+            <div className="composer">
+              <div className="field with-skill"><span className="chip skill-chip"><Icon name="spark" size={12} />contract-review</span>
+                <textarea rows={1} placeholder="Что сделать по скиллу?" aria-label="Что сделать по скиллу?" /></div>
+              <ContextMeter context={{ tokens: 40_000, window: 1_000_000 }} />
+              <ContextMeter context={{ tokens: 96_000, window: 128_000 }} />
+              <ContextMeter context={{ tokens: 912_000, window: 1_000_000 }} onCompact={() => {}} onReset={() => {}} />
+            </div>
+          </div>
+        </Example>
+        <Example label="События разговора: сброс, сжатие с изложением, смена модели" box>
+          <div className="msgs">
+            <MessageView busy={false} m={{ id: "e1", role: "event", text: "", createdAt: "2026-10-11T14:02:00", status: "done", event: { icon: "undo", text: "Контекст сброшен" } }} />
+            <MessageView busy={false} m={{ id: "e2", role: "event", text: "", createdAt: "2026-10-11T14:05:00", status: "done",
+              event: { icon: "compress", text: "Контекст сжат: 182 тыс. → 9 тыс. токенов · автоматически", details: "Пользователь проверяет договор с «Ромашкой»: два риска, правки — до пятницы." } }} />
+            <MessageView busy={false} m={{ id: "e3", role: "event", text: "", createdAt: "2026-10-11T14:07:00", status: "done", event: { icon: "cpu", text: "Модель: GigaChat 2 Max" } }} />
           </div>
         </Example>
         <Example label="Выбранные файлы над полем" box>
@@ -410,20 +433,33 @@ const AGENT_OPTIONS = [
   { key: "brief", label: "Лаконичный", icon: "tBrief" }, { key: "mentor", label: "Наставник", icon: "tMentor" },
 ] as const;
 
+const DEMO_COMMANDS: ChatCommand[] = [
+  { kind: "command", name: "new", description: "Начать с чистого контекста" },
+  { kind: "command", name: "compact", description: "Сжать контекст · можно указать, на чём сосредоточиться", takesText: true },
+  { kind: "skill", name: "contract-review", description: "Проверка договора по чек-листу юристов", source: "Юристы" },
+  { kind: "skill", name: "weekly-report", description: "Еженедельный отчёт по шаблону", source: "Отчёты" },
+];
+
 function AgentDemo() {
   const [open, setOpen] = useState(true);
   const [name, setName] = useState("Ада");
   const [value, setValue] = useState("business");
+  const [model, setModel] = useState("giga");
   const close = useCallback(() => setOpen(false), []);
   return (
-    <div style={{ position: "relative", height: 330, padding: 12 }} data-demo="agent">
+    <div style={{ position: "relative", height: 560, padding: 12 }} data-demo="agent">
       <div className="row">
         <AgentButton icon={AGENT_OPTIONS.find((o) => o.key === value)!.icon} label="Агент" expanded={open} onClick={() => setOpen((v) => !v)} />
         <b>{name}</b>
       </div>
       {open && (
         <AgentMenu label="Агент" name={name} options={[...AGENT_OPTIONS]} value={value} optionsLabel="Тон"
-          hint="Изменение действует во всех каналах." onRename={setName} onPick={setValue} onClose={close} />
+          hint="Изменение действует во всех каналах." onRename={setName} onPick={setValue} onClose={close}
+          models={{ label: "Модель", value: model, onPick: setModel, options: [
+            { key: "", label: "По умолчанию", sub: "DeepSeek V4.1 Flash" },
+            { key: "flash", label: "DeepSeek V4.1 Flash", sub: "DeepSeek", badges: [{ icon: "image", text: "изображения" }, { icon: "brain", text: "рассуждение" }, { text: "1 млн" }] },
+            { key: "giga", label: "GigaChat 2 Max", sub: "GigaChat", badges: [{ icon: "image", text: "изображения" }, { text: "131 тыс." }], warn: "Контекст будет сжат перед следующим ответом" },
+          ] }} />
       )}
     </div>
   );
