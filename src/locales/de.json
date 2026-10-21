@@ -88,5 +88,16 @@
       "source": "Code",
       "page": "Seite"
     }
+  },
+  "agent": {
+    "menu": "Agent",
+    "options": "Ton",
+    "model": "Modell",
+    "modelDefault": "Standard",
+    "noModels": "Keine Modelle freigegeben — wenden Sie sich an einen Administrator",
+    "modelCompactWarn": "Der Kontext wird vor der nächsten Antwort komprimiert",
+    "everywhere": "Die Änderung gilt in allen Kanälen und verbundenen Diensten.",
+    "capImage": "Bilder",
+    "capReasoning": "Reasoning"
   }
 }

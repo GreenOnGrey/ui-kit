@@ -88,5 +88,16 @@
       "source": "代码",
       "page": "页面"
     }
+  },
+  "agent": {
+    "menu": "智能体",
+    "options": "语气",
+    "model": "模型",
+    "modelDefault": "默认",
+    "noModels": "没有可用的模型——请联系管理员",
+    "modelCompactWarn": "下次回答前将压缩上下文",
+    "everywhere": "更改在所有渠道和已连接的服务中生效。",
+    "capImage": "图片",
+    "capReasoning": "推理"
   }
 }

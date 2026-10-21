@@ -88,5 +88,16 @@
       "source": "Code",
       "page": "Page"
     }
+  },
+  "agent": {
+    "menu": "Agent",
+    "options": "Tone",
+    "model": "Model",
+    "modelDefault": "Default",
+    "noModels": "No models granted — ask an administrator",
+    "modelCompactWarn": "The context will be compacted before the next answer",
+    "everywhere": "The change applies in every channel and connected service.",
+    "capImage": "images",
+    "capReasoning": "reasoning"
   }
 }

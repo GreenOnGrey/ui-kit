@@ -4,6 +4,18 @@ Versions follow semver. A visible change of the look is at least a minor (FTR.NA
 Since `1.0.0` the contract of the kit — class names, tokens, props, icon names, keys of strings — changes only
 in a major.
 
+## 1.8.0
+
+A visible change (FTR.HMR.SPEC-0001): the example of the menu of the agent on the showcase takes the strings of the kit.
+
+- Chat: `AgentSettingsMenu` — the menu of the agent of every product: the name, the options of the product in two
+  columns, the block «Model» and the hint, with the strings of the kit (namespace `uikit`, keys `agent.*`). The
+  product gives its options with icons (the kit knows nothing of what they mean), the models of the agent as
+  `AgentModelState` and the handlers; without `models` there is no model block, `hint` replaces the hint of the kit.
+  `agentModelOptions` and `agentModelKey` build the block «Model» as Nabu did: «Default» first, the capabilities, a
+  warning when the context outgrows the window (FTR.NAB.CHAT-0001 R16, R17). Nabu and Hammurapi move to it from
+  their own copies of the menu.
+
 ## 1.7.0
 
 A visible change (FTR.HMR.SPEC-0001 R8, design §3.4): the showcase of icons has one more.

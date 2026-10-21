@@ -5,7 +5,7 @@ import {
 } from "../src";
 import { ICON_NAMES } from "../src/components/Icon";
 import tokensCss from "../src/styles/tokens.css?raw";
-import { AgentButton, AgentMenu, CommandPalette, ContextMeter, MessageView, VoiceButton, type ChatCommand } from "../src/chat";
+import { AgentButton, AgentSettingsMenu, CommandPalette, ContextMeter, MessageView, VoiceButton, type AgentModel, type AgentModelChoice, type ChatCommand } from "../src/chat";
 import { LoginScreen } from "../src/login";
 import pkg from "../package.json";
 import { ChatDemo } from "./ChatDemo";
@@ -473,11 +473,16 @@ const DEMO_COMMANDS: ChatCommand[] = [
   { kind: "skill", name: "weekly-report", description: "Еженедельный отчёт по шаблону", source: "Отчёты" },
 ];
 
+const AGENT_MODELS: AgentModel[] = [
+  { connectionId: "deepseek", model: "flash", name: "DeepSeek V4.1 Flash", connection: "DeepSeek", caps: { image: true, reasoning: true, contextWindow: 1_000_000 } },
+  { connectionId: "giga", model: "max", name: "GigaChat 2 Max", connection: "GigaChat", caps: { image: true, reasoning: false, contextWindow: 131_072 } },
+];
+
 function AgentDemo() {
   const [open, setOpen] = useState(true);
   const [name, setName] = useState("Ада");
   const [value, setValue] = useState("business");
-  const [model, setModel] = useState("giga");
+  const [choice, setChoice] = useState<AgentModelChoice>({ connectionId: "giga", model: "max" });
   const close = useCallback(() => setOpen(false), []);
   return (
     <div style={{ position: "relative", height: 560, padding: 12 }} data-demo="agent">
@@ -486,13 +491,11 @@ function AgentDemo() {
         <b>{name}</b>
       </div>
       {open && (
-        <AgentMenu label="Агент" name={name} options={[...AGENT_OPTIONS]} value={value} optionsLabel="Тон"
-          hint="Изменение действует во всех каналах." onRename={setName} onPick={setValue} onClose={close}
-          models={{ label: "Модель", value: model, onPick: setModel, options: [
-            { key: "", label: "По умолчанию", sub: "DeepSeek V4.1 Flash" },
-            { key: "flash", label: "DeepSeek V4.1 Flash", sub: "DeepSeek", badges: [{ icon: "image", text: "изображения" }, { icon: "brain", text: "рассуждение" }, { text: "1 млн" }] },
-            { key: "giga", label: "GigaChat 2 Max", sub: "GigaChat", badges: [{ icon: "image", text: "изображения" }, { text: "131 тыс." }], warn: "Контекст будет сжат перед следующим ответом" },
-          ] }} />
+        // FTR.HMR.SPEC-0001: the menu of the agent of every product — its strings and the block «Model» are the kit's
+        <AgentSettingsMenu name={name} value={value} options={[...AGENT_OPTIONS]} onRename={setName} onPick={setValue} onClose={close}
+          onModel={setChoice}
+          models={{ available: AGENT_MODELS, defaultModel: AGENT_MODELS[0], contextTokens: 120_000, chosen: choice !== null,
+            model: choice ? (AGENT_MODELS.find((m) => m.connectionId === choice.connectionId && m.model === choice.model) ?? null) : AGENT_MODELS[0] }} />
       )}
     </div>
   );

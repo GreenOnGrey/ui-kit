@@ -88,5 +88,16 @@
       "source": "Código",
       "page": "Página"
     }
+  },
+  "agent": {
+    "menu": "Agente",
+    "options": "Tono",
+    "model": "Modelo",
+    "modelDefault": "Predeterminado",
+    "noModels": "No hay modelos disponibles: consulte a un administrador",
+    "modelCompactWarn": "El contexto se compactará antes de la próxima respuesta",
+    "everywhere": "El cambio se aplica en todos los canales y servicios conectados.",
+    "capImage": "imágenes",
+    "capReasoning": "razonamiento"
   }
 }
