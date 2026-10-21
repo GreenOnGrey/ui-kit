@@ -25,7 +25,7 @@ const screen = (error?: string) => html(
 
 describe("icons (KIT-05)", () => {
   it("holds the icons of both products and the tone drawings", () => {
-    for (const n of ["key", "link", "menu", "x", "tBusiness", "tFriendly", "tBrief", "tMentor", "tg", "mail", "stop", "refresh"]) {
+    for (const n of ["key", "link", "menu", "x", "tBusiness", "tFriendly", "tBrief", "tMentor", "tg", "mail", "stop", "refresh", "chevrons"]) {
       expect(ICON_NAMES, n).toContain(n);
     }
     expect(new Set(ICON_NAMES).size).toBe(ICON_NAMES.length);

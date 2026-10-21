@@ -4,6 +4,13 @@ Versions follow semver. A visible change of the look is at least a minor (FTR.NA
 Since `1.0.0` the contract of the kit — class names, tokens, props, icon names, keys of strings — changes only
 in a major.
 
+## 1.7.0
+
+A visible change (FTR.HMR.SPEC-0001 R8, design §3.4): the showcase of icons has one more.
+
+- Icons: `chevrons` — a double chevron to the right, for a panel that folds to the right edge (the chat of Hammurapi
+  folds into a rail).
+
 ## 1.6.0
 
 A visible change (FTR.NAB.CHAT-0001 design §3.1).

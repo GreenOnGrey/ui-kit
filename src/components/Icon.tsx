@@ -80,6 +80,8 @@ const PATHS = {
   edit: '<path d="M4 20h4L19 9l-4-4L4 16zM14 6l4 4"/>',
   image: '<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="m21 16-5-5-9 9"/>',
   compress: '<path d="M4 14h6v6M20 10h-6V4M14 10l7-7M3 21l7-7"/>',
+  // a double chevron to the right: a panel folds to the right edge (FTR.HMR.SPEC-0001 R8)
+  chevrons: '<path d="m6 6 6 6-6 6M13 6l6 6-6 6"/>',
 } as const;
 
 export type IconName = keyof typeof PATHS;
