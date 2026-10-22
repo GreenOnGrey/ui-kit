@@ -7,7 +7,7 @@ export {
 } from "./AgentSettingsMenu";
 export { CommandPalette } from "./CommandPalette";
 export { ContextMeter, tokens } from "./ContextMeter";
-export { MessageView } from "./MessageView";
+export { MessageView, NOTICE_LINES } from "./MessageView";
 export { useRecorder } from "./useRecorder";
 export type {
   ChatAttachment, ChatCommand, ChatConfirmation, ChatContext, ChatConversation, ChatEvent, ChatMark, ChatMessage, ChatProps, ChatStep, ChatUpload,

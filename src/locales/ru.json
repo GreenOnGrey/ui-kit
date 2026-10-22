@@ -87,6 +87,10 @@
       "rows": "Показаны {shown} из {total, plural, one {# строки} other {# строк}}",
       "source": "Код",
       "page": "Страница"
+    },
+    "notice": {
+      "more": "Показать полностью",
+      "less": "Свернуть"
     }
   },
   "agent": {

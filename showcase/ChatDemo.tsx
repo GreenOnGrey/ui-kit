@@ -6,15 +6,19 @@ import { confirmations as fixtureConfirmations, conversations, history } from ".
 /** The chat of the showcase on invented data: the buttons work without a server
  * (design §3). `full` turns on what not every chat has — cancelling a turn and
  * confirming an action; `narrow` is the side panel of Hammurapi. */
-export function ChatDemo({ demo, narrow, full, empty, readOnly, wait, typing, historyError, listOpen = false, modes, files }: {
+export function ChatDemo({ demo, narrow, full, empty, readOnly, wait, typing, historyError, listOpen = false, modes, files, notices, draft }: {
   /** The name of the example: tests find the demo by it, not by its place on the page. */
   demo: string;
   narrow?: boolean; full?: boolean; empty?: boolean; readOnly?: boolean; wait?: "starting" | "queued"; typing?: boolean; historyError?: boolean;
   listOpen?: boolean; modes?: boolean;
   /** The agent has sent files: a chart, a PDF and Markdown with their preview (FTR.NAB.CHAT-0001 R34). */
   files?: boolean;
+  /** Notices of a product, a short one and a folded one (FTR.NAB.CHAT-0002). */
+  notices?: boolean;
+  /** The draft of the topic of an issue: the empty conversation of the product and its placeholder (FTR.HMR.DISC-0001). */
+  draft?: boolean;
 }) {
-  const initial: ChatMessage[] = empty ? [] : typing
+  const initial: ChatMessage[] = empty || draft ? [] : notices ? noticeHistory : typing
     ? [...history.slice(0, 1), { id: "t", role: "assistant", text: "", createdAt: "2026-10-11T14:02:00", status: "streaming",
         steps: [{ id: "s", text: "Спецификации: чтение FTR.NAB.CMN-0005", status: "running" }] }]
     : wait
@@ -76,6 +80,19 @@ export function ChatDemo({ demo, narrow, full, empty, readOnly, wait, typing, hi
           onPick={(id) => { setCurrent(id); setOpen(false); }}
           onCreate={async (title) => { const id = `t${n.current++}`; setList((l) => [...l, { id, group: "topic", title, when: "сейчас" }]); setCurrent(id); }} />
         <Chat agentName="Ада" messages={messages} header={header} busy={busy} emptyHint="Спросите о спецификации или попросите напомнить позже."
+          empty={draft ? (
+            <div className="empty">
+              <div className="ic"><Icon name="msg" /></div>
+              <b>Обсуждение задачи ISS.FMS-0007</b>
+              Тема появится в списке разговоров после первого сообщения
+              <div className="row" style={{ marginTop: 12, flexDirection: "column", alignItems: "stretch" }}>
+                {["Уточнить метрику", "Проверить оценку", "Найти дубликаты"].map((s) => (
+                  <button key={s} className="chip" onClick={() => void onSend(s, [], false)}>{s}</button>
+                ))}
+              </div>
+            </div>
+          ) : undefined}
+          placeholder={draft ? "Что доработать в Discovery?" : undefined}
           readOnly={readOnly ? <><span className="small muted">Тема в архиве</span><button className="btn sm">Вернуть из архива</button></> : undefined}
           aboveComposer={modes ? (
             <div style={{ padding: "10px 10px 0" }}>
@@ -175,3 +192,13 @@ async function loadDemoFile(a: { id: string }): Promise<Blob> {
   }
   return new Promise((ok, fail) => c.toBlob((b) => (b ? ok(b) : fail(new Error("canvas"))), "image/png"));
 }
+
+/** Notices of a product in a topic (FTR.NAB.CHAT-0002 design §3.1): a short one and one folded past twelve lines. */
+const noticeHistory: ChatMessage[] = [
+  { id: "nu", role: "user", text: "Метрика должна считаться по заказам", createdAt: "2026-10-21T14:01:00", status: "done" },
+  { id: "na", role: "assistant", text: "Передал исследователю, пришлю итог сюда.", createdAt: "2026-10-21T14:02:00", status: "done" },
+  { id: "nn", role: "assistant", variant: "notice", mark: { icon: "plug", text: "Hammurapi" }, createdAt: "2026-10-21T14:19:00", status: "done",
+    text: "**Анализ обновлён · ревизия 4**\n\n- Метрика считается по заказам аренды\n- Окно оценки сдвинуто на 12 января" },
+  { id: "nl", role: "assistant", variant: "notice", mark: { icon: "plug", text: "Hammurapi" }, createdAt: "2026-10-21T14:40:00", status: "done",
+    text: ["**Анализ обновлён · ревизия 5**", "", ...Array.from({ length: 14 }, (_, i) => `- Изменение ${i + 1}`)].join("\n") },
+];

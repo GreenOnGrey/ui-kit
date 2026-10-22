@@ -87,6 +87,10 @@
       "rows": "{shown} von {total, plural, one {# Zeile} other {# Zeilen}} angezeigt",
       "source": "Code",
       "page": "Seite"
+    },
+    "notice": {
+      "more": "Vollständig anzeigen",
+      "less": "Einklappen"
     }
   },
   "agent": {

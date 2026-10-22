@@ -4,6 +4,19 @@ Versions follow semver. A visible change of the look is at least a minor (FTR.NA
 Since `1.0.0` the contract of the kit — class names, tokens, props, icon names, keys of strings — changes only
 in a major.
 
+## 1.9.0
+
+A visible change (FTR.NAB.CHAT-0002, FTR.HMR.DISC-0001): the showcase of the chat has two more examples.
+
+- Chat: `ChatMessage.variant = "notice"` — a notice of a product in a topic, not words of the agent: on the left with
+  the mark of the product, a card with a stripe (`.m.a.notice`), without retry; a text longer than `NOTICE_LINES` (12)
+  lines is folded with «Show in full» (strings `chat.notice.more`, `chat.notice.less`). The content of the product
+  replaces the text, as in an answer.
+- Chat: `ChatProps.empty` replaces the whole empty conversation — the draft of the topic of an issue in Hammurapi
+  with its suggestions; `emptyHint` stays for the plain empty conversation.
+- Chat: `ChatProps.placeholder` replaces the placeholder of the composer («What to revise in the analysis?»); a picked
+  skill keeps its own.
+
 ## 1.8.0
 
 A visible change (FTR.HMR.SPEC-0001): the example of the menu of the agent on the showcase takes the strings of the kit.

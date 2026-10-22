@@ -87,6 +87,10 @@
       "rows": "Showing {shown} of {total, plural, one {# row} other {# rows}}",
       "source": "Code",
       "page": "Page"
+    },
+    "notice": {
+      "more": "Show in full",
+      "less": "Collapse"
     }
   },
   "agent": {

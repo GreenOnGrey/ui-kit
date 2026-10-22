@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { Icon } from "../components/Icon";
 import { Markdown } from "../components/Markdown";
@@ -56,6 +56,7 @@ export function MessageView({ m, busy, onRetry, loadAttachment, onOpenAttachment
       </div>
     );
   }
+  if (m.variant === "notice") return <NoticeView m={m} mark={mark} atts={atts} />;
   const steps = m.steps ?? [];
   const waiting = (m.status === "streaming" || m.status === "pending") && !m.text && !m.content;
   return (
@@ -85,6 +86,33 @@ export function MessageView({ m, busy, onRetry, loadAttachment, onOpenAttachment
           )}
         </div>
       )}
+    </div>
+  );
+}
+
+/** A notice longer than this many lines is folded (FTR.NAB.CHAT-0002 design §3.1). */
+export const NOTICE_LINES = 12;
+
+/** A notice of a product (FTR.NAB.CHAT-0002 design §3.1): on the left as an answer, a card with a
+ * stripe, no retry, a long text folded. The content of the product, if any, replaces the text. */
+function NoticeView({ m, mark, atts }: { m: ChatMessage; mark: ReactNode; atts: ReactNode }) {
+  const { t } = useTranslation(UIKIT_NS);
+  const [open, setOpen] = useState(false);
+  const long = !m.content && m.text.split("\n").length > NOTICE_LINES;
+  return (
+    <div className="m a notice">
+      {mark}
+      {m.content ?? (
+        <div className={`bub${long && !open ? " folded" : ""}`}>
+          <Markdown text={m.text} />
+          {long && (
+            <button type="button" className="textbtn" aria-expanded={open} onClick={() => setOpen((v) => !v)}>
+              {t(open ? "chat.notice.less" : "chat.notice.more")}
+            </button>
+          )}
+        </div>
+      )}
+      {atts}
     </div>
   );
 }

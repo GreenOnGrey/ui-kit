@@ -87,6 +87,10 @@
       "rows": "Se muestran {shown} de {total, plural, one {# fila} other {# filas}}",
       "source": "Código",
       "page": "Página"
+    },
+    "notice": {
+      "more": "Mostrar completo",
+      "less": "Contraer"
     }
   },
   "agent": {

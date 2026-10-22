@@ -55,6 +55,9 @@ export interface ChatMessage {
   error?: { text: string; transient: boolean };
   /** The content of the product inside the message: a mail card, a digest. */
   content?: ReactNode;
+  /** `notice`: an answer that is a notice of a product, not words of the agent (FTR.NAB.CHAT-0002 R2):
+   * a card with a stripe, without the actions of an answer, folded past `NOTICE_LINES` lines. */
+  variant?: "notice";
   /** The tooltip of the bubble: the model of an answer (FTR.NAB.CHAT-0001 R18). */
   hint?: string;
 }
@@ -85,6 +88,11 @@ export interface ChatProps {
   header?: ReactNode;
   /** The second line of the empty conversation. */
   emptyHint?: ReactNode;
+  /** Replaces the whole empty conversation: the draft of a topic with its suggestions
+   * (FTR.HMR.DISC-0001 design §3.2). `emptyHint` is then not used. */
+  empty?: ReactNode;
+  /** The placeholder of the composer instead of «Message to <agent>»; a picked skill keeps its own. */
+  placeholder?: string;
   loading?: boolean;
   historyError?: ReactNode;
   hasOlder?: boolean;

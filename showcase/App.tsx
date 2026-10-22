@@ -222,6 +222,8 @@ function Sections() {
         <Example label="История: подписи, шаги, вложения, ошибка с повтором" box><ChatDemo demo="history" /></Example>
         <Example label="Файлы агента: миниатюры, плитки просмотра по типу, плитка скачивания" box><ChatDemo demo="files" files /></Example>
         <Example label="Пустой разговор" box><ChatDemo demo="empty" empty /></Example>
+        <Example label="Свой пустой разговор продукта и подсказка поля ввода: черновик темы задачи" box><ChatDemo demo="draft" draft /></Example>
+        <Example label="Уведомления продукта: короткое и свёрнутое после 12 строк" box><ChatDemo demo="notices" notices /></Example>
         <Example label="Агент печатает: шаг выполняется, текста ещё нет" box><ChatDemo demo="typing" typing /></Example>
         <Example label="История не загрузилась; ранние сообщения подгружаются" box><ChatDemo demo="history-error" historyError /></Example>
         <Example label="Кнопка голоса: готова и распознаёт запись (волна вместо микрофона)">

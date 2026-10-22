@@ -212,7 +212,7 @@ export function Chat(props: ChatProps) {
     }
   };
 
-  const placeholder = skill ? t("chat.skillPlaceholder") : t("chat.placeholder", { name: props.agentName });
+  const placeholder = skill ? t("chat.skillPlaceholder") : (props.placeholder ?? t("chat.placeholder", { name: props.agentName }));
   const left = maxSeconds - recorder.seconds;
   return (
     <section className="nb-chat" aria-label={t("chat.title")}>
@@ -224,7 +224,7 @@ export function Chat(props: ChatProps) {
           </button>
         )}
         {props.historyError && <div className="err-text">{props.historyError}</div>}
-        {messages.length === 0 && !props.loading && !props.historyError && (
+        {messages.length === 0 && !props.loading && !props.historyError && (props.empty ??
           <div className="empty"><div className="ic"><Icon name="spark" /></div><b>{t("chat.emptyTitle", { name: props.agentName })}</b>{props.emptyHint}</div>
         )}
         {messages.map((m) => <MessageView key={m.id} m={m} busy={busy} onRetry={props.onRetry && (() => props.onRetry?.(m.id))}
