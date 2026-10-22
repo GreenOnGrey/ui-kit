@@ -622,6 +622,19 @@ textarea.inp {
   background: var(--surface-2);
   border-top-left-radius: 4px;
 }
+/* A notice of a product (FTR.NAB.CHAT-0002 design §1): a card with a stripe, not a bubble of the agent. */
+.m.a.notice .bub {
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--border-strong);
+  border-radius: 4px var(--r-m) var(--r-m) var(--r-m);
+}
+.m.a.notice .bub.folded > :not(.textbtn) {
+  max-height: calc(12 * 1.5em);
+  overflow: hidden;
+}
+.m.a.notice .textbtn {
+  margin-top: 4px;
+}
 .m.u {
   align-self: flex-end;
 }
