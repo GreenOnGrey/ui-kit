@@ -126,6 +126,9 @@ export interface ChatProps {
   onUpload?(file: File): Promise<ChatUpload | null>;
   /** Loads a file of a message for its preview (R34): images, PDF and Markdown open in the chat. Without it files are links. */
   loadAttachment?(attachment: ChatAttachment): Promise<Blob>;
+  /** FTR.NAB.CHAT-0003 R13–R16: the preview of a document (PDF of its first pages) or of a spreadsheet (sheets).
+   * Without it documents and spreadsheets download, as before. */
+  loadPreview?(attachment: ChatAttachment): Promise<OfficePreview>;
   /** The files attached to the message being written, after every change. */
   onPendingChange?(uploads: ChatUpload[]): void;
   /** The text of a recording; `null`: it failed and the product has told the user. A rejection
@@ -143,3 +146,14 @@ export interface ConversationListProps {
   /** Rejects with an Error whose message is shown in the dialog. */
   onCreate?(title: string): Promise<void>;
 }
+
+/** A cell of a sheet: the value as shown (`v`), its number (`n`) or a formula without a value (`f`). */
+export interface SheetCell { v?: string; n?: number; f?: string }
+/** A sheet of a spreadsheet in the preview (FTR.NAB.CHAT-0003 R14). */
+export interface Sheet { name: string; rows: number; cols: number; cells: SheetCell[][]; merges: string[] }
+/** The answer of a preview of an office file (FTR.NAB.CHAT-0003 tech §8.1). */
+export type OfficePreview =
+  | { state: "pending" }
+  | { state: "error"; reason: "too_large" | "timeout" | "broken" | "busy"; limitMb?: number }
+  | { state: "doc"; blob: Blob; shown: number; total: number | null; from: string }
+  | { state: "sheet"; sheets: Sheet[] };

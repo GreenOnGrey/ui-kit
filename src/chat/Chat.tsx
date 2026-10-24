@@ -5,7 +5,7 @@ import { useKitT } from "../i18n";
 import { CommandPalette, matchCommands } from "./CommandPalette";
 import { ContextMeter } from "./ContextMeter";
 import { MessageView } from "./MessageView";
-import { AttachmentPreview, type LoadAttachment } from "./Attachments";
+import { AttachmentPreview, type LoadAttachment, type LoadOfficePreview } from "./Attachments";
 import { transcribe } from "./transcription";
 import type { ChatAttachment, ChatCommand, ChatProps, ChatUpload } from "./types";
 import { clock, useRecorder } from "./useRecorder";
@@ -28,14 +28,9 @@ export function Chat(props: ChatProps) {
   // FTR.NAB.CHAT-0001 R34: the file open in the preview. The product's loader may be a new function on
   // every render; the chat gives the thumbnails one stable function while the product has a loader
   const [viewing, setViewing] = useState<ChatAttachment | null>(null);
-  const latestLoader = useRef(props.loadAttachment);
-  useEffect(() => {
-    latestLoader.current = props.loadAttachment;
-  });
-  const canLoad = !!props.loadAttachment;
-  const loadFile = useMemo<LoadAttachment | undefined>(() => canLoad
-    ? (a: ChatAttachment) => latestLoader.current ? latestLoader.current(a) : Promise.reject(new Error("no loader"))
-    : undefined, [canLoad]);
+  const loadFile: LoadAttachment | undefined = useStableLoader(props.loadAttachment);
+  // FTR.NAB.CHAT-0003: the preview of documents and spreadsheets, stable in the same way
+  const loadPreview: LoadOfficePreview | undefined = useStableLoader(props.loadPreview);
   const voice = useRef(false);
   const listRef = useRef<HTMLDivElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -228,7 +223,7 @@ export function Chat(props: ChatProps) {
           <div className="empty"><div className="ic"><Icon name="spark" /></div><b>{t("chat.emptyTitle", { name: props.agentName })}</b>{props.emptyHint}</div>
         )}
         {messages.map((m) => <MessageView key={m.id} m={m} busy={busy} onRetry={props.onRetry && (() => props.onRetry?.(m.id))}
-          loadAttachment={loadFile} onOpenAttachment={setViewing} />)}
+          loadAttachment={loadFile} loadPreview={loadPreview} onOpenAttachment={setViewing} />)}
         {props.onConfirm && (props.confirmations ?? []).map((c) => (
           <div className="confirm" key={c.id} role="group" aria-label={t("chat.confirm.title")}>
             <div className="h"><Icon name="alert" size={16} />{t("chat.confirm.title")}</div>
@@ -310,7 +305,7 @@ export function Chat(props: ChatProps) {
           {recorder.error && <div className="err-text" style={{ padding: "0 12px 8px" }}>{t("chat.voice.micDenied")}</div>}
         </div>
       )}
-      {viewing && loadFile && <AttachmentPreview a={viewing} load={loadFile} onClose={() => setViewing(null)} />}
+      {viewing && loadFile && <AttachmentPreview a={viewing} load={loadFile} loadPreview={loadPreview} onClose={() => setViewing(null)} />}
     </section>
   );
 }
@@ -361,4 +356,17 @@ function fitField(el: HTMLTextAreaElement | null) {
   el.style.height = `${full}px`;
   // the bar appears only past three lines, where the CSS stops the field
   el.style.overflowY = el.offsetHeight < full ? "auto" : "hidden";
+}
+
+/** One function for as long as the product has a loader, whatever function it passes on each render:
+ * thumbnails and the preview do not load again when the product renders. */
+function useStableLoader<A, R>(load: ((a: A) => Promise<R>) | undefined): ((a: A) => Promise<R>) | undefined {
+  const latest = useRef(load);
+  useEffect(() => {
+    latest.current = load;
+  });
+  const has = !!load;
+  return useMemo(() => has
+    ? (a: A) => latest.current ? latest.current(a) : Promise.reject(new Error("no loader"))
+    : undefined, [has]);
 }

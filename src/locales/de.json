@@ -86,7 +86,22 @@
       "notUtf8": "Die Datei ist nicht in UTF-8 — bitte herunterladen",
       "rows": "{shown} von {total, plural, one {# Zeile} other {# Zeilen}} angezeigt",
       "source": "Code",
-      "page": "Seite"
+      "page": "Seite",
+      "converted": "Vorschau · konvertiert aus {format}",
+      "pagesShown": "{shown} von {total} Seiten werden angezeigt",
+      "firstPages": "Die ersten {shown} Seiten werden angezeigt",
+      "cols": "und {shown} von {total} Spalten",
+      "preparing": "Vorschau wird vorbereitet…",
+      "preparingHint": "Meist nur wenige Sekunden",
+      "unavailable": "Vorschau nicht verfügbar",
+      "formulaHint": "Der Wert wird beim Öffnen in Excel berechnet",
+      "sheets": "Blätter",
+      "reasons": {
+        "too_large": "Die Datei ist größer als {limit} MB",
+        "timeout": "Hat länger als 30 Sekunden gedauert",
+        "broken": "Die Datei ist beschädigt oder das Format wird nicht unterstützt",
+        "busy": "Der Dienst ist ausgelastet, versuchen Sie es später erneut"
+      }
     },
     "notice": {
       "more": "Vollständig anzeigen",

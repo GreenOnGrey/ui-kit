@@ -4,6 +4,23 @@ Versions follow semver. A visible change of the look is at least a minor (FTR.NA
 Since `1.0.0` the contract of the kit — class names, tokens, props, icon names, keys of strings — changes only
 in a major.
 
+## 1.10.0
+
+A visible change (FTR.NAB.CHAT-0003): documents and spreadsheets open in the preview of a file.
+
+- Chat: `ChatProps.loadPreview` — the product makes the preview of a document (DOCX, DOC, PPTX, ODT, RTF, …) and of a
+  spreadsheet (XLSX, XLS, ODS); without it these files stay download tiles. `AttachmentList` takes `office`,
+  `AttachmentPreview` takes `loadPreview`; `previewKind(a, office)` gives `office-doc` and `office-sheet`.
+- A document is the PDF of its first pages with «Preview · converted from DOCX» and how many pages are shown; a
+  spreadsheet is its sheets as tabs (`Tabs`), with column letters, row numbers, merged cells, numbers on the right
+  and formulas grey with a hint. While it
+  is made the preview waits (a `pending` answer is asked again every 2 s, up to 40 s); a reason is shown when there
+  is none (`too_large`, `timeout`, `broken`, `busy`).
+- The showcase «Файлы агента» has a contract, a budget, a draft being made and an old deck without a preview;
+  snapshots `preview-sheet`, `preview-preparing`, `preview-unavailable`.
+- Types `OfficePreview`, `Sheet`, `SheetCell`, `LoadOfficePreview`; `columnName(n)`. Strings `chat.files.converted`,
+  `pagesShown`, `firstPages`, `cols`, `preparing`, `preparingHint`, `unavailable`, `reasons.*`, `formulaHint`, `sheets`.
+
 ## 1.9.0
 
 A visible change (FTR.NAB.CHAT-0002, FTR.HMR.DISC-0001): the showcase of the chat has two more examples.

@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Icon } from "../components/Icon";
 import { Markdown } from "../components/Markdown";
 import { UIKIT_NS } from "../i18n";
-import { AttachmentList, type LoadAttachment } from "./Attachments";
+import { AttachmentList, type LoadAttachment, type LoadOfficePreview } from "./Attachments";
 import { intlLocale } from "./intl";
 import type { ChatAttachment, ChatMessage, ChatStep } from "./types";
 
@@ -26,10 +26,12 @@ const STEP = {
 } as const;
 
 /** One message of the conversation (design §6.4). */
-export function MessageView({ m, busy, onRetry, loadAttachment, onOpenAttachment }: {
+export function MessageView({ m, busy, onRetry, loadAttachment, loadPreview, onOpenAttachment }: {
   m: ChatMessage; busy: boolean; onRetry?: () => void;
   /** R34: the preview of the files; without it they are links. */
   loadAttachment?: LoadAttachment; onOpenAttachment?: (a: ChatAttachment) => void;
+  /** FTR.NAB.CHAT-0003: documents and spreadsheets open in the preview too. */
+  loadPreview?: LoadOfficePreview;
 }) {
   const { t, i18n } = useTranslation(UIKIT_NS);
   const [open, setOpen] = useState(false);
@@ -37,7 +39,7 @@ export function MessageView({ m, busy, onRetry, loadAttachment, onOpenAttachment
   if (m.role === "event" && m.event) return <EventDivider m={m} />;
   const mark = m.mark && <div className="chan"><Icon name={m.mark.icon} size={12} /> {m.mark.text} · {markTime(m.createdAt, i18n.language)}</div>;
   const atts = m.attachments && m.attachments.length > 0 && (
-    <AttachmentList items={m.attachments} load={loadAttachment} onOpen={onOpenAttachment} />
+    <AttachmentList items={m.attachments} load={loadAttachment} office={!!loadPreview} onOpen={onOpenAttachment} />
   );
   if (m.role === "user") {
     return (

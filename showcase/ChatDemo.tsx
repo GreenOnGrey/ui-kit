@@ -1,6 +1,6 @@
 import { useRef, useState, type ReactNode } from "react";
 import { Avatar, Icon } from "../src";
-import { Chat, ChatLayout, ConversationList, type ChatMessage } from "../src/chat";
+import { Chat, ChatLayout, ConversationList, type ChatMessage, type OfficePreview, type Sheet } from "../src/chat";
 import { confirmations as fixtureConfirmations, conversations, history } from "./fixtures";
 
 /** The chat of the showcase on invented data: the buttons work without a server
@@ -111,6 +111,7 @@ export function ChatDemo({ demo, narrow, full, empty, readOnly, wait, typing, hi
             return "Расшифровка записи: проверьте перед отправкой.";
           }}
           loadAttachment={files ? loadDemoFile : undefined}
+          loadPreview={files ? loadDemoPreview : undefined}
           historyError={historyError ? "Не удалось загрузить историю. Проверьте соединение." : undefined} loadingOlder={historyError}
           hasOlder={!empty} onLoadOlder={() => setMessages((ms) => [{ id: `o${n.current++}`, role: "assistant", text: "Более раннее сообщение.", createdAt: "2026-10-10T09:00:00", status: "done" }, ...ms])}
           confirmations={confirmations}
@@ -139,7 +140,32 @@ const demoFiles = [
   { id: "page", fileName: "slides.html", href: "#", mimeType: "text/html", size: 520 },
   { id: "logo", fileName: "logo.svg", href: "#", mimeType: "image/svg+xml", size: 410 },
   { id: "data", fileName: "data.zip", href: "#", mimeType: "application/zip", size: 1_204_000 },
+  // FTR.NAB.CHAT-0003: documents and spreadsheets — ready, being made and without a preview
+  { id: "contract", fileName: "договор.docx", href: "#", size: 48_300 },
+  { id: "budget", fileName: "бюджет.xlsx", href: "#", size: 21_700 },
+  { id: "draft", fileName: "черновик.docx", href: "#", size: 9_800_000 },
+  { id: "legacy", fileName: "старый.ppt", href: "#", size: 3_100_000 },
 ];
+
+const BUDGET: Sheet[] = [
+  { name: "Бюджет", rows: 640, cols: 4, merges: ["A1:D1"], cells: [
+    [{ v: "Бюджет на IV квартал" }, {}, {}, {}],
+    [{ v: "Статья" }, { v: "Октябрь" }, { v: "Ноябрь" }, { v: "Итого" }],
+    [{ v: "Серверы" }, { v: "120 000", n: 120000 }, { v: "125 000", n: 125000 }, { f: "=SUM(B3:C3)" }],
+    [{ v: "Лицензии" }, { v: "48 000", n: 48000 }, { v: "48 000", n: 48000 }, { f: "=SUM(B4:C4)" }],
+    [{ v: "Итого" }, { f: "=SUM(B3:B4)" }, { f: "=SUM(C3:C4)" }, { f: "=SUM(D3:D4)" }],
+  ] },
+  { name: "Допущения", rows: 2, cols: 2, merges: [], cells: [[{ v: "Курс" }, { v: "92,5", n: 92.5 }], [{ v: "Рост" }, { v: "4%", n: 0.04 }]] },
+];
+
+/** FTR.NAB.CHAT-0003: the previews of the showcase — a converted contract, a budget with formulas, a large
+ * draft still being made and an old deck the converter could not open. */
+async function loadDemoPreview(a: { id: string }): Promise<OfficePreview> {
+  if (a.id === "contract") return { state: "doc", blob: new Blob([MINI_PDF], { type: "application/pdf" }), shown: 3, total: 3, from: "DOCX" };
+  if (a.id === "budget") return { state: "sheet", sheets: BUDGET };
+  if (a.id === "draft") return { state: "pending" };
+  return { state: "error", reason: "broken" };
+}
 
 const MINI_PDF = `%PDF-1.4
 1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj

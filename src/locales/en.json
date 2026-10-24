@@ -86,7 +86,22 @@
       "notUtf8": "The file is not in UTF-8 — download it",
       "rows": "Showing {shown} of {total, plural, one {# row} other {# rows}}",
       "source": "Code",
-      "page": "Page"
+      "page": "Page",
+      "converted": "Preview · converted from {format}",
+      "pagesShown": "Showing {shown} of {total} pages",
+      "firstPages": "Showing the first {shown} pages",
+      "cols": "and {shown} of {total} columns",
+      "preparing": "Preparing the preview…",
+      "preparingHint": "Usually a few seconds",
+      "unavailable": "Preview unavailable",
+      "formulaHint": "The value is calculated when opened in Excel",
+      "sheets": "Sheets",
+      "reasons": {
+        "too_large": "The file is over {limit} MB",
+        "timeout": "Took longer than 30 seconds",
+        "broken": "The file is damaged or the format is not supported",
+        "busy": "The service is busy, try again later"
+      }
     },
     "notice": {
       "more": "Show in full",

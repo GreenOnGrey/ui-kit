@@ -32,7 +32,10 @@ for (const theme of ["light", "dark"] as const) {
   // FTR.NAB.CHAT-0001 R34: the preview of a file sent by the agent (PDF is left out: its viewer is the browser's)
   // the drawn Markdown shifts the headings by two levels: «#» is <h3>
   for (const [name, file, ready] of [["preview-markdown", "release-notes.md", ".att-md :is(h1, h2, h3, h4, h5, h6)"], ["preview-table", "metrics.csv", "table"],
-    ["preview-html", "slides.html", "iframe.att-html"]]) {
+    ["preview-html", "slides.html", "iframe.att-html"],
+    // FTR.NAB.CHAT-0003: a spreadsheet, a document being made, a document without a preview (a converted document is a PDF)
+    ["preview-sheet", "бюджет.xlsx", ".att-sheet table"], ["preview-preparing", "черновик.docx", ".att-wait .spin"],
+    ["preview-unavailable", "старый.ppt", ".att-wait .err-text, .att-wait b"]]) {
     test(`${name} ${theme}`, async ({ page }) => {
       const s = await openSection(page, "chat", theme);
       await s.locator('[data-demo="files"]').getByRole("button", { name: `Открыть ${file}` }).click();

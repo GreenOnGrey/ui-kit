@@ -86,7 +86,22 @@
       "notUtf8": "El archivo no está en UTF-8: descárguelo",
       "rows": "Se muestran {shown} de {total, plural, one {# fila} other {# filas}}",
       "source": "Código",
-      "page": "Página"
+      "page": "Página",
+      "converted": "Vista previa · convertido desde {format}",
+      "pagesShown": "Se muestran {shown} de {total} páginas",
+      "firstPages": "Se muestran las primeras {shown} páginas",
+      "cols": "y {shown} de {total} columnas",
+      "preparing": "Preparando la vista previa…",
+      "preparingHint": "Suele tardar unos segundos",
+      "unavailable": "Vista previa no disponible",
+      "formulaHint": "El valor se calcula al abrir el archivo en Excel",
+      "sheets": "Hojas",
+      "reasons": {
+        "too_large": "El archivo supera {limit} MB",
+        "timeout": "Tardó más de 30 segundos",
+        "broken": "El archivo está dañado o el formato no es compatible",
+        "busy": "El servicio está ocupado, inténtalo más tarde"
+      }
     },
     "notice": {
       "more": "Mostrar completo",

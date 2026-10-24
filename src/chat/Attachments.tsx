@@ -2,19 +2,30 @@ import { useEffect, useMemo, useRef, useState, type SyntheticEvent } from "react
 import { useTranslation } from "react-i18next";
 import { Icon, type IconName } from "../components/Icon";
 import { Markdown } from "../components/Markdown";
+import { Tabs } from "../components/Tabs";
 import { Modal } from "../components/ui";
 import { UIKIT_NS, useKitT } from "../i18n";
 import { intlLocale } from "./intl";
-import type { ChatAttachment } from "./types";
+import type { ChatAttachment, OfficePreview, Sheet } from "./types";
 
 // The files of a message and their preview (FTR.NAB.CHAT-0001 R34, design §3.6):
 // images as thumbnails, the files with a preview as tiles with the icon of the
 // preview, the rest as tiles that download.
 
-export type PreviewKind = "image" | "pdf" | "markdown" | "table" | "html" | "text";
+export type PreviewKind = "image" | "pdf" | "markdown" | "table" | "html" | "text" | "office-doc" | "office-sheet";
 
 /** Loads the content of an attachment: the product fetches it with its session. */
 export type LoadAttachment = (a: ChatAttachment) => Promise<Blob>;
+
+/** Loads the preview of a document or a spreadsheet (FTR.NAB.CHAT-0003 R13–R16): the product asks its API; a
+ * `pending` answer is asked again. */
+export type LoadOfficePreview = (a: ChatAttachment) => Promise<OfficePreview>;
+
+const OFFICE_DOC = /\.(docx|doc|docm|odt|rtf|pptx|ppt|pptm|odp)$/;
+const OFFICE_SHEET = /\.(xlsx|xlsm|xls|ods)$/;
+/** The rows and columns of a sheet in the preview (R14). */
+export const SHEET_ROWS = 500;
+export const SHEET_COLS = 50;
 
 // SVG is an image of <img>: there its scripts do not run.
 const IMAGES = new Set(["image/png", "image/jpeg", "image/gif", "image/webp", "image/svg+xml"]);
@@ -26,10 +37,13 @@ export const TEXT_PREVIEW_MAX = 1 << 20;
 /** The rows of a table shown in the preview. */
 export const TABLE_ROWS = 500;
 
-/** How an attachment is previewed, or null when it is only downloaded. */
-export function previewKind(a: Pick<ChatAttachment, "fileName" | "mimeType">): PreviewKind | null {
+/** How an attachment is previewed, or null when it is only downloaded. `office`: the product previews
+ * documents and spreadsheets (FTR.NAB.CHAT-0003). */
+export function previewKind(a: Pick<ChatAttachment, "fileName" | "mimeType">, office = false): PreviewKind | null {
   const type = (a.mimeType ?? "").toLowerCase().split(";")[0].trim();
   const name = a.fileName.toLowerCase();
+  if (office && OFFICE_DOC.test(name)) return "office-doc";
+  if (office && OFFICE_SHEET.test(name)) return "office-sheet";
   if (IMAGES.has(type) || ((!type || type === "application/octet-stream") && IMAGE_EXT.test(name))) return "image";
   if (type === "application/pdf" || name.endsWith(".pdf")) return "pdf";
   if (type === "text/markdown" || /\.(md|markdown)$/.test(name)) return "markdown";
@@ -39,7 +53,8 @@ export function previewKind(a: Pick<ChatAttachment, "fileName" | "mimeType">): P
   return null;
 }
 
-const KIND_ICON: Record<PreviewKind, IconName> = { image: "image", pdf: "pdf", markdown: "markdown", table: "table", html: "globe", text: "source" };
+const KIND_ICON: Record<PreviewKind, IconName> = { image: "image", pdf: "pdf", markdown: "markdown", table: "table", html: "globe", text: "source",
+  "office-doc": "files", "office-sheet": "table" };
 
 /** The icon of a kind of preview: the tiles of the chat and the products' own lists of files show it. */
 export const previewIcon = (kind: PreviewKind): IconName => KIND_ICON[kind];
@@ -218,13 +233,16 @@ function Tile({ a, kind, onOpen }: { a: ChatAttachment; kind: PreviewKind | null
   return <a className="att-tile dl" href={a.href} download={a.fileName} aria-label={t("chat.files.save", { name: a.fileName })} title={a.fileName}>{body}</a>;
 }
 
-/** The files of a message: thumbnails of images and tiles; without `load` every file downloads. */
-export function AttachmentList({ items, load, onOpen }: { items: ChatAttachment[]; load?: LoadAttachment; onOpen?: (a: ChatAttachment) => void }) {
+/** The files of a message: thumbnails of images and tiles; without `load` every file downloads. `office`:
+ * documents and spreadsheets open in the preview (FTR.NAB.CHAT-0003). */
+export function AttachmentList({ items, load, onOpen, office = false }: {
+  items: ChatAttachment[]; load?: LoadAttachment; onOpen?: (a: ChatAttachment) => void; office?: boolean;
+}) {
   return (
     <div className="atts">
       {items.map((a) => {
         const open = load && onOpen ? () => onOpen(a) : undefined;
-        const kind = previewKind(a);
+        const kind = previewKind(a, office);
         return load && open && kind === "image"
           ? <Thumb key={a.id} a={a} load={load} onOpen={open} />
           : <Tile key={a.id} a={a} kind={kind} onOpen={open} />;
@@ -301,16 +319,20 @@ function HtmlPage({ text, title }: { text: string; title: string }) {
 /** The text of a file, or null when it is not UTF-8. */
 type Text = { text: string | null };
 
-/** The preview of an attachment: an image, the browser's PDF viewer, drawn Markdown, a table or text. */
-export function AttachmentPreview({ a, load, onClose }: { a: ChatAttachment; load: LoadAttachment; onClose: () => void }) {
+/** The preview of an attachment: an image, the browser's PDF viewer, drawn Markdown, a table or text; with
+ * `loadPreview` — documents and spreadsheets as well (FTR.NAB.CHAT-0003). */
+export function AttachmentPreview({ a, load, loadPreview, onClose }: {
+  a: ChatAttachment; load: LoadAttachment; loadPreview?: LoadOfficePreview; onClose: () => void;
+}) {
   const t = useKitT();
   const { i18n } = useTranslation(UIKIT_NS);
-  const kind = previewKind(a);
+  const kind = previewKind(a, !!loadPreview);
+  const office = kind === "office-doc" || kind === "office-sheet";
   const textual = kind === "markdown" || kind === "table" || kind === "html" || kind === "text";
   const [source, setSource] = useState(false);
   // a known size over the limit is not loaded at all
   const knownTooLarge = textual && (a.size ?? 0) > TEXT_PREVIEW_MAX;
-  const { url, blob, failed } = useBlob(a, load, !knownTooLarge);
+  const { url, blob, failed } = useBlob(a, load, !knownTooLarge && !office);
   const [content, setContent] = useState<Text | null>(null);
   const tooLarge = knownTooLarge || (textual && (blob?.size ?? 0) > TEXT_PREVIEW_MAX);
   useEffect(() => {
@@ -325,7 +347,8 @@ export function AttachmentPreview({ a, load, onClose }: { a: ChatAttachment; loa
   }, [textual, blob, tooLarge]);
   const text = content?.text;
   let body;
-  if (failed) body = <div className="att-msg err-text">{t("chat.files.failed")}</div>;
+  if (office && loadPreview) body = <OfficeView a={a} load={loadPreview} />;
+  else if (failed) body = <div className="att-msg err-text">{t("chat.files.failed")}</div>;
   else if (tooLarge) body = <div className="att-msg">{t("chat.files.tooLarge")}</div>;
   else if (content && text === null) body = <div className="att-msg">{t("chat.files.notUtf8")}</div>;
   else if (!url || (textual && text == null)) body = <div className="att-msg"><span className="spin" aria-hidden="true" /> {t("loading")}</div>;
@@ -351,5 +374,152 @@ export function AttachmentPreview({ a, load, onClose }: { a: ChatAttachment; loa
       </>}>
       <div className={`att-view ${kind ?? ""}`}>{body}</div>
     </Modal>
+  );
+}
+
+// ─── Documents and spreadsheets (FTR.NAB.CHAT-0003 R13–R16, design §3.2–3.3) ───
+
+/** How long a preview is waited for before «not available: timeout» (the server gives up after 30 s). */
+const OFFICE_WAIT = 40_000;
+const OFFICE_POLL = 2_000;
+/** The limit of a file the server names in a refusal; this one when it does not (R12). */
+const OFFICE_LIMIT_MB = 25;
+/** The pages of a document in its preview (R13): the server converts these first ones. */
+const DOC_PAGES = 50;
+
+type OfficeState = OfficePreview | { state: "loading" } | { state: "failed" };
+
+function OfficeView({ a, load }: { a: ChatAttachment; load: LoadOfficePreview }) {
+  const t = useKitT();
+  const [st, setSt] = useState<OfficeState>({ state: "loading" });
+  const { id, href, fileName, mimeType, size } = a;
+  useEffect(() => {
+    let live = true;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const started = Date.now();
+    const ask = () => {
+      load({ id, href, fileName, mimeType, size }).then((p) => {
+        if (!live) return;
+        if (p.state === "pending") {
+          if (Date.now() - started > OFFICE_WAIT) setSt({ state: "error", reason: "timeout" });
+          else {
+            setSt(p);
+            timer = setTimeout(ask, OFFICE_POLL);
+          }
+          return;
+        }
+        setSt(p);
+      }, () => live && setSt({ state: "failed" }));
+    };
+    ask();
+    return () => {
+      live = false;
+      if (timer) clearTimeout(timer);
+    };
+  }, [load, id, href, fileName, mimeType, size]);
+  if (st.state === "loading" || st.state === "pending") {
+    return <div className="att-msg att-wait"><span className="spin" aria-hidden="true" /><b>{t("chat.files.preparing")}</b><span className="muted small">{t("chat.files.preparingHint")}</span></div>;
+  }
+  if (st.state === "failed") return <div className="att-msg err-text">{t("chat.files.failed")}</div>;
+  if (st.state === "error") {
+    return (
+      <div className="att-msg att-wait">
+        <Icon name="alert" size={28} />
+        <b>{t("chat.files.unavailable")}</b>
+        <span className="muted small">{t(`chat.files.reasons.${st.reason}`, { limit: st.limitMb ?? OFFICE_LIMIT_MB })}</span>
+      </div>
+    );
+  }
+  if (st.state === "doc") return <DocView blob={st.blob} shown={st.shown} total={st.total} from={st.from} name={a.fileName} />;
+  return <SheetView sheets={st.sheets} />;
+}
+
+function DocView({ blob, shown, total, from, name }: { blob: Blob; shown: number; total: number | null; from: string; name: string }) {
+  const t = useKitT();
+  const url = useMemo(() => URL.createObjectURL(blob.type === "application/pdf" ? blob : new Blob([blob], { type: "application/pdf" })), [blob]);
+  useEffect(() => () => URL.revokeObjectURL(url), [url]);
+  return (
+    <div className="att-office">
+      <div className="att-converted">{t("chat.files.converted", { format: from })}</div>
+      <object className="att-pdf" data={url} type="application/pdf" aria-label={name}><div className="att-msg">{t("chat.files.failed")}</div></object>
+      {total != null && total > shown && <div className="att-more">{t("chat.files.pagesShown", { shown, total })}</div>}
+      {total == null && shown >= DOC_PAGES && <div className="att-more">{t("chat.files.firstPages", { shown })}</div>}
+    </div>
+  );
+}
+
+/** A cell address: `B3` → row 2, column 1 (from zero). */
+function cellAt(ref: string): [number, number] | null {
+  const m = /^([A-Z]+)(\d+)$/.exec(ref);
+  if (!m) return null;
+  let col = 0;
+  for (const ch of m[1]) col = col * 26 + ch.charCodeAt(0) - 64;
+  return [Number(m[2]) - 1, col - 1];
+}
+
+/** The merged ranges of a sheet: the spans of their first cells and the cells they cover. */
+export function mergeSpans(merges: string[]): { spans: Map<string, [number, number]>; covered: Set<string> } {
+  const spans = new Map<string, [number, number]>();
+  const covered = new Set<string>();
+  for (const m of merges) {
+    const [from, to] = m.split(":").map(cellAt);
+    if (!from || !to) continue;
+    spans.set(`${from[0]}:${from[1]}`, [to[0] - from[0] + 1, to[1] - from[1] + 1]);
+    for (let r = from[0]; r <= to[0]; r++) for (let c = from[1]; c <= to[1]; c++) if (r !== from[0] || c !== from[1]) covered.add(`${r}:${c}`);
+  }
+  return { spans, covered };
+}
+
+/** The letters of a column: 1 → A, 27 → AA. */
+export function columnName(n: number): string {
+  let s = "";
+  for (let c = n; c > 0; c = Math.floor((c - 1) / 26)) s = String.fromCharCode(65 + ((c - 1) % 26)) + s;
+  return s;
+}
+
+export function SheetView({ sheets }: { sheets: Sheet[] }) {
+  const t = useKitT();
+  const [i, setI] = useState(0);
+  const sheet = sheets[Math.min(i, sheets.length - 1)];
+  if (!sheet) return <div className="att-msg">{t("chat.files.failed")}</div>;
+  const width = Math.max(0, ...sheet.cells.map((r) => r.length));
+  const cols = Array.from({ length: width }, (_, c) => columnName(c + 1));
+  const { spans, covered } = mergeSpans(sheet.merges);
+  const moreRows = sheet.rows > sheet.cells.length;
+  const moreCols = sheet.cols > width;
+  return (
+    <div className="att-office">
+      {sheets.length > 1 && (
+        <Tabs label={t("chat.files.sheets")} items={sheets.map((s, k) => ({ key: String(k), label: s.name }))} value={String(i)}
+          onChange={(k) => setI(Number(k))} />
+      )}
+      <div className="att-table att-sheet">
+        <table>
+          <thead><tr><th />{cols.map((c) => <th key={c}>{c}</th>)}</tr></thead>
+          <tbody>
+            {sheet.cells.map((row, r) => (
+              <tr key={r}>
+                <th>{r + 1}</th>
+                {row.map((cell, c) => {
+                  if (covered.has(`${r}:${c}`)) return null;
+                  const [down, across] = spans.get(`${r}:${c}`) ?? [1, 1];
+                  const rowSpan = down > 1 ? down : undefined;
+                  const colSpan = across > 1 ? across : undefined;
+                  return cell.f
+                    ? <td key={c} rowSpan={rowSpan} colSpan={colSpan} className="att-formula" title={t("chat.files.formulaHint")}>{cell.f}</td>
+                    : <td key={c} rowSpan={rowSpan} colSpan={colSpan} className={cell.n != null ? "att-num" : undefined}>{cell.v ?? ""}</td>;
+                })}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      {(moreRows || moreCols) && (
+        <div className="att-more">
+          {t("chat.files.rows", { shown: sheet.cells.length, total: sheet.rows })}
+          {moreCols && <> {t("chat.files.cols", { shown: width, total: sheet.cols })}</>}
+        </div>
+      )}
+    </div>
   );
 }

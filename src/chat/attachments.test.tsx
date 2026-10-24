@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { html } from "../testing";
-import { AttachmentList, AttachmentPreview, fileSize, htmlDocument, parseTable, previewKind, previewType } from "./Attachments";
+import { AttachmentList, AttachmentPreview, SheetView, columnName, mergeSpans, fileSize, htmlDocument, parseTable, previewKind, previewType } from "./Attachments";
 import type { ChatAttachment } from "./types";
 
 const att = (fileName: string, mimeType?: string, size?: number): ChatAttachment => ({ id: fileName, fileName, href: `/files/${fileName}`, mimeType, size });
@@ -91,5 +91,52 @@ describe("attachments", () => {
   it("formats sizes in the language of the interface", () => {
     expect(fileSize(512, "en")).toBe("512 byte");
     expect(fileSize(3 * 1024 * 1024, "en")).toBe("3 MB");
+  });
+
+  it("FTR.NAB.CHAT-0003 PRV-01 previews documents and spreadsheets only when the product can", () => {
+    for (const n of ["report.docx", "old.doc", "deck.pptx", "notes.odt", "letter.rtf", "slides.odp"]) {
+      expect(previewKind(att(n), true)).toBe("office-doc");
+      expect(previewKind(att(n))).toBeNull();
+    }
+    for (const n of ["data.xlsx", "macro.xlsm", "old.xls", "table.ods"]) expect(previewKind(att(n), true)).toBe("office-sheet");
+    expect(previewKind(att("scan.pdf"), true)).toBe("pdf");
+    const out = html(<AttachmentList items={[att("report.docx"), att("data.xlsx")]} load={load} onOpen={() => {}} office />);
+    expect(out).toContain('class="att-tile office-doc" aria-label="Open report.docx"');
+    expect(out).toContain('class="att-tile office-sheet" aria-label="Open data.xlsx"');
+    expect(html(<AttachmentList items={[att("report.docx")]} load={load} onOpen={() => {}} />)).toContain('class="att-tile dl"');
+  });
+
+  it("PRV-02 waits for the preview of a document", () => {
+    const out = html(<AttachmentPreview a={att("report.docx")} load={load} loadPreview={() => new Promise(() => {})} onClose={() => {}} />);
+    expect(out).toContain("Preparing the preview");
+    expect(out).toContain("Download");
+  });
+
+  it("PRV-03 draws a sheet: tabs, column letters, formulas grey with a hint, what is cut", () => {
+    const sheets = [
+      { name: "Sales", rows: 900, cols: 2, merges: [], cells: [[{ v: "Q1" }, { v: "1 200", n: 1200 }], [{ v: "Sum" }, { f: "=SUM(B1:B1)" }]] },
+      { name: "Notes", rows: 1, cols: 1, merges: [], cells: [[{ v: "x" }]] },
+    ];
+    const out = html(<SheetView sheets={sheets} />);
+    expect(out).toContain('role="tab" aria-selected="true" tabindex="0" class="on">Sales');
+    expect(out).toContain(">Notes</button>");
+    expect(out).toContain("<th>A</th><th>B</th>");
+    expect(out).toContain('class="att-num">1 200');
+    expect(out).toContain('class="att-formula" title="The value is calculated when opened in Excel"');
+    expect(out).toContain("=SUM(B1:B1)");
+    expect(out).toContain("Showing 2 of 900 rows");
+    expect(html(<SheetView sheets={[sheets[1]]} />)).not.toContain("tablist");
+  });
+
+  it("PRV-04 draws merged cells once with their span", () => {
+    const { spans, covered } = mergeSpans(["A1:B2", "bad"]);
+    expect(spans.get("0:0")).toEqual([2, 2]);
+    expect([...covered].toSorted()).toEqual(["0:1", "1:0", "1:1"]);
+    const out = html(<SheetView sheets={[{ name: "S", rows: 2, cols: 3, merges: ["A1:B1"], cells: [[{ v: "Title" }, {}, { v: "x" }], [{ v: "a" }, { v: "b" }, { v: "c" }]] }]} />);
+    expect(out).toContain('<td colSpan="2">Title</td><td>x</td>');
+  });
+
+  it("names columns as spreadsheets do", () => {
+    expect([1, 26, 27, 52, 703].map(columnName)).toEqual(["A", "Z", "AA", "AZ", "AAA"]);
   });
 });

@@ -86,7 +86,22 @@
       "notUtf8": "文件不是 UTF-8 编码，请下载",
       "rows": "显示 {total} 行中的 {shown} 行",
       "source": "代码",
-      "page": "页面"
+      "page": "页面",
+      "converted": "预览 · 由 {format} 转换",
+      "pagesShown": "显示 {shown} / {total} 页",
+      "firstPages": "显示前 {shown} 页",
+      "cols": "以及 {shown} / {total} 列",
+      "preparing": "正在准备预览…",
+      "preparingHint": "通常只需几秒",
+      "unavailable": "无法预览",
+      "formulaHint": "在 Excel 中打开时计算该值",
+      "sheets": "工作表",
+      "reasons": {
+        "too_large": "文件大于 {limit} MB",
+        "timeout": "超过 30 秒未完成",
+        "broken": "文件已损坏或格式不受支持",
+        "busy": "服务繁忙，请稍后重试"
+      }
     },
     "notice": {
       "more": "显示全部",
