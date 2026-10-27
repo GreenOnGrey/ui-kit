@@ -4,6 +4,15 @@ Versions follow semver. A visible change of the look is at least a minor (FTR.NA
 Since `1.0.0` the contract of the kit — class names, tokens, props, icon names, keys of strings — changes only
 in a major.
 
+## 1.10.3
+
+A fix of 1.10.0 (FTR.NAB.CHAT-0003): the preview of a document and a spreadsheet takes the width of the modal.
+
+- `.att-view.office-doc` and `.att-view.office-sheet` are blocks, as `table`, `text` and `html`: a PPTX or DOCX
+  preview was a narrow column in the middle of the modal.
+- The modal of a document preview is 1100px wide, as of a PDF and an HTML page.
+- Snapshots `preview-preparing`, `preview-unavailable` are updated.
+
 ## 1.10.0
 
 A visible change (FTR.NAB.CHAT-0003): documents and spreadsheets open in the preview of a file.
