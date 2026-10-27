@@ -198,11 +198,11 @@
 .att-view.markdown{display:block}
 .att-md{max-height:70vh;overflow:auto;padding:4px 2px}
 .att-msg{color:var(--muted);display:flex;align-items:center;gap:8px}
-.att-view.table,.att-view.text,.att-view.html{display:block}
+.att-view.table,.att-view.text,.att-view.html,.att-view.office-doc,.att-view.office-sheet{display:block}
 .att-htmlbox{width:100%;height:70vh;overflow:hidden;border:1px solid var(--border);border-radius:var(--r-m);background:#fff}
 .att-html{display:block;border:0;transform-origin:0 0;background:#fff}
 /* a page or a PDF is seen better wider than the modal of the kit */
-.modal.wide:has(.att-view.html),.modal.wide:has(.att-view.pdf){width:1100px}
+.modal.wide:has(.att-view.html),.modal.wide:has(.att-view.pdf),.modal.wide:has(.att-view.office-doc){width:1100px}
 .att-table{max-height:70vh;overflow:auto}
 .att-table table{border-collapse:collapse;font-family:var(--mono);font-size:12px}
 .att-table th,.att-table td{border:1px solid var(--border);padding:5px 8px;text-align:left;white-space:nowrap}
