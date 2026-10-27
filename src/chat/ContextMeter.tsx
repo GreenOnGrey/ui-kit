@@ -14,10 +14,12 @@ export function tokens(n: number, lng: string): string {
 /** The fill of the context window by a ring next to the send button
  * (FTR.NAB.CHAT-0001 R3, design §3.1): grey, amber from 70 %, red from 90 %.
  * A click shows the numbers; a full context (from 90 %) offers to compact or to reset, off while the agent answers. */
-export function ContextMeter({ context, onCompact, onReset, busy = false }: {
+export function ContextMeter({ context, onCompact, onReset, busy = false, queued = false }: {
   context: ChatContext; onCompact?: () => void; onReset?: () => void;
   /** A turn is being written: the actions wait for it. */
   busy?: boolean;
+  /** FTR.NAB.CHAT-0004 R5: messages wait in the queue — the actions wait for their answers too. */
+  queued?: boolean;
 }) {
   const t = useKitT();
   const { i18n } = useTranslation(UIKIT_NS);
@@ -52,7 +54,7 @@ export function ContextMeter({ context, onCompact, onReset, busy = false }: {
                 {onReset && <MeterAction icon="reset" label={t("chat.context.reset")} busy={busy} run={() => { setOpen(false); onReset(); }} />}
               </div>
               {/* the reason is said in words: a disabled button shows no tooltip everywhere and is not read out */}
-              {busy && <div id="ctx-wait" className="small muted" style={{ marginTop: 6 }}>{t("chat.context.waitTurn")}</div>}
+              {busy && <div id="ctx-wait" className="small muted" style={{ marginTop: 6 }}>{t(queued ? "chat.context.waitQueue" : "chat.context.waitTurn")}</div>}
             </>
           )}
         </div>

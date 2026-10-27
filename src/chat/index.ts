@@ -8,9 +8,9 @@ export {
 } from "./AgentSettingsMenu";
 export { CommandPalette } from "./CommandPalette";
 export { ContextMeter, tokens } from "./ContextMeter";
-export { MessageView, NOTICE_LINES } from "./MessageView";
+export { MessageView, NOTICE_LINES, SubagentStep } from "./MessageView";
 export { useRecorder } from "./useRecorder";
 export type {
-  ChatAttachment, ChatCommand, ChatConfirmation, ChatContext, ChatConversation, ChatEvent, ChatMark, ChatMessage, ChatProps, ChatStep, ChatUpload,
+  ChatAttachment, ChatCommand, ChatConfirmation, ChatContext, ChatConversation, ChatEvent, ChatMark, ChatMessage, ChatProps, ChatStep, ChatSubagent, ChatUpload,
   ChatWait, ConversationListProps, OfficePreview, Sheet, SheetCell,
 } from "./types";

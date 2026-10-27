@@ -234,6 +234,8 @@ function Sections() {
         </Example>
         <Example label="Агент запускается" box><ChatDemo demo="starting" wait="starting" /></Example>
         <Example label="В очереди" box><ChatDemo demo="queued" wait="queued" /></Example>
+        <Example label="Субагенты: шаг в работе и завершённый с прерванной задачей" box><ChatDemo demo="subagents" subagents /></Example>
+        <Example label="Очередь сообщений и «Остановить»: ответ идёт, два сообщения ждут, прошлый ответ остановлен" box><ChatDemo demo="message-queue" queue /></Example>
         <Example label="Отмена хода и подтверждение действия" box><ChatDemo demo="full" full /></Example>
         <Example label="Только чтение" box><ChatDemo demo="readonly" readOnly /></Example>
         <Example label="Кнопка агента и его меню: имя и выбор варианта, который задаёт продукт" box><AgentDemo /></Example>

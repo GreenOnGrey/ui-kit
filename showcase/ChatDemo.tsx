@@ -6,7 +6,7 @@ import { confirmations as fixtureConfirmations, conversations, history } from ".
 /** The chat of the showcase on invented data: the buttons work without a server
  * (design §3). `full` turns on what not every chat has — cancelling a turn and
  * confirming an action; `narrow` is the side panel of Hammurapi. */
-export function ChatDemo({ demo, narrow, full, empty, readOnly, wait, typing, historyError, listOpen = false, modes, files, notices, draft }: {
+export function ChatDemo({ demo, narrow, full, empty, readOnly, wait, typing, historyError, listOpen = false, modes, files, notices, draft, queue, subagents }: {
   /** The name of the example: tests find the demo by it, not by its place on the page. */
   demo: string;
   narrow?: boolean; full?: boolean; empty?: boolean; readOnly?: boolean; wait?: "starting" | "queued"; typing?: boolean; historyError?: boolean;
@@ -17,8 +17,12 @@ export function ChatDemo({ demo, narrow, full, empty, readOnly, wait, typing, hi
   notices?: boolean;
   /** The draft of the topic of an issue: the empty conversation of the product and its placeholder (FTR.HMR.DISC-0001). */
   draft?: boolean;
+  /** Messages in the queue behind the answer being written, a stopped answer, «Stop» (FTR.NAB.CHAT-0004). */
+  queue?: boolean;
+  /** The steps of subagents: one running, one done with a failed task (FTR.NAB.CMN-0009). */
+  subagents?: boolean;
 }) {
-  const initial: ChatMessage[] = empty || draft ? [] : notices ? noticeHistory : typing
+  const initial: ChatMessage[] = empty || draft ? [] : notices ? noticeHistory : queue ? queueHistory : subagents ? subagentHistory : typing
     ? [...history.slice(0, 1), { id: "t", role: "assistant", text: "", createdAt: "2026-10-11T14:02:00", status: "streaming",
         steps: [{ id: "s", text: "Спецификации: чтение FTR.NAB.CMN-0005", status: "running" }] }]
     : wait
@@ -60,6 +64,13 @@ export function ChatDemo({ demo, narrow, full, empty, readOnly, wait, typing, hi
   const contextEvent = (name: "new" | "compact") => setMessages((ms) => [...ms, { id: `e${n.current++}`, role: "event", text: "", createdAt: new Date().toISOString(), status: "done",
     event: name === "new" ? { icon: "undo", text: "Контекст сброшен" } : { icon: "compress", text: "Контекст сжат: 42 тыс. → 3 тыс. токенов", details: "Изложение разговора." } }]);
   const onRetry = (id: string) => { setBusy(true); answer(id); };
+  // FTR.NAB.CHAT-0004: a message goes to the queue; a stop ends the answer in a moment
+  const onSendQueued = async (text: string) => {
+    setMessages((ms) => [...ms, { id: `q${n.current++}`, role: "user", text, createdAt: new Date().toISOString(), status: "done", queued: true }]);
+  };
+  const onStop = async (id: string) => {
+    timer.current = window.setTimeout(() => setMessages((ms) => ms.map((m) => (m.id === id ? { ...m, status: "stopped", steps: m.steps?.map((s) => ({ ...s, status: "done" as const })) } : m))), 1200);
+  };
   const onCancel = () => {
     window.clearTimeout(timer.current);
     setBusy(false);
@@ -103,7 +114,9 @@ export function ChatDemo({ demo, narrow, full, empty, readOnly, wait, typing, hi
               </div>
             </div>
           ) : undefined}
-          upload={{ maxBytes: 5_000_000 }} onSend={onSend} onRetry={onRetry}
+          upload={{ maxBytes: 5_000_000 }} onSend={queue ? onSendQueued : onSend} onRetry={onRetry}
+          allowQueue={queue} onStop={queue ? onStop : undefined}
+          onCancelQueued={queue ? async (id) => setMessages((ms) => ms.filter((m) => m.id !== id)) : undefined}
           onUpload={async (f) => ({ id: f.name, fileName: f.name })}
           onTranscribe={async () => {
             // the server takes a moment: the wave of FTR.NAB.CHAT-0001 design §3.1 is seen
@@ -218,6 +231,32 @@ async function loadDemoFile(a: { id: string }): Promise<Blob> {
   }
   return new Promise((ok, fail) => c.toBlob((b) => (b ? ok(b) : fail(new Error("canvas"))), "image/png"));
 }
+
+/** A turn with subagents: a finished call with a task out of time and a call that runs (FTR.NAB.CMN-0009 design §3). */
+const subagentHistory: ChatMessage[] = [
+  { id: "r1", role: "user", text: "/code-review main", createdAt: "2026-10-27T15:00:00", status: "done" },
+  { id: "r2", role: "assistant", text: "## Standards\n\nДва замечания.\n\n## Spec\n\nТребование R3 не выполнено.", createdAt: "2026-10-27T15:00:05", status: "done",
+    steps: [{ id: "s1", text: "subagent", status: "done", subagents: [
+      { task: 1, description: "Ревью по стандартам", state: "done", tools: 7, result: "Два замечания: имя `x` и дублирование в `api.go`." },
+      { task: 2, description: "Ревью по спецификации", state: "timeout", tools: 12, result: "Требование R3 не выполнено…" },
+    ] }] },
+  { id: "r3", role: "user", text: "Проверь ещё раз ветку", createdAt: "2026-10-27T15:05:00", status: "done" },
+  { id: "r4", role: "assistant", text: "", createdAt: "2026-10-27T15:05:02", status: "streaming",
+    steps: [{ id: "s2", text: "subagent", status: "running", subagents: [
+      { task: 1, description: "Ревью по стандартам", state: "running", tools: 3 },
+      { task: 2, description: "Ревью по спецификации", state: "done", tools: 5, result: "Замечаний нет." },
+    ] }] },
+];
+
+const queueHistory: ChatMessage[] = [
+  { id: "s1", role: "user", text: "Перескажи CMN-0005 целиком", createdAt: "2026-10-27T13:50:00", status: "done" },
+  { id: "s2", role: "assistant", text: "CMN-0005 описывает UI Kit: состав, токены, компоненты…", createdAt: "2026-10-27T13:50:10", status: "stopped", retryQueued: true },
+  { id: "w1", role: "user", text: "Сравни дизайн чата CHAT-0001 и CHAT-0004", createdAt: "2026-10-27T14:00:00", status: "done" },
+  { id: "w2", role: "assistant", text: "В CHAT-0004 к полю ввода добавлена очередь:", createdAt: "2026-10-27T14:00:05", status: "streaming",
+    steps: [{ id: "s", text: "Спецификации: чтение FTR.NAB.CHAT-0004", status: "running" }] },
+  { id: "q1", role: "user", text: "И добавь таблицу различий", createdAt: "2026-10-27T14:01:00", status: "done", queued: true },
+  { id: "q2", role: "user", text: "Потом проверь макеты", createdAt: "2026-10-27T14:01:20", status: "done", queued: true },
+];
 
 /** Notices of a product in a topic (FTR.NAB.CHAT-0002 design §3.1): a short one and one folded past twelve lines. */
 const noticeHistory: ChatMessage[] = [

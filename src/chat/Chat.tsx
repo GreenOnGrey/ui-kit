@@ -25,6 +25,8 @@ export function Chat(props: ChatProps) {
   const [paletteClosed, setPaletteClosed] = useState(false);
   const [unknown, setUnknown] = useState<string | null>(null);
   const [recognizing, setRecognizing] = useState(false);
+  // FTR.NAB.CHAT-0004 R8: the answer the user asked to stop; the button waits for its end
+  const [stopping, setStopping] = useState<string | null>(null);
   // FTR.NAB.CHAT-0001 R34: the file open in the preview. The product's loader may be a new function on
   // every render; the chat gives the thumbnails one stable function while the product has a loader
   const [viewing, setViewing] = useState<ChatAttachment | null>(null);
@@ -39,7 +41,10 @@ export function Chat(props: ChatProps) {
   const recorder = useRecorder(maxSeconds, () => void stopAndTranscribe());
   const { messages, busy = false } = props;
   // FTR.NAB.CHAT-0001 R1, R2: the context is reset or compacted between turns, not during one
-  const turnRunning = busy || messages.some((m) => m.status === "pending" || m.status === "streaming");
+  const answer = messages.findLast((m) => m.role === "assistant" && (m.status === "pending" || m.status === "streaming"));
+  // FTR.NAB.CHAT-0004 R1: the queued messages are numbered in the order of the conversation
+  const queue = messages.filter((m) => m.role === "user" && m.queued).map((m) => m.id);
+  const turnRunning = busy || !!answer || queue.length > 0;
   const onPendingChange = props.onPendingChange;
   useEffect(() => onPendingChange?.(pending), [pending, onPendingChange]);
 
@@ -89,7 +94,8 @@ export function Chat(props: ChatProps) {
 
   const send = async (body: string, asText = false) => {
     const msg = body.trim();
-    if ((!msg && pending.length === 0 && !skill) || busy || props.readOnly) return;
+    // FTR.NAB.CHAT-0004 R1: without allowQueue a message waits for the answer, as before
+    if ((!msg && pending.length === 0 && !skill) || busy || (answer && !props.allowQueue) || props.readOnly) return;
     // R4: a command typed in full runs; an unknown one waits for «Send as text»
     if (!asText && !skill && props.commands && msg.startsWith("/")) {
       const [word, ...rest] = msg.slice(1).split(/\s+/);
@@ -207,7 +213,16 @@ export function Chat(props: ChatProps) {
     }
   };
 
-  const placeholder = skill ? t("chat.skillPlaceholder") : (props.placeholder ?? t("chat.placeholder", { name: props.agentName }));
+  const placeholder = skill ? t("chat.skillPlaceholder")
+    : props.allowQueue && answer ? t("chat.queuePlaceholder")
+      : (props.placeholder ?? t("chat.placeholder", { name: props.agentName }));
+  // FTR.NAB.CHAT-0004 design §3 p. 1, 7: «Stop» while an answer is written and the field is empty; a text, a file or a
+  // skill in the field turn it back into «Send»
+  const showStop = props.onStop && answer && !text.trim() && pending.length === 0 && !skill;
+  const stop = (id: string) => {
+    setStopping(id);
+    props.onStop?.(id).catch(() => setStopping(null));
+  };
   const left = maxSeconds - recorder.seconds;
   return (
     <section className="nb-chat" aria-label={t("chat.title")}>
@@ -223,7 +238,10 @@ export function Chat(props: ChatProps) {
           <div className="empty"><div className="ic"><Icon name="spark" /></div><b>{t("chat.emptyTitle", { name: props.agentName })}</b>{props.emptyHint}</div>
         )}
         {messages.map((m) => <MessageView key={m.id} m={m} busy={busy} onRetry={props.onRetry && (() => props.onRetry?.(m.id))}
-          loadAttachment={loadFile} loadPreview={loadPreview} onOpenAttachment={setViewing} />)}
+          loadAttachment={loadFile} loadPreview={loadPreview} onOpenAttachment={setViewing}
+          queuePosition={m.queued ? queue.indexOf(m.id) + 1 : undefined}
+          onCancelQueued={props.onCancelQueued && (() => void props.onCancelQueued?.(m.id).catch(() => {}))}
+          stopping={stopping === m.id} />)}
         {props.onConfirm && (props.confirmations ?? []).map((c) => (
           <div className="confirm" key={c.id} role="group" aria-label={t("chat.confirm.title")}>
             <div className="h"><Icon name="alert" size={16} />{t("chat.confirm.title")}</div>
@@ -290,14 +308,17 @@ export function Chat(props: ChatProps) {
                   onKeyDown={keys} />
               </div>
             )}
-            {props.context && !recorder.recording && <ContextMeter context={props.context} onCompact={props.onCompact} onReset={props.onReset} busy={turnRunning} />}
+            {props.context && !recorder.recording && <ContextMeter context={props.context} onCompact={props.onCompact} onReset={props.onReset} busy={turnRunning} queued={queue.length > 0} />}
             {props.onTranscribe && !recorder.recording && (
               <VoiceButton supported={recorder.supported} recognizing={recognizing} onStart={() => void recorder.start()} />
             )}
-            {!recorder.recording && (props.onCancel && busy ? (
+            {!recorder.recording && (showStop ? (
+              <button className="iconbtn stopbtn" aria-label={t("chat.stopAnswer")} title={t("chat.stopAnswer")}
+                disabled={stopping === answer.id} onClick={() => stop(answer.id)}><Icon name="stop" /></button>
+            ) : props.onCancel && busy ? (
               <button className="iconbtn fill" aria-label={t("chat.stop")} onClick={props.onCancel}><Icon name="stop" /></button>
             ) : (
-              <button className="iconbtn fill" aria-label={t("chat.send")} disabled={(!text.trim() && pending.length === 0 && !skill) || busy || recognizing} onClick={() => send(text)}>
+              <button className="iconbtn fill" aria-label={t("chat.send")} disabled={(!text.trim() && pending.length === 0 && !skill) || busy || (!!answer && !props.allowQueue) || recognizing} onClick={() => send(text)}>
                 <Icon name="send" />
               </button>
             ))}

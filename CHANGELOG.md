@@ -4,6 +4,26 @@ Versions follow semver. A visible change of the look is at least a minor (FTR.NA
 Since `1.0.0` the contract of the kit — class names, tokens, props, icon names, keys of strings — changes only
 in a major.
 
+## 1.11.0
+
+A visible change (FTR.NAB.CHAT-0004, FTR.NAB.CMN-0009): the queue of messages, the stop of an answer and the step of
+subagents.
+
+- Chat: `ChatProps.allowQueue` — «Send» stays on while the agent answers, the placeholder says the message waits;
+  `busy` is then the request only. `ChatMessage.queued` draws a message of the queue with a dashed violet frame, its
+  number («In the queue · 2») and «Cancel» (`ChatProps.onCancelQueued`).
+- Chat: `ChatProps.onStop` — «Stop» takes the place of «Send» while an answer is written and the field is empty; text,
+  a file or a skill in the field turn it back into «Send». After a click the answer says «Stopping…».
+- `ChatMessage.status = "stopped"`: the answer keeps its text and gets a grey «Stopped» with «Retry».
+- `ChatMessage.retryQueued`: a failed or stopped answer whose retry waits in the queue shows «The retry waits in the
+  queue» instead of «Retry». Without `allowQueue` sending waits for the answer being written, as before.
+- `ContextMeter` takes `queued`: its actions wait for the queue too, with their own hint.
+- `ChatStep.subagents` (`ChatSubagent`): the step «Subagents · N» — open with a row per task while one runs, folded to
+  one line when done; a row opens its result. An aborted task without an `error` reads «stopped · the turn was stopped».
+  `SubagentStep` is exported. Snapshots `stopping` and `subagents-open`.
+- Strings `chat.queuePlaceholder`, `chat.queue.*`, `chat.stopAnswer`, `chat.stopping`, `chat.stopped`,
+  `chat.context.waitQueue`, `chat.subagents.*`. Showcase examples «Субагенты» and «Очередь сообщений и «Остановить»».
+
 ## 1.10.3
 
 A fix of 1.10.0 (FTR.NAB.CHAT-0003): the preview of a document and a spreadsheet takes the width of the modal.

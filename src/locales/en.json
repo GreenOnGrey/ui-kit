@@ -72,7 +72,8 @@
       "full": "Answers get more expensive and the agent may get confused.",
       "compact": "Compact",
       "reset": "Start over",
-      "waitTurn": "Wait for the answer or stop it"
+      "waitTurn": "Wait for the answer or stop it",
+      "waitQueue": "Wait for the answers to the queued messages"
     },
     "event": {
       "details": "Summary"
@@ -106,7 +107,30 @@
     "notice": {
       "more": "Show in full",
       "less": "Collapse"
-    }
+    },
+    "queuePlaceholder": "The message will wait in the queue",
+    "queue": {
+      "position": "In the queue · {n}",
+      "cancel": "Cancel"
+    },
+    "stopAnswer": "Stop the answer",
+    "stopping": "Stopping…",
+    "stopped": "Stopped",
+    "subagents": {
+      "title": "{count, plural, one {Subagents · #} other {Subagents · #}}",
+      "done": "done",
+      "failed": "{count, plural, one {# not done} other {# not done}}",
+      "tools": "{count, plural, one {# tool} other {# tools}}",
+      "state": {
+        "running": "running",
+        "done": "done",
+        "failed": "error",
+        "timeout": "stopped · out of time",
+        "aborted": "stopped",
+        "turnStopped": "stopped · the turn was stopped"
+      }
+    },
+    "retryQueued": "The retry waits in the queue"
   },
   "agent": {
     "menu": "Agent",

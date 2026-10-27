@@ -52,6 +52,24 @@ for (const theme of ["light", "dark"] as const) {
     await expect(page.locator(".navmenu .side")).toHaveScreenshot(`admin-burger-${theme}.png`);
   });
 
+  // FTR.NAB.CHAT-0004 design §3 p. 7: «Stopping…» after a click on «Stop»
+  test(`stopping ${theme}`, async ({ page }) => {
+    const s = await openSection(page, "chat", theme);
+    const demo = s.locator('[data-demo="message-queue"]');
+    await demo.getByRole("button", { name: "Остановить ответ" }).click();
+    await expect(demo.locator(".stopmark").last()).toHaveScreenshot(`stopping-${theme}.png`);
+  });
+
+  // FTR.NAB.CMN-0009 design §3 p. 2: a finished step of subagents opened, with the result of a task
+  test(`subagents open ${theme}`, async ({ page }) => {
+    const s = await openSection(page, "chat", theme);
+    const step = s.locator('[data-demo="subagents"] .tool.subagents').first();
+    await step.locator(".sa-head").click();
+    await step.locator(".sa-row").first().click();
+    await expect(step.locator(".sa-result")).toBeVisible();
+    await expect(step).toHaveScreenshot(`subagents-open-${theme}.png`);
+  });
+
   // FTR.NAB.CHAT-0001 design §3.1: the menu of the context meter and the focus of the composer
   test(`context menu ${theme}`, async ({ page }) => {
     const s = await openSection(page, "chat", theme);

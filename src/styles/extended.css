@@ -68,6 +68,26 @@
 .warn-t{color:var(--amber)}
 .turnstate{display:flex;align-items:center;justify-content:flex-end;gap:6px;font-size:12px;color:var(--muted);margin-top:5px}
 .turnstate.q{color:var(--amber)}
+/* FTR.NAB.CHAT-0004 design §1: a message in the queue, its number and «Cancel»; «Stop» on the place of «Send»;
+   the stop of an answer, grey — an action of the user, not an error */
+.m.u.queued .bub{border:1px dashed var(--violet);background:var(--violet-soft);color:var(--text)}
+.qmark{display:flex;align-items:center;justify-content:flex-end;gap:6px;font-size:12px;color:var(--muted);margin-top:5px}
+.qmark .textbtn{display:inline-flex;align-items:center;gap:3px;margin-left:4px}
+.stopmark{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);margin-top:6px}
+.stopmark .textbtn{margin-left:4px}
+.qmark-inline{display:inline-flex;align-items:center;gap:4px;color:var(--muted);font-size:12px;margin-left:4px}
+.iconbtn.stopbtn{border:1px solid var(--border-strong);color:var(--text);border-radius:50%}
+/* FTR.NAB.CMN-0009 design §1: the step «Subagents · N» and its rows of tasks */
+.tool.subagents{flex-direction:column;align-items:stretch;gap:2px}
+.tool.subagents .sa-head,.tool.subagents .sa-row{display:flex;align-items:center;gap:6px;border:0;background:none;padding:0;font:inherit;color:inherit;text-align:left;cursor:pointer;width:100%}
+.tool.subagents .sa-row[disabled]{cursor:default}
+.tool.subagents .sa-task{padding-left:20px}
+.tool.subagents .sa-desc{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tool.subagents .sa-meta{color:var(--muted);font-size:12px;white-space:nowrap}
+.tool.subagents .sa-state.running{color:var(--violet-text)}
+.tool.subagents .sa-err{color:var(--muted);font-size:12px;padding-left:18px}
+.tool.subagents .sa-result{margin:4px 0 4px 18px;padding:6px 8px;border-left:2px solid var(--border);font-size:13px;max-height:260px;overflow:auto}
+.tool.subagents .off{color:var(--muted)}
 .spin{display:inline-block;width:11px;height:11px;border-radius:50%;border:2px solid var(--border-strong);border-top-color:var(--violet);animation:nb-spin 1s linear infinite}
 @keyframes nb-spin{to{transform:rotate(360deg)}}
 @media (prefers-reduced-motion:reduce){

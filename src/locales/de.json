@@ -72,7 +72,8 @@
       "full": "Antworten werden teurer, der Agent kann durcheinanderkommen.",
       "compact": "Komprimieren",
       "reset": "Neu beginnen",
-      "waitTurn": "Warten Sie auf die Antwort oder stoppen Sie sie"
+      "waitTurn": "Warten Sie auf die Antwort oder stoppen Sie sie",
+      "waitQueue": "Warten Sie auf die Antworten auf die Nachrichten in der Warteschlange"
     },
     "event": {
       "details": "Zusammenfassung"
@@ -106,7 +107,30 @@
     "notice": {
       "more": "Vollständig anzeigen",
       "less": "Einklappen"
-    }
+    },
+    "queuePlaceholder": "Die Nachricht wartet in der Warteschlange",
+    "queue": {
+      "position": "In der Warteschlange · {n}",
+      "cancel": "Abbrechen"
+    },
+    "stopAnswer": "Antwort stoppen",
+    "stopping": "Wird gestoppt…",
+    "stopped": "Gestoppt",
+    "subagents": {
+      "title": "Subagenten · {count}",
+      "done": "fertig",
+      "failed": "{count} nicht fertig",
+      "tools": "{count, plural, one {# Werkzeug} other {# Werkzeuge}}",
+      "state": {
+        "running": "läuft",
+        "done": "fertig",
+        "failed": "Fehler",
+        "timeout": "abgebrochen · Zeit abgelaufen",
+        "aborted": "abgebrochen",
+        "turnStopped": "abgebrochen · Antwort gestoppt"
+      }
+    },
+    "retryQueued": "Die Wiederholung wartet in der Warteschlange"
   },
   "agent": {
     "menu": "Agent",

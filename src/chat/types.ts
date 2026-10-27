@@ -22,7 +22,22 @@ export interface ChatUpload { id: string; fileName: string }
  * (FTR.NAB.CHAT-0001 R34). */
 export interface ChatAttachment extends ChatUpload { href: string; mimeType?: string; size?: number }
 
-export interface ChatStep { id: string; text: string; title?: string; status: "running" | "done" | "error" }
+export interface ChatStep {
+  id: string; text: string; title?: string; status: "running" | "done" | "error";
+  /** The tasks of a call of subagents (FTR.NAB.CMN-0009 R8): the step is drawn as «Subagents · N» with a row per task. */
+  subagents?: ChatSubagent[];
+}
+
+/** A task of a subagent: `result` is its beginning, cut by the product with «…», only when done or timed out;
+ * `error` is why it failed or was stopped — an aborted task without one was stopped with the turn. */
+export interface ChatSubagent {
+  task: number;
+  description: string;
+  state: "running" | "done" | "failed" | "timeout" | "aborted";
+  tools: number;
+  error?: string;
+  result?: string;
+}
 
 /** The caption over a message: the channel it came from or the context of the product. */
 export interface ChatMark { icon: IconName; text: string }
@@ -47,7 +62,12 @@ export interface ChatMessage {
   text: string;
   /** ISO time. */
   createdAt: string;
-  status: "pending" | "streaming" | "done" | "failed";
+  /** `stopped`: the user stopped the answer (FTR.NAB.CHAT-0004 R9) — what was written stays, with «Retry». */
+  status: "pending" | "streaming" | "done" | "failed" | "stopped";
+  /** A user message waiting in the queue for its answer (FTR.NAB.CHAT-0004 R1); the chat numbers them. */
+  queued?: boolean;
+  /** A failed or stopped answer whose retry waits in the queue (FTR.NAB.CHAT-0004 design §3 p. 8). */
+  retryQueued?: boolean;
   mark?: ChatMark;
   attachments?: ChatAttachment[];
   steps?: ChatStep[];
@@ -97,8 +117,10 @@ export interface ChatProps {
   historyError?: ReactNode;
   hasOlder?: boolean;
   loadingOlder?: boolean;
-  /** A turn is being sent or answered: sending and retrying wait. */
+  /** A turn is being sent or answered: sending and retrying wait. With `allowQueue` — only while a message is sent. */
   busy?: boolean;
+  /** FTR.NAB.CHAT-0004 R1: a message may be sent while the agent answers; it waits in the queue. */
+  allowQueue?: boolean;
   /** Shown instead of the composer: why one cannot write here and what to do. */
   readOnly?: ReactNode;
   confirmations?: ChatConfirmation[];
@@ -121,6 +143,10 @@ export interface ChatProps {
   onLoadOlder?(): void;
   onRetry?(messageId: string): void;
   onCancel?(): void;
+  /** FTR.NAB.CHAT-0004 R3: cancels a message waiting in the queue; the product tells the user of a failure. */
+  onCancelQueued?(messageId: string): Promise<void>;
+  /** FTR.NAB.CHAT-0004 R8: stops the answer being written. «Stop» takes the place of «Send» while the field is empty. */
+  onStop?(answerId: string): Promise<void>;
   onConfirm?(id: string, approve: boolean): void;
   /** `null`: the upload failed and the product has told the user. */
   onUpload?(file: File): Promise<ChatUpload | null>;
