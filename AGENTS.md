@@ -38,6 +38,12 @@ showcase/         the showcase: every element in every state, on invented data
 e2e/              Playwright: behaviour.spec.ts, visual.spec.ts and the baselines
 ```
 
+## Checks before a commit
+
+A change is ready when every job of `.github/workflows/ci.yml` passes locally at the versions the workflow pins, plus the
+matching lines below. Read the workflow for the exact commands. Install a missing tool outside the repository
+at the pinned version. Name any job you could not run in your report, with the reason.
+
 ## Rules
 
 - **The kit repeats Nabu.** A visible change is a decision, not a side effect: it changes a
