@@ -4,6 +4,10 @@ Versions follow semver. A visible change of the look is at least a minor (FTR.NA
 Since `1.0.0` the contract of the kit — class names, tokens, props, icon names, keys of strings — changes only
 in a major.
 
+## 1.11.1
+
+- Markdown: `_` inside a word is not emphasis, `snake_case` names keep their underscores.
+
 ## 1.11.0
 
 A visible change (FTR.NAB.CHAT-0004, FTR.NAB.CMN-0009): the queue of messages, the stop of an answer and the step of

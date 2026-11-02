@@ -41,6 +41,11 @@ describe("Markdown (KIT-07)", () => {
     expect(out).toContain("<pre><code>code</code></pre>");
   });
 
+  it("keeps snake_case names and emphasizes whole words", () => {
+    const out = html(<Markdown text={"CATALOG_USAGE_UNUSED_DAYS и last_check_at, _важно_."} />);
+    expect(out).toContain("CATALOG_USAGE_UNUSED_DAYS и last_check_at, <i>важно</i>.");
+  });
+
   it("never inserts markup from the text", () => {
     const out = html(<Markdown text={'<script>alert(1)</script>\n\n<img src=x onerror="alert(1)">'} />);
     expect(out).not.toContain("<script");

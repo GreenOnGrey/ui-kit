@@ -7,7 +7,8 @@ import type { ReactNode } from "react";
 
 function inline(text: string, key: string): ReactNode[] {
   const out: ReactNode[] = [];
-  const re = /(`[^`]+`|\*\*[^*]+\*\*|\*[^*]+\*|_[^_]+_)/g;
+  // "_" inside a word is not emphasis: snake_case names stay as they are.
+  const re = /(`[^`]+`|\*\*[^*]+\*\*|\*[^*]+\*|(?<![\p{L}\p{N}_])_[^_]+_(?![\p{L}\p{N}_]))/gu;
   let last = 0;
   let m: RegExpExecArray | null;
   let i = 0;
