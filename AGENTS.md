@@ -44,6 +44,8 @@ A change is ready when every job of `.github/workflows/ci.yml` passes locally at
 matching lines below. Read the workflow for the exact commands. Install a missing tool outside the repository
 at the pinned version. Name any job you could not run in your report, with the reason.
 
+- Always, after the checks pass: run the `code-review` skill on the diff to be committed. Fix each finding, or name it in your report with the reason it stays. Ask the user when you doubt a finding.
+
 ## Rules
 
 - **The kit repeats Nabu.** A visible change is a decision, not a side effect: it changes a
