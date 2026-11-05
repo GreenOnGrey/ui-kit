@@ -26,5 +26,5 @@ if [[ $highest == "$version" ]]; then
   cp -r "$src"/. "$work/"
 fi
 git -C "$work" add -A
-git -C "$work" commit -qm "Витрина $version"
+git -C "$work" commit -qm "Showcase $version"
 git -C "$work" push origin HEAD:gh-pages

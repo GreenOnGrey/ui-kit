@@ -1,12 +1,12 @@
-# Проверки на каждый PR: линтер (oxlint + tsc), тесты, сборка пакета и витрины,
-# поведение и снимки витрины (Playwright), журнал изменений, actionlint.
+# Checks on every PR: the linter (oxlint + tsc), tests, the build of the package and the showcase,
+# behaviour and snapshots of the showcase (Playwright), the changelog, actionlint.
 name: ci
 on:
   pull_request:
   push:
     branches: [main]
-  # Ручной запуск: коммит эталонов из update-snapshots сделан GITHUB_TOKEN и сам
-  # проверки не запускает — их вызывает update-snapshots.
+  # A manual run: a commit of baselines from update-snapshots is made by GITHUB_TOKEN and does not
+  # start checks by itself, so update-snapshots calls them.
   workflow_dispatch:
 permissions: { contents: read }
 concurrency: { group: "ci-${{ github.ref }}", cancel-in-progress: true }
@@ -38,12 +38,12 @@ jobs:
         with: { node-version: 24, cache: npm }
       - run: npm ci --no-audit --no-fund
       - run: npm run build:showcase
-      - name: Пакет собирается и устанавливается
+      - name: The package builds and installs
         run: npm pack --dry-run
 
-  # Поведение компонентов и снимки витрины (FTR.NAB.CMN-0005 qa §1). Эталоны
-  # снимков лежат в e2e/__screenshots__ и обновляются только workflow
-  # update-snapshots: отрисовка на машине разработчика отличается.
+  # Behaviour of components and snapshots of the showcase (FTR.NAB.CMN-0005 qa §1). Baseline
+  # snapshots are in e2e/__screenshots__ and change only through the workflow
+  # update-snapshots: rendering on a developer's machine differs.
   e2e:
     runs-on: ubuntu-24.04
     steps:
@@ -54,15 +54,15 @@ jobs:
       - run: npx playwright install --with-deps chromium
       - run: npm run test:e2e
 
-  # R24: изменённый снимок — видимое изменение. Оно требует записи в журнале и
-  # версии не ниже следующего minor.
+  # R24: a changed snapshot is a visible change. It needs a changelog entry and
+  # a version of at least the next minor.
   changelog:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with: { fetch-depth: 0 }
-      - name: Видимое изменение записано в журнале и повышает minor
+      - name: A visible change is in the changelog and raises the minor
         env:
           BASE: ${{ github.event.pull_request.base.sha }}
         run: bash scripts/visible-change.sh "$BASE"
