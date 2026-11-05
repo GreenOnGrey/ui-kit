@@ -10,6 +10,7 @@ The kit is used by `nabu-web` and `hammurapi-web`, checked out next to it. The s
 - Every change implements the specification; refer to it in comments as `FTR.NAB.CMN-0005 R23`, `design §6`.
 - Deviations from a spec are written into the spec in the same piece of work.
 - Do not commit, tag or push unless asked.
+- English for code, comments, docs, CI, scripts, logs, test names, and the messages and tool descriptions that services return. Russian stays in the locale dictionary `src/locales/ru.json`, test data that exercises Russian text and the specifications in `hammurapi-specs`. Other Russian here is a leftover to translate.
 
 ## Stack
 
