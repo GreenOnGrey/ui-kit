@@ -1,7 +1,7 @@
-# Эталоны снимков витрины создаются и обновляются только здесь — на той же
-# машине, на которой их сравнивает ci (FTR.NAB.CMN-0005 qa, решение 9). Ручной
-# запуск на ветке запроса: эталоны коммитятся в неё. Коммит от GITHUB_TOKEN не
-# запускает другие workflow, поэтому ci на нём вызывается отсюда явно.
+# Baseline snapshots of the showcase are created and updated only here, on the same
+# machine on which ci compares them (FTR.NAB.CMN-0005 qa, decision 9). A manual
+# run on the branch of a PR commits baselines to it. A commit by GITHUB_TOKEN does not
+# start other workflows, so ci on it is called from here explicitly.
 name: update-snapshots
 on:
   workflow_dispatch:
@@ -17,12 +17,12 @@ jobs:
       - run: npm ci --no-audit --no-fund
       - run: npx playwright install --with-deps chromium
       - run: npx playwright test e2e/visual.spec.ts --update-snapshots
-      - name: Коммит эталонов
+      - name: Commit baselines
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add e2e/__screenshots__
-          if git diff --cached --quiet; then echo "Эталоны не изменились."; exit 0; fi
+          if git diff --cached --quiet; then echo "Baselines did not change."; exit 0; fi
           git commit -m "Showcase snapshot baselines"
           git push
           gh workflow run ci.yml --ref "$GITHUB_REF_NAME"

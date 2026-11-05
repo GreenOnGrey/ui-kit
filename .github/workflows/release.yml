@@ -1,7 +1,7 @@
-# Релиз @green-on-grey/ui-kit (FTR.NAB.CMN-0005 tech §3.8):
-#   push тега vX.Y.Z  →  проверки → публикация в npm → витрина в GitHub Pages
-# Публикация — доверенная (OIDC), без токена; витрина версии ложится в /vX.Y.Z/
-# ветки gh-pages и больше не меняется, корень показывает наибольшую версию.
+# Release of @green-on-grey/ui-kit (FTR.NAB.CMN-0005 tech §3.8):
+#   push of a tag vX.Y.Z  →  checks → publishing to npm → the showcase on GitHub Pages
+# Publishing is trusted (OIDC), with no token; the showcase of a version goes to /vX.Y.Z/
+# of the branch gh-pages and no longer changes, and the root shows the highest version.
 name: release
 on:
   push:
@@ -18,10 +18,10 @@ jobs:
       - id: m
         run: |
           tag=$GITHUB_REF_NAME
-          [[ $tag =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "::error::тег «$tag» не в формате vX.Y.Z"; exit 1; }
+          [[ $tag =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "::error::tag '$tag' is not in the format vX.Y.Z"; exit 1; }
           version=$(node -p 'require("./package.json").version')
-          [[ v$version == "$tag" ]] || { echo "::error::тег $tag, а в package.json версия $version"; exit 1; }
-          grep -q "^## $version\b" CHANGELOG.md || { echo "::error::в CHANGELOG.md нет раздела «## $version»"; exit 1; }
+          [[ v$version == "$tag" ]] || { echo "::error::tag $tag, while package.json has version $version"; exit 1; }
+          grep -q "^## $version\b" CHANGELOG.md || { echo "::error::CHANGELOG.md has no section '## $version'"; exit 1; }
           echo "version=$version" >>"$GITHUB_OUTPUT"
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with: { node-version: 24, cache: npm }
@@ -41,14 +41,14 @@ jobs:
         with: { node-version: 24, cache: npm, registry-url: "https://registry.npmjs.org" }
       - run: npm ci --no-audit --no-fund
       - run: npm run build
-      # Повторный запуск релиза не падает на уже опубликованной версии: витрина
-      # в Pages должна доехать и тогда, когда пакет опубликован раньше.
-      - name: Публикация в npm
+      # A repeated run of a release does not fail on a version already published: the showcase
+      # must reach Pages even when the package was published earlier.
+      - name: Publish to npm
         env:
           VERSION: ${{ needs.verify.outputs.version }}
         run: |
           if npm view "@green-on-grey/ui-kit@$VERSION" version >/dev/null 2>&1; then
-            echo "Версия $VERSION уже в реестре — публикация пропущена."
+            echo "Version $VERSION is already in the registry: publishing is skipped."
           else
             npm publish --provenance --access public
           fi
@@ -65,7 +65,7 @@ jobs:
         with: { node-version: 24, cache: npm }
       - run: npm ci --no-audit --no-fund
       - run: npm run build:showcase
-      - name: Витрина версии — в gh-pages
+      - name: The showcase of the version to gh-pages
         env:
           VERSION: ${{ needs.verify.outputs.version }}
         run: bash scripts/publish-pages.sh "$VERSION"
