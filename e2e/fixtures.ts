@@ -14,8 +14,8 @@ export { expect };
 export const demo = (section: Locator, name: string) => section.locator(`[data-demo="${name}"]`);
 
 /** One section of the showcase without its header and contents. */
-export async function openSection(page: Page, id: string, theme: "light" | "dark" = "light") {
-  await page.goto(`/?embed=1&theme=${theme}#${id}`);
+export async function openSection(page: Page, id: string, theme: "light" | "dark" = "light", lng: "en" | "ru" = "en") {
+  await page.goto(`/?embed=1&theme=${theme}&lng=${lng}#${id}`);
   const section = page.locator(`#${id}`);
   await expect(section).toBeVisible();
   return section;
@@ -27,5 +27,5 @@ export async function send(input: Locator) {
   const touch = await input.evaluate(() => matchMedia("(hover: none) and (pointer: coarse)").matches);
   if (!touch) return input.press("Enter");
   await input.locator("xpath=ancestor::*[contains(concat(' ', normalize-space(@class), ' '), ' composer ')][1]")
-    .getByRole("button", { name: "Отправить", exact: true }).click();
+    .getByRole("button", { name: "Send", exact: true }).click();
 }

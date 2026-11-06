@@ -2,9 +2,9 @@
 // snapshots (e2e/visual.spec.ts) are built from, so a section cannot be left
 // without a snapshot.
 export const SECTIONS = [
-  ["tokens", "Токены"], ["type", "Типографика"], ["buttons", "Кнопки"], ["forms", "Поля и формы"], ["chips", "Чипы и вкладки"],
-  ["data", "Данные"], ["messages", "Сообщения"], ["overlay", "Меню и модальные окна"], ["toasts", "Уведомления"], ["avatars", "Аватары"],
-  ["icons", "Иконки"], ["topbar", "Верхняя панель"], ["login", "Вход"], ["chat", "Чат"], ["states", "Состояния"], ["markdown", "Markdown"],
+  ["tokens", "Tokens"], ["type", "Typography"], ["buttons", "Buttons"], ["forms", "Fields and forms"], ["chips", "Chips and tabs"],
+  ["data", "Data"], ["messages", "Messages"], ["overlay", "Menus and modals"], ["toasts", "Toasts"], ["avatars", "Avatars"],
+  ["icons", "Icons"], ["topbar", "Top bar"], ["login", "Sign-in"], ["chat", "Chat"], ["states", "States"], ["markdown", "Markdown"],
 ] as const;
 
 export type SectionId = (typeof SECTIONS)[number][0];

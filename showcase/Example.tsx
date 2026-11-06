@@ -28,7 +28,7 @@ export function Example({ label, children, box, source }: {
       <div className={`sc-stage${box ? " sc-box" : ""}`}>{children}</div>
       <div className="sc-code">
         <pre>{markup}</pre>
-        <button className="btn sm ghost" onClick={copy}><Icon name={copied ? "check" : "copy"} size={14} />{copied ? "Скопировано" : "Копировать"}</button>
+        <button className="btn sm ghost" onClick={copy}><Icon name={copied ? "check" : "copy"} size={14} />{copied ? "Copied" : "Copy"}</button>
       </div>
     </div>
   );
