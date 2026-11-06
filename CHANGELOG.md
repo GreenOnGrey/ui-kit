@@ -4,6 +4,13 @@ Versions follow semver. A visible change of the look is at least a minor (FTR.NA
 Since `1.0.0` the contract of the kit — class names, tokens, props, icon names, keys of strings — changes only
 in a major.
 
+## 1.12.0
+
+A visible change of the showcase only: it speaks English. The labels, the invented data and the strings of the
+components (the dictionary `en`) are English, and the snapshots of the showcase are taken anew. `?lng=ru` draws the
+components with the Russian dictionary: the sections «Chat» and «Top bar» are also taken with it, as its strings are
+longer. The kit itself, its styles and its five dictionaries do not change.
+
 ## 1.11.1
 
 - Markdown: `_` inside a word is not emphasis, `snake_case` names keep their underscores.

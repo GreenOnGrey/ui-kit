@@ -16,11 +16,11 @@ for (const theme of ["light", "dark"] as const) {
   // what a section shows only after a click
   test(`open menu ${theme}`, async ({ page }) => {
     const s = await openSection(page, "overlay", theme);
-    await s.getByRole("button", { name: "Открыть меню" }).click();
+    await s.getByRole("button", { name: "Open the menu" }).click();
     await expect(page.locator(".menu")).toHaveScreenshot(`menu-${theme}.png`);
   });
 
-  for (const [name, button] of [["modal", "Открыть окно"], ["modal-wide", "Открыть широкое окно"]]) {
+  for (const [name, button] of [["modal", "Open a dialog"], ["modal-wide", "Open a wide dialog"]]) {
     test(`${name} ${theme}`, async ({ page }) => {
       const s = await openSection(page, "overlay", theme);
       await s.getByRole("button", { name: button, exact: true }).click();
@@ -34,11 +34,11 @@ for (const theme of ["light", "dark"] as const) {
   for (const [name, file, ready] of [["preview-markdown", "release-notes.md", ".att-md :is(h1, h2, h3, h4, h5, h6)"], ["preview-table", "metrics.csv", "table"],
     ["preview-html", "slides.html", "iframe.att-html"],
     // FTR.NAB.CHAT-0003: a spreadsheet, a document being made, a document without a preview (a converted document is a PDF)
-    ["preview-sheet", "бюджет.xlsx", ".att-sheet table"], ["preview-preparing", "черновик.docx", ".att-wait .spin"],
-    ["preview-unavailable", "старый.ppt", ".att-wait .err-text, .att-wait b"]]) {
+    ["preview-sheet", "budget.xlsx", ".att-sheet table"], ["preview-preparing", "draft.docx", ".att-wait .spin"],
+    ["preview-unavailable", "old.ppt", ".att-wait .err-text, .att-wait b"]]) {
     test(`${name} ${theme}`, async ({ page }) => {
       const s = await openSection(page, "chat", theme);
-      await s.locator('[data-demo="files"]').getByRole("button", { name: `Открыть ${file}` }).click();
+      await s.locator('[data-demo="files"]').getByRole("button", { name: `Open ${file}` }).click();
       await expect(page.getByRole("dialog").locator(ready).first()).toBeVisible();
       await expect(page).toHaveScreenshot(`${name}-${theme}.png`);
     });
@@ -48,7 +48,7 @@ for (const theme of ["light", "dark"] as const) {
   test(`admin burger ${theme}`, async ({ page }, info) => {
     test.skip(info.project.name !== "phone", "the burger is a phone's");
     const s = await openSection(page, "topbar", theme);
-    await s.getByRole("button", { name: "Администрирование" }).click();
+    await s.getByRole("button", { name: "Administration" }).click();
     await expect(page.locator(".navmenu .side")).toHaveScreenshot(`admin-burger-${theme}.png`);
   });
 
@@ -56,7 +56,7 @@ for (const theme of ["light", "dark"] as const) {
   test(`stopping ${theme}`, async ({ page }) => {
     const s = await openSection(page, "chat", theme);
     const demo = s.locator('[data-demo="message-queue"]');
-    await demo.getByRole("button", { name: "Остановить ответ" }).click();
+    await demo.getByRole("button", { name: "Stop the answer" }).click();
     await expect(demo.locator(".stopmark").last()).toHaveScreenshot(`stopping-${theme}.png`);
   });
 
@@ -80,16 +80,25 @@ for (const theme of ["light", "dark"] as const) {
   test(`composer focus ${theme}`, async ({ page }) => {
     const s = await openSection(page, "chat", theme);
     const composer = s.locator('[data-demo="history"] .composer');
-    await composer.getByRole("textbox").fill("первая строка\nвторая строка");
+    await composer.getByRole("textbox").fill("first line\nsecond line");
     await composer.getByRole("textbox").focus();
     await expect(composer).toHaveScreenshot(`composer-focus-${theme}.png`);
   });
 
   test(`shown toasts ${theme}`, async ({ page }) => {
     const s = await openSection(page, "toasts", theme);
-    for (const button of ["Успех", "Ошибка", "С действиями"]) await s.getByRole("button", { name: button, exact: true }).click();
+    for (const button of ["Success", "Error", "With actions"]) await s.getByRole("button", { name: button, exact: true }).click();
     await expect(page.locator(".toast")).toHaveCount(3);
     await expect(page.locator(".toast-wrap")).toHaveScreenshot(`shown-toasts-${theme}.png`);
+  });
+}
+
+// The Russian dictionary of the kit: its strings are longer than the English ones, so the sections full of
+// them are taken with it too.
+for (const id of ["chat", "topbar"] as const) {
+  test(`${id} ru`, async ({ page }) => {
+    const section = await openSection(page, id, "light", "ru");
+    await expect(section).toHaveScreenshot(`${id}-ru.png`);
   });
 }
 

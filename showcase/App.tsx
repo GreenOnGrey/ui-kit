@@ -10,6 +10,7 @@ import { LoginScreen } from "../src/login";
 import pkg from "../package.json";
 import { ChatDemo } from "./ChatDemo";
 import { Example, Section } from "./Example";
+import { LNG } from "./i18n";
 import { SECTIONS } from "./sections";
 
 type Theme = "light" | "dark" | "system";
@@ -53,25 +54,25 @@ export function App() {
         <span className="chip sc-version">v{pkg.version}</span>
         <div className="top-actions">
           <button className={`btn sm${phone ? " primary" : " ghost"} sc-hide-m`} aria-pressed={phone} onClick={() => setPhone((v) => !v)}>
-            <Icon name="grid" size={14} />Ширина телефона
+            <Icon name="grid" size={14} />Phone width
           </button>
-          <div className="mini-seg" role="group" aria-label="Тема">
+          <div className="mini-seg" role="group" aria-label="Theme">
             {(["light", "dark", "system"] as const).map((t) => (
               <button key={t} className={theme === t ? "on" : ""} aria-pressed={theme === t} onClick={() => setTheme(t)}>
-                {t === "light" ? "Светлая" : t === "dark" ? "Тёмная" : "Системная"}
+                {t === "light" ? "Light" : t === "dark" ? "Dark" : "System"}
               </button>
             ))}
           </div>
-          <IconButton label="Разделы" className="sc-only-m" on={toc} onClick={() => setToc((v) => !v)}><Icon name={toc ? "x" : "menu"} /></IconButton>
+          <IconButton label="Sections" className="sc-only-m" on={toc} onClick={() => setToc((v) => !v)}><Icon name={toc ? "x" : "menu"} /></IconButton>
         </div>
       </div>
       <div className="sc-body">
-        <nav className={`sc-toc${toc ? " sc-open" : ""}`} aria-label="Разделы">
+        <nav className={`sc-toc${toc ? " sc-open" : ""}`} aria-label="Sections">
           {SECTIONS.map(([id, title]) => <a key={id} href={`#${id}`} className={hash === id ? "sc-on" : undefined} onClick={() => setToc(false)}>{title}</a>)}
         </nav>
         {phone
           // oxlint-disable-next-line react/iframe-missing-sandbox -- the frame shows this very page: its scripts and its storage are its own
-          ? <div className="sc-main sc-phone"><iframe title="Ширина телефона" src={`?embed=1&theme=${theme}#${hash}`} key={`${theme}${hash}`} /></div>
+          ? <div className="sc-main sc-phone"><iframe title="Phone width" src={`?embed=1&theme=${theme}&lng=${LNG}#${hash}`} key={`${theme}${hash}`} /></div>
           : <div className="sc-main"><Sections /></div>}
       </div>
     </div>
@@ -85,187 +86,187 @@ function Sections() {
   }, []);
   return (
     <>
-      <Section id="tokens" lead="Цвета, радиусы, тени и шрифты. Значения меняются вместе с темой. Зелёный и янтарный — только статусы.">
+      <Section id="tokens" lead="Colours, radii, shadows and fonts. The values change with the theme. Green and amber are for statuses only.">
         <Tokens />
       </Section>
 
-      <Section id="type" lead="Onest — текст, JetBrains Mono — код и идентификаторы. Тона текста — классами.">
+      <Section id="type" lead="Onest for text, JetBrains Mono for code and identifiers. Tones of text are classes.">
         <Example>
           <div className="stack">
-            <div>Основной текст, 15 px</div>
-            <div className="t2">Вторичный текст — <span className="mono">.t2</span></div>
-            <div className="muted">Приглушённый текст — <span className="mono">.muted</span></div>
-            <div className="small">Мелкий текст, 13 px — <span className="mono">.small</span></div>
+            <div>Body text, 15 px</div>
+            <div className="t2">Secondary text: <span className="mono">.t2</span></div>
+            <div className="muted">Muted text: <span className="mono">.muted</span></div>
+            <div className="small">Small text, 13 px: <span className="mono">.small</span></div>
             <div><span className="mono">FTR.NAB.CMN-0005</span> — <span className="mono">.mono</span></div>
-            <div><span className="ok-t">Готово</span> · <span className="warn-t">Ждёт</span> · <span className="err-t">Ошибка</span></div>
+            <div><span className="ok-t">Done</span> · <span className="warn-t">Waiting</span> · <span className="err-t">Error</span></div>
           </div>
         </Example>
       </Section>
 
-      <Section id="buttons" lead="Действие. Основная — одна на экран или окно. Применяются классами или компонентами Button и IconButton.">
-        <Example label="Варианты">
-          <div className="row"><Button variant="primary">Сохранить</Button><Button>Отмена</Button><Button variant="ghost">Позже</Button><Button variant="danger">Удалить</Button></div>
+      <Section id="buttons" lead="An action. One primary per screen or dialog. Use the classes or the components Button and IconButton.">
+        <Example label="Variants">
+          <div className="row"><Button variant="primary">Save</Button><Button>Cancel</Button><Button variant="ghost">Later</Button><Button variant="danger">Delete</Button></div>
         </Example>
-        <Example label="Малый размер">
-          <div className="row"><Button variant="primary" size="sm"><Icon name="plus" size={14} />Добавить</Button><Button size="sm">Изменить</Button></div>
+        <Example label="Small size">
+          <div className="row"><Button variant="primary" size="sm"><Icon name="plus" size={14} />Add</Button><Button size="sm">Edit</Button></div>
         </Example>
-        <Example label="Выключено">
-          <div className="row"><Button variant="primary" disabled>Сохранить</Button><Button disabled>Отмена</Button></div>
+        <Example label="Disabled">
+          <div className="row"><Button variant="primary" disabled>Save</Button><Button disabled>Cancel</Button></div>
         </Example>
-        <Example label="Кнопка-иконка: обычная, основная, запись, включённая, выключенная">
+        <Example label="Icon button: plain, primary, recording, on, disabled">
           <div className="row">
-            <IconButton label="Прикрепить"><Icon name="clip" /></IconButton>
-            <IconButton label="Отправить" fill><Icon name="send" /></IconButton>
-            <IconButton label="Остановить запись" className="rec"><Icon name="mic" /></IconButton>
-            <IconButton label="Разделы" on><Icon name="menu" /></IconButton>
-            <IconButton label="Недоступно" disabled><Icon name="mic" /></IconButton>
+            <IconButton label="Attach"><Icon name="clip" /></IconButton>
+            <IconButton label="Send" fill><Icon name="send" /></IconButton>
+            <IconButton label="Stop recording" className="rec"><Icon name="mic" /></IconButton>
+            <IconButton label="Sections" on><Icon name="menu" /></IconButton>
+            <IconButton label="Unavailable" disabled><Icon name="mic" /></IconButton>
           </div>
         </Example>
-        <Example label="Кнопка как ссылка"><button className="linkish">Показать все</button></Example>
+        <Example label="A button as a link"><button className="linkish">Show all</button></Example>
       </Section>
 
-      <Section id="forms" lead="Подпись над полем, подсказка или ошибка — под ним. Форма в две колонки складывается в одну на телефоне.">
+      <Section id="forms" lead="The label above a field, a hint or an error below it. A form in two columns folds into one on a phone.">
         <Example>
           <div className="form-grid">
-            <div className="field"><label htmlFor="f1">Название</label><input id="f1" className="inp" defaultValue="Релиз 1.4" /><div className="hint">До 120 знаков</div></div>
-            <div className="field"><label htmlFor="f2">Адрес</label><input id="f2" className="inp" defaultValue="nabu.example" aria-invalid="true" /><div className="err-text">Укажите адрес с https://</div></div>
-            <div className="field"><label htmlFor="f3">Часовой пояс</label><select id="f3" className="inp"><option>Europe/Moscow</option><option>UTC</option></select></div>
-            <div className="field"><label htmlFor="f4">Заметка</label><textarea id="f4" className="inp" rows={2} defaultValue="Текст" /></div>
+            <div className="field"><label htmlFor="f1">Name</label><input id="f1" className="inp" defaultValue="Release 1.4" /><div className="hint">Up to 120 characters</div></div>
+            <div className="field"><label htmlFor="f2">Address</label><input id="f2" className="inp" defaultValue="nabu.example" aria-invalid="true" /><div className="err-text">Give an address with https://</div></div>
+            <div className="field"><label htmlFor="f3">Time zone</label><select id="f3" className="inp"><option>Europe/Moscow</option><option>UTC</option></select></div>
+            <div className="field"><label htmlFor="f4">Note</label><textarea id="f4" className="inp" rows={2} defaultValue="Text" /></div>
           </div>
         </Example>
-        <Example label="Переключатель"><SwitchDemo /></Example>
-        <Example label="Поиск"><form className="search" role="search" style={{ maxWidth: 320 }}><Icon name="search" /><input placeholder="Поиск" aria-label="Поиск" /></form></Example>
+        <Example label="Switch"><SwitchDemo /></Example>
+        <Example label="Search"><form className="search" role="search" style={{ maxWidth: 320 }}><Icon name="search" /><input placeholder="Search" aria-label="Search" /></form></Example>
       </Section>
 
-      <Section id="chips" lead="Чип — выбор из немногих значений или метка. Вкладки переключают вид; стрелки двигают выбор.">
-        <Example label="Чипы"><div className="chips"><button className="chip">EN</button><button className="chip on">RU</button><span className="chip"><Icon name="clip" size={12} />план.pdf</span></div></Example>
-        <Example label="Вкладки"><TabsDemo /></Example>
-        <Example label="Сегменты"><div className="mini-seg"><button className="on" aria-pressed="true">День</button><button aria-pressed="false">Неделя</button><button aria-pressed="false">Месяц</button></div></Example>
-        <Example label="Статус: обычный и черновик"><div className="row"><span className="st">Активен</span><span className="st draft">Черновик</span></div></Example>
+      <Section id="chips" lead="A chip is a choice among a few values, or a label. Tabs switch the view; the arrow keys move the choice.">
+        <Example label="Chips"><div className="chips"><button className="chip on">EN</button><button className="chip">RU</button><span className="chip"><Icon name="clip" size={12} />plan.pdf</span></div></Example>
+        <Example label="Tabs"><TabsDemo /></Example>
+        <Example label="Segments"><div className="mini-seg"><button className="on" aria-pressed="true">Day</button><button aria-pressed="false">Week</button><button aria-pressed="false">Month</button></div></Example>
+        <Example label="Status: plain and draft"><div className="row"><span className="st">Active</span><span className="st draft">Draft</span></div></Example>
       </Section>
 
-      <Section id="data" lead="Таблица, числа, пары «ключ — значение», панель.">
-        <Example label="Числа"><div className="kpi"><div><b>128</b><span>Запросов</span></div><div><b>$4.20</b><span>Стоимость</span></div><div><b>3 / 8</b><span>Подов</span></div></div></Example>
-        <Example label="Таблица">
+      <Section id="data" lead="A table, numbers, key-value pairs, a panel.">
+        <Example label="Numbers"><div className="kpi"><div><b>128</b><span>Requests</span></div><div><b>$4.20</b><span>Cost</span></div><div><b>3 / 8</b><span>Pods</span></div></div></Example>
+        <Example label="Table">
           <table className="t">
-            <thead><tr><th>Пользователь</th><th>Статус</th><th>Запросов</th></tr></thead>
+            <thead><tr><th>User</th><th>Status</th><th>Requests</th></tr></thead>
             <tbody>
-              <tr><td>Ада Лавлейс</td><td><span className="st">Активен</span></td><td className="num">128</td></tr>
-              <tr className="sel"><td>Алан Тьюринг</td><td><span className="st draft">Черновик</span></td><td className="num">12</td></tr>
+              <tr><td>Ada Lovelace</td><td><span className="st">Active</span></td><td className="num">128</td></tr>
+              <tr className="sel"><td>Alan Turing</td><td><span className="st draft">Draft</span></td><td className="num">12</td></tr>
             </tbody>
           </table>
         </Example>
-        <Example label="Ключ — значение"><dl className="kv"><dt>Модель</dt><dd className="mono">sonnet</dd><dt>Создан</dt><dd>11 октября</dd></dl></Example>
-        <Example label="Строки настроек">
-          <div className="stack"><div className="kvrow"><span className="muted">Бюджет</span><b>$10</b></div><div className="kvrow"><span className="muted">Дни</span><b>Пн–Пт</b></div></div>
+        <Example label="Key and value"><dl className="kv"><dt>Model</dt><dd className="mono">sonnet</dd><dt>Created</dt><dd>October 11</dd></dl></Example>
+        <Example label="Rows of settings">
+          <div className="stack"><div className="kvrow"><span className="muted">Budget</span><b>$10</b></div><div className="kvrow"><span className="muted">Days</span><b>Mon–Fri</b></div></div>
         </Example>
-        <Example label="Панель: рядом с содержимым, на телефоне — на весь экран" source={notePanel}>
+        <Example label="Panel: next to the content, full screen on a phone" source={notePanel}>
           <div className="sc-contain">{notePanel}</div>
         </Example>
       </Section>
 
-      <Section id="messages" lead="Подсказка, предупреждение и ошибка модели — блоком в потоке страницы.">
-        <Example label="Подсказка"><div className="hintbox"><Icon name="bulb" /><div>Подключите почту, чтобы агент разбирал письма.</div></div></Example>
-        <Example label="Предупреждение"><div className="hintbox warn"><Icon name="alert" /><div>Свободной ёмкости нет: сообщения ждут в очереди.</div></div></Example>
-        <Example label="Ошибка модели: временная и постоянная">
+      <Section id="messages" lead="A hint, a warning and an error of the model, as blocks in the flow of the page.">
+        <Example label="Hint"><div className="hintbox"><Icon name="bulb" /><div>Connect your mail so that the agent sorts your letters.</div></div></Example>
+        <Example label="Warning"><div className="hintbox warn"><Icon name="alert" /><div>No free capacity: messages wait in the queue.</div></div></Example>
+        <Example label="Error of the model: temporary and permanent">
           <div className="stack">
-            <div className="llmerr amber" role="alert"><span>Модель временно недоступна. Повторите запрос.</span><div className="row"><button className="btn sm"><Icon name="refresh" size={14} />Повторить</button></div></div>
-            <div className="llmerr" role="alert"><span>Ключ модели отклонён. Обратитесь к администратору.</span></div>
+            <div className="llmerr amber" role="alert"><span>The model is temporarily unavailable. Try again.</span><div className="row"><button className="btn sm"><Icon name="refresh" size={14} />Retry</button></div></div>
+            <div className="llmerr" role="alert"><span>The model key was rejected. Contact your administrator.</span></div>
           </div>
         </Example>
-        <Example label="Текст ошибки под полем"><div className="err-text">Не удалось сохранить.</div></Example>
+        <Example label="Error text under a field"><div className="err-text">Could not save.</div></Example>
       </Section>
 
-      <Section id="overlay" lead="Меню закрывается по Escape и нажатию снаружи. Модальное окно ставит фокус в первое поле.">
-        <Example label="Меню" source={<div className="menu" role="dialog" aria-label="Профиль">{profileSections}</div>}><MenuDemo /></Example>
-        <Example label="Модальное окно: обычное и широкое" source={<Modal title="Новая тема" onClose={noop} footer={modalFooter(noop)}>{modalBody}</Modal>}><ModalDemo /></Example>
+      <Section id="overlay" lead="A menu closes on Escape and on a click outside. A modal puts the focus into its first field.">
+        <Example label="Menu" source={<div className="menu" role="dialog" aria-label="Profile">{profileSections}</div>}><MenuDemo /></Example>
+        <Example label="Modal: plain and wide" source={<Modal title="New topic" onClose={noop} footer={modalFooter(noop)}>{modalBody}</Modal>}><ModalDemo /></Example>
       </Section>
 
-      <Section id="toasts" lead="Без действий исчезает через 6 секунд; с действиями остаётся до выбора.">
+      <Section id="toasts" lead="Without actions it goes after 6 seconds; with actions it stays until a choice.">
         <Example source={
           <div className="toast error" role="alert">
             <div className="row" style={{ alignItems: "flex-start", flexWrap: "nowrap" }}>
-              <div className="grow"><b>Не удалось сохранить</b><span className="small t2">Сервер недоступен.</span></div>
-              <IconButton label="Закрыть" style={{ width: 24, height: 24 }}><Icon name="x" size={14} /></IconButton>
+              <div className="grow"><b>Could not save</b><span className="small t2">The server is unavailable.</span></div>
+              <IconButton label="Close" style={{ width: 24, height: 24 }}><Icon name="x" size={14} /></IconButton>
             </div>
           </div>
         }><ToastDemo /></Example>
       </Section>
 
-      <Section id="avatars" lead="Пользователь — картинка или инициалы. Агент — иконка и цветовой вариант, которые передаёт продукт.">
-        <Example label="Пользователь"><div className="row"><Avatar name="Ада Лавлейс" /><Avatar name="Алан" small /></div></Example>
-        <Example label="Агент: business, friendly, brief, mentor">
+      <Section id="avatars" lead="A user is a picture or initials. An agent is an icon and a colour variant that the product passes.">
+        <Example label="User"><div className="row"><Avatar name="Ada Lovelace" /><Avatar name="Alan" small /></div></Example>
+        <Example label="Agent: business, friendly, brief, mentor">
           <div className="row">
-            <Avatar name="Ада" agent icon="tBusiness" variant="business" /><Avatar name="Ада" agent icon="tFriendly" variant="friendly" />
-            <Avatar name="Ада" agent icon="tBrief" variant="brief" /><Avatar name="Ада" agent icon="tMentor" variant="mentor" />
-            <Avatar name="Ада" agent icon="tBusiness" variant="business" small />
+            <Avatar name="Ada" agent icon="tBusiness" variant="business" /><Avatar name="Ada" agent icon="tFriendly" variant="friendly" />
+            <Avatar name="Ada" agent icon="tBrief" variant="brief" /><Avatar name="Ada" agent icon="tMentor" variant="mentor" />
+            <Avatar name="Ada" agent icon="tBusiness" variant="business" small />
           </div>
         </Example>
       </Section>
 
-      <Section id="icons" lead="Штриховые иконки обоих продуктов. Щелчок копирует имя.">
+      <Section id="icons" lead="Stroke icons of both products. A click copies the name.">
         <Icons />
       </Section>
 
-      <Section id="topbar" lead="Логотип и название, разделы, действия продукта, аватар с меню профиля. На телефоне разделы уходят под бургер после аватара.">
+      <Section id="topbar" lead="The logo and the name, sections, actions of the product, the avatar with the profile menu. On a phone the sections go under a burger after the avatar.">
         <Example label="Nabu" box><BarDemo product="nabu" /></Example>
-        <Example label="Hammurapi: поиск и «Новая задача» — действия продукта" box><BarDemo product="hammurapi" /></Example>
-        <Example label="Администрирование: на телефоне под бургером — его подразделы, а не разделы продукта" box><BarDemo product="nabu" admin /></Example>
+        <Example label="Hammurapi: search and “New issue” are actions of the product" box><BarDemo product="hammurapi" /></Example>
+        <Example label="Administration: on a phone the burger holds its subsections, not the sections of the product" box><BarDemo product="nabu" admin /></Example>
       </Section>
 
-      <Section id="login" lead="Тёмный экран в обеих темах. Логотип, название, девиз и поставщика входа передаёт продукт.">
+      <Section id="login" lead="A dark screen in both themes. The product passes the logo, the name, the motto and the sign-in provider.">
         <Example label="Nabu" box source={<LoginDemo product="nabu" />}><LoginFrame view="login-nabu" /></Example>
-        <Example label="Hammurapi, ошибка входа" box source={<LoginDemo product="hammurapi" error />}><LoginFrame view="login-hammurapi" /></Example>
+        <Example label="Hammurapi, a failed sign-in" box source={<LoginDemo product="hammurapi" error />}><LoginFrame view="login-hammurapi" /></Example>
       </Section>
 
-      <Section id="chat" lead="Данные вымышленные, кнопки работают без сервера. Отмена хода, подтверждение, вложения и голос есть, только когда продукт передал обработчик.">
-        <Example label="История: подписи, шаги, вложения, ошибка с повтором" box><ChatDemo demo="history" /></Example>
-        <Example label="Файлы агента: миниатюры, плитки просмотра по типу, плитка скачивания" box><ChatDemo demo="files" files /></Example>
-        <Example label="Пустой разговор" box><ChatDemo demo="empty" empty /></Example>
-        <Example label="Свой пустой разговор продукта и подсказка поля ввода: черновик темы задачи" box><ChatDemo demo="draft" draft /></Example>
-        <Example label="Уведомления продукта: короткое и свёрнутое после 12 строк" box><ChatDemo demo="notices" notices /></Example>
-        <Example label="Агент печатает: шаг выполняется, текста ещё нет" box><ChatDemo demo="typing" typing /></Example>
-        <Example label="История не загрузилась; ранние сообщения подгружаются" box><ChatDemo demo="history-error" historyError /></Example>
-        <Example label="Кнопка голоса: готова и распознаёт запись (волна вместо микрофона)">
+      <Section id="chat" lead="The data is invented, and the buttons work without a server. Cancelling a turn, confirmation, attachments and voice appear only when the product passes a handler.">
+        <Example label="History: marks, steps, attachments, an error with a retry" box><ChatDemo demo="history" /></Example>
+        <Example label="Files of the agent: thumbnails, preview tiles by type, a download tile" box><ChatDemo demo="files" files /></Example>
+        <Example label="An empty conversation" box><ChatDemo demo="empty" empty /></Example>
+        <Example label="The own empty conversation of a product and a hint of the input: a draft topic of an issue" box><ChatDemo demo="draft" draft /></Example>
+        <Example label="Notices of a product: a short one and one folded after 12 lines" box><ChatDemo demo="notices" notices /></Example>
+        <Example label="The agent is typing: a step runs, no text yet" box><ChatDemo demo="typing" typing /></Example>
+        <Example label="The history did not load; earlier messages are loading" box><ChatDemo demo="history-error" historyError /></Example>
+        <Example label="The voice button: ready, and recognizing a recording (a wave instead of the microphone)">
           <div className="row" style={{ gap: 12 }}>
             <VoiceButton supported recognizing={false} onStart={() => {}} />
             <VoiceButton supported recognizing onStart={() => {}} />
           </div>
         </Example>
-        <Example label="Агент запускается" box><ChatDemo demo="starting" wait="starting" /></Example>
-        <Example label="В очереди" box><ChatDemo demo="queued" wait="queued" /></Example>
-        <Example label="Субагенты: шаг в работе и завершённый с прерванной задачей" box><ChatDemo demo="subagents" subagents /></Example>
-        <Example label="Очередь сообщений и «Остановить»: ответ идёт, два сообщения ждут, прошлый ответ остановлен" box><ChatDemo demo="message-queue" queue /></Example>
-        <Example label="Отмена хода и подтверждение действия" box><ChatDemo demo="full" full /></Example>
-        <Example label="Только чтение" box><ChatDemo demo="readonly" readOnly /></Example>
-        <Example label="Кнопка агента и его меню: имя и выбор варианта, который задаёт продукт" box><AgentDemo /></Example>
-        <Example label="Запись голоса: полоса с таймером, уровнем, «Отмена» и «Стоп»; за 15 секунд до конца — янтарная" box>
+        <Example label="The agent is starting" box><ChatDemo demo="starting" wait="starting" /></Example>
+        <Example label="Queued" box><ChatDemo demo="queued" wait="queued" /></Example>
+        <Example label="Subagents: a running step and a finished one with an interrupted task" box><ChatDemo demo="subagents" subagents /></Example>
+        <Example label="The message queue and “Stop”: an answer is coming, two messages wait, the previous answer was stopped" box><ChatDemo demo="message-queue" queue /></Example>
+        <Example label="Cancelling a turn and confirming an action" box><ChatDemo demo="full" full /></Example>
+        <Example label="Read only" box><ChatDemo demo="readonly" readOnly /></Example>
+        <Example label="The agent button and its menu: the name and the choice of a variant the product sets" box><AgentDemo /></Example>
+        <Example label="Voice recording: a bar with a timer, the level, “Cancel” and “Stop”; amber 15 seconds before the end" box>
           <div>
             <div className="composer">
               <div className="recbar"><span className="dot" /><span className="tm">0:12 / 5:00</span><span className="lvl"><i style={{ transform: "scaleX(.6)" }} /></span>
-                <button className="btn ghost sm">Отмена</button><button className="btn primary sm">Стоп</button></div>
+                <button className="btn ghost sm">Cancel</button><button className="btn primary sm">Stop</button></div>
             </div>
             <div className="composer">
               <div className="recbar ending"><span className="dot" /><span className="tm">4:47 / 5:00</span><span className="lvl"><i style={{ transform: "scaleX(.3)" }} /></span>
-                <button className="btn ghost sm">Отмена</button><button className="btn primary sm">Стоп</button></div>
+                <button className="btn ghost sm">Cancel</button><button className="btn primary sm">Stop</button></div>
             </div>
-            <div className="err-text" style={{ padding: "0 12px 8px" }}>Нет доступа к микрофону</div>
+            <div className="err-text" style={{ padding: "0 12px 8px" }}>No access to the microphone</div>
           </div>
         </Example>
-        <Example label="Палитра «/»: команды и скиллы, выбранная строка подсвечена" box>
+        <Example label="The palette of “/”: commands and skills, the chosen row highlighted" box>
           <div style={{ position: "relative", paddingTop: 260 }}>
             <div className="composer-wrap">
               <CommandPalette items={DEMO_COMMANDS} active={2} onPick={() => {}} onHover={() => {}} />
-              <div className="composer"><div className="field"><textarea rows={1} defaultValue="/" aria-label="Сообщение" /></div></div>
+              <div className="composer"><div className="field"><textarea rows={1} defaultValue="/" aria-label="Message" /></div></div>
             </div>
           </div>
         </Example>
-        <Example label="Скилл в поле ввода, неизвестная команда, заполненность контекста: 4 %, 75 %, 91 %" box>
+        <Example label="A skill in the input, an unknown command, the fill of the context: 4%, 75%, 91%" box>
           <div className="composer-wrap">
-            <div className="cmd-unknown">Неизвестная команда /foo<button className="textbtn">Отправить как текст</button></div>
+            <div className="cmd-unknown">Unknown command /foo<button className="textbtn">Send as text</button></div>
             <div className="composer">
               <div className="field with-skill"><span className="chip skill-chip"><Icon name="spark" size={12} />contract-review</span>
-                <textarea rows={1} placeholder="Что сделать по скиллу?" aria-label="Что сделать по скиллу?" /></div>
+                <textarea rows={1} placeholder="What should the skill do?" aria-label="What should the skill do?" /></div>
               <ContextMeter context={{ tokens: 40_000, window: 1_000_000 }} onCompact={() => {}} onReset={() => {}} />
               <ContextMeter context={{ tokens: 96_000, window: 128_000 }} />
               <ContextMeter context={{ tokens: 950_000, window: 1_000_000 }} onCompact={() => {}} onReset={() => {}} busy />
@@ -273,20 +274,20 @@ function Sections() {
             </div>
           </div>
         </Example>
-        <Example label="События разговора: сброс, сжатие с изложением, смена модели" box>
+        <Example label="Events of a conversation: a reset, a compaction with a summary, a change of the model" box>
           <div className="msgs">
-            <MessageView busy={false} m={{ id: "e1", role: "event", text: "", createdAt: "2026-10-11T14:02:00", status: "done", event: { icon: "undo", text: "Контекст сброшен" } }} />
+            <MessageView busy={false} m={{ id: "e1", role: "event", text: "", createdAt: "2026-10-11T14:02:00", status: "done", event: { icon: "undo", text: "Context reset" } }} />
             <MessageView busy={false} m={{ id: "e2", role: "event", text: "", createdAt: "2026-10-11T14:05:00", status: "done",
-              event: { icon: "compress", text: "Контекст сжат: 182 тыс. → 9 тыс. токенов · автоматически", details: "Пользователь проверяет договор с «Ромашкой»: два риска, правки — до пятницы." } }} />
-            <MessageView busy={false} m={{ id: "e3", role: "event", text: "", createdAt: "2026-10-11T14:07:00", status: "done", event: { icon: "cpu", text: "Модель: GigaChat 2 Max" } }} />
+              event: { icon: "compress", text: "Context compacted: 182K → 9K tokens · automatically", details: "The user is reviewing the contract with Acme: two risks, edits due by Friday." } }} />
+            <MessageView busy={false} m={{ id: "e3", role: "event", text: "", createdAt: "2026-10-11T14:07:00", status: "done", event: { icon: "cpu", text: "Model: GigaChat 2 Max" } }} />
           </div>
         </Example>
-        <Example label="Выбранные файлы над полем" box>
+        <Example label="Chosen files above the input" box>
           <div className="pending-files">
-            <span className="chip"><Icon name="clip" size={12} />план.pdf<IconButton label="Убрать" style={{ width: 18, height: 18 }}><Icon name="x" size={12} /></IconButton></span>
+            <span className="chip"><Icon name="clip" size={12} />plan.pdf<IconButton label="Remove" style={{ width: 18, height: 18 }}><Icon name="x" size={12} /></IconButton></span>
           </div>
         </Example>
-        <Example label="Узкое место — боковая панель: режимы над полем, список разговоров поверх ленты">
+        <Example label="A narrow place, such as a side panel: modes above the input, the list of conversations over the feed">
           <div className="row" style={{ alignItems: "flex-start", gap: 16 }}>
             <div className="sc-stage sc-box"><ChatDemo demo="narrow" narrow modes full /></div>
             <div className="sc-stage sc-box"><ChatDemo demo="narrow-list" narrow listOpen /></div>
@@ -294,14 +295,14 @@ function Sections() {
         </Example>
       </Section>
 
-      <Section id="states" lead="Пусто и загрузка.">
-        <Example label="Пусто"><Empty icon="files" title="Файлов пока нет">Они появятся, когда агент сохранит первый.</Empty></Example>
-        <Example label="Загрузка"><Loading /></Example>
-        <Example label="Индикатор"><div className="turnstate" style={{ justifyContent: "flex-start" }}><span className="spin" aria-hidden="true" />Агент запускается…</div></Example>
+      <Section id="states" lead="Empty and loading.">
+        <Example label="Empty"><Empty icon="files" title="No files yet">They appear when the agent saves the first one.</Empty></Example>
+        <Example label="Loading"><Loading /></Example>
+        <Example label="Indicator"><div className="turnstate" style={{ justifyContent: "flex-start" }}><span className="spin" aria-hidden="true" />The agent is starting…</div></Example>
       </Section>
 
-      <Section id="markdown" lead="Заголовки, списки, таблицы, код, выделение. Разметка из текста не вставляется.">
-        <Example><Markdown text={"## Итог\n\nПокрыто **24** требования из 26.\n\n1. `KIT-01` — токены\n2. `NAB-01` — сравнение экранов\n\n| Шаг | Статус |\n|---|---|\n| 1 | готов |\n\n```\nnpm run lint\n```"} /></Example>
+      <Section id="markdown" lead="Headings, lists, tables, code, emphasis. Markup from the text is never inserted.">
+        <Example><Markdown text={"## Summary\n\n**24** requirements of 26 are covered.\n\n1. `KIT-01`: tokens\n2. `NAB-01`: comparison of screens\n\n| Step | Status |\n|---|---|\n| 1 | done |\n\n```\nnpm run lint\n```"} /></Example>
       </Section>
     </>
   );
@@ -329,13 +330,13 @@ function Tokens() {
   const names = Object.keys(LIGHT);
   return (
     <table className="t">
-      <thead><tr><th>Токен</th><th>Светлая тема</th><th>Тёмная тема</th></tr></thead>
+      <thead><tr><th>Token</th><th>Light theme</th><th>Dark theme</th></tr></thead>
       <tbody>
         {names.map((n) => (
           <tr key={n}>
             <td className="mono">{n}</td>
             <td><div className="sc-sw">{sample(n, LIGHT[n])}<code>{LIGHT[n]}</code></div></td>
-            <td>{DARK[n] ? <div className="sc-sw">{sample(n, DARK[n])}<code>{DARK[n]}</code></div> : <span className="muted">как в светлой</span>}</td>
+            <td>{DARK[n] ? <div className="sc-sw">{sample(n, DARK[n])}<code>{DARK[n]}</code></div> : <span className="muted">as in the light theme</span>}</td>
           </tr>
         ))}
       </tbody>
@@ -349,7 +350,7 @@ function Icons() {
     <div className="sc-icons">
       {ICON_NAMES.map((n) => (
         <button key={n} title={n} onClick={() => { void navigator.clipboard?.writeText(n); setCopied(n); }}>
-          <Icon name={n} size={20} />{copied === n ? "скопировано" : n}
+          <Icon name={n} size={20} />{copied === n ? "copied" : n}
         </button>
       ))}
     </div>
@@ -358,37 +359,37 @@ function Icons() {
 
 function SwitchDemo() {
   const [on, setOn] = useState(true);
-  return <div className="row"><Switch on={on} onChange={setOn} label="Голосовой ввод" /><Switch on={false} onChange={() => {}} label="Недоступно" disabled /></div>;
+  return <div className="row"><Switch on={on} onChange={setOn} label="Voice input" /><Switch on={false} onChange={() => {}} label="Unavailable" disabled /></div>;
 }
 
 function TabsDemo() {
   const [tab, setTab] = useState("table");
-  return <Tabs label="Вид" value={tab} onChange={setTab} items={[{ key: "table", label: "Таблица" }, { key: "graph", label: "Граф" }, { key: "tasks", label: "Задания" }]} />;
+  return <Tabs label="View" value={tab} onChange={setTab} items={[{ key: "table", label: "Table" }, { key: "graph", label: "Graph" }, { key: "tasks", label: "Tasks" }]} />;
 }
 
 const noop = () => {};
 const notePanel: ReactNode = (
-  <aside className="panel"><div className="panel-h"><b className="grow">Заметка</b><IconButton label="Закрыть"><Icon name="x" size={16} /></IconButton></div><div className="small t2">Содержимое панели.</div></aside>
+  <aside className="panel"><div className="panel-h"><b className="grow">Note</b><IconButton label="Close"><Icon name="x" size={16} /></IconButton></div><div className="small t2">The content of the panel.</div></aside>
 );
 const profileSections: ReactNode = (
   <>
-    <div className="sec"><div className="row"><Avatar name="Ада Лавлейс" /><div><b>Ада Лавлейс</b><div className="small muted">ada@example.com</div></div></div></div>
-    <div className="sec"><div className="line"><span>Тема</span><div className="mini-seg"><button className="on">Светлая</button><button>Тёмная</button></div></div></div>
-    <div className="sec"><button className="action"><Icon name="plug" />Подключения</button><button className="action danger"><Icon name="out" />Выйти</button></div>
+    <div className="sec"><div className="row"><Avatar name="Ada Lovelace" /><div><b>Ada Lovelace</b><div className="small muted">ada@example.com</div></div></div></div>
+    <div className="sec"><div className="line"><span>Theme</span><div className="mini-seg"><button className="on">Light</button><button>Dark</button></div></div></div>
+    <div className="sec"><button className="action"><Icon name="plug" />Connections</button><button className="action danger"><Icon name="out" />Sign out</button></div>
   </>
 );
-const modalBody: ReactNode = <div className="field"><label htmlFor="m1">Тема</label><input id="m1" className="inp" /><div className="hint">У темы своя история.</div></div>;
-const modalFooter = (close: () => void): ReactNode => <><Button variant="ghost" onClick={close}>Отмена</Button><Button variant="primary" onClick={close}>Создать</Button></>;
+const modalBody: ReactNode = <div className="field"><label htmlFor="m1">Topic</label><input id="m1" className="inp" /><div className="hint">A topic has a history of its own.</div></div>;
+const modalFooter = (close: () => void): ReactNode => <><Button variant="ghost" onClick={close}>Cancel</Button><Button variant="primary" onClick={close}>Create</Button></>;
 
 function MenuDemo() {
   const [open, setOpen] = useState(false);
   const close = useCallback(() => setOpen(false), []);
   return (
     <div style={{ position: "relative", height: open ? 190 : "auto" }}>
-      <Button onMouseDown={(e) => open && e.stopPropagation()} onClick={() => setOpen((v) => !v)} aria-expanded={open}>Открыть меню</Button>
+      <Button onMouseDown={(e) => open && e.stopPropagation()} onClick={() => setOpen((v) => !v)} aria-expanded={open}>Open the menu</Button>
       {open && (
         <div style={{ position: "absolute", left: 0, top: 0, width: 372, height: 0 }}>
-          <Menu onClose={close} label="Профиль">{profileSections}</Menu>
+          <Menu onClose={close} label="Profile">{profileSections}</Menu>
         </div>
       )}
     </div>
@@ -400,10 +401,10 @@ function ModalDemo() {
   const close = useCallback(() => setOpen(""), []);
   return (
     <div className="row">
-      <Button onClick={() => setOpen("plain")}>Открыть окно</Button>
-      <Button onClick={() => setOpen("wide")}>Открыть широкое окно</Button>
+      <Button onClick={() => setOpen("plain")}>Open a dialog</Button>
+      <Button onClick={() => setOpen("wide")}>Open a wide dialog</Button>
       {open && (
-        <Modal title="Новая тема" wide={open === "wide"} onClose={close} footer={modalFooter(close)}>{modalBody}</Modal>
+        <Modal title="New topic" wide={open === "wide"} onClose={close} footer={modalFooter(close)}>{modalBody}</Modal>
       )}
     </div>
   );
@@ -413,23 +414,23 @@ function ToastDemo() {
   const toast = useToast();
   return (
     <div className="row">
-      <Button onClick={() => toast({ kind: "ok", title: "Сохранено" })}>Успех</Button>
-      <Button onClick={() => toast({ kind: "error", title: "Не удалось сохранить", text: "Сервер недоступен." })}>Ошибка</Button>
-      <Button onClick={() => toast({ title: "Вышла новая версия", actions: [{ label: "Обновить", primary: true, onClick: () => {} }, { label: "Позже", onClick: () => {} }] })}>С действиями</Button>
+      <Button onClick={() => toast({ kind: "ok", title: "Saved" })}>Success</Button>
+      <Button onClick={() => toast({ kind: "error", title: "Could not save", text: "The server is unavailable." })}>Error</Button>
+      <Button onClick={() => toast({ title: "A new version is out", actions: [{ label: "Update", primary: true, onClick: () => {} }, { label: "Later", onClick: () => {} }] })}>With actions</Button>
     </div>
   );
 }
 
-const profile = (close: () => void): ReactNode => <Menu onClose={close} label="Профиль">{profileSections}</Menu>;
+const profile = (close: () => void): ReactNode => <Menu onClose={close} label="Profile">{profileSections}</Menu>;
 
-const ADMIN_DEMO = [["users", "Пользователи", "users"], ["groups", "Группы", "lock"], ["models", "Подключения к моделям", "cpu"], ["audit", "Аудит", "shield"]] as const;
+const ADMIN_DEMO = [["users", "Users", "users"], ["groups", "Groups", "lock"], ["models", "Model connections", "cpu"], ["audit", "Audit", "shield"]] as const;
 
 /** The navigation of the administration: the side panel on a desktop (`inBurger`: hidden on a phone), the burger
  * on a phone. */
 function AdminNav({ on, onPick, inBurger }: { on: string; onPick?: () => void; inBurger?: boolean }) {
   return (
-    <nav className={inBurger ? "side in-burger" : "side"} aria-label="Администрирование">
-      <div className="lab">Администрирование</div>
+    <nav className={inBurger ? "side in-burger" : "side"} aria-label="Administration">
+      <div className="lab">Administration</div>
       {ADMIN_DEMO.map(([k, l, icon]) => (
         <a key={k} href="#topbar" className={k === on ? "active" : undefined} onClick={onPick}><Icon name={icon} />{l}</a>
       ))}
@@ -437,11 +438,11 @@ function AdminNav({ on, onPick, inBurger }: { on: string; onPick?: () => void; i
   );
 }
 
-const adminMenu = { label: "Администрирование", render: (close: () => void): ReactNode => <AdminNav on="audit" onPick={close} /> };
+const adminMenu = { label: "Administration", render: (close: () => void): ReactNode => <AdminNav on="audit" onPick={close} /> };
 
 function BarDemo({ product, admin }: { product: "nabu" | "hammurapi"; admin?: boolean }) {
   const nabu = product === "nabu";
-  const names = nabu ? ["Чат", "Память", "Пространство", "Задания"] : ["Общее", "Спецификация", "Исследование", "Разработка", "Поставка"];
+  const names = nabu ? ["Chat", "Memory", "Space", "Tasks"] : ["General", "Specification", "Discovery", "Development", "Delivery"];
   const [on, setOn] = useState(0);
   // the links of the showcase lead nowhere: a click only marks the section
   const pick = (e: MouseEvent) => {
@@ -450,15 +451,15 @@ function BarDemo({ product, admin }: { product: "nabu" | "hammurapi"; admin?: bo
   };
   return (
     <div style={{ minHeight: 230 }} onClick={pick}>
-      <TopBar logo={nabu ? "./nabu.jpg" : "./hammurapi.png"} name={nabu ? "Nabu" : "Hammurapi"} Link={Link} avatar={<Avatar name="Ада Лавлейс" />} profileMenu={profile}
+      <TopBar logo={nabu ? "./nabu.jpg" : "./hammurapi.png"} name={nabu ? "Nabu" : "Hammurapi"} Link={Link} avatar={<Avatar name="Ada Lovelace" />} profileMenu={profile}
         sections={names.map((label, i) => ({ key: String(i), label, href: "#topbar", active: i === on }))}
-        center={nabu ? undefined : <form className="search" role="search"><Icon name="search" /><input placeholder="Поиск" aria-label="Поиск" /></form>}
-        actions={nabu ? undefined : <button className="btn primary sm"><Icon name="plus" /><span className="hide-m">Новая задача</span></button>}
+        center={nabu ? undefined : <form className="search" role="search"><Icon name="search" /><input placeholder="Search" aria-label="Search" /></form>}
+        actions={nabu ? undefined : <button className="btn primary sm"><Icon name="plus" /><span className="hide-m">New issue</span></button>}
         menu={admin ? adminMenu : undefined} />
       {admin && (
         <div className="admin">
           <AdminNav inBurger on="audit" />
-          <main className="main"><h2 style={{ margin: 0 }}>Аудит</h2></main>
+          <main className="main"><h2 style={{ margin: 0 }}>Audit</h2></main>
         </div>
       )}
     </div>
@@ -466,15 +467,15 @@ function BarDemo({ product, admin }: { product: "nabu" | "hammurapi"; admin?: bo
 }
 
 const AGENT_OPTIONS = [
-  { key: "business", label: "Деловой", icon: "tBusiness" }, { key: "friendly", label: "Дружелюбный", icon: "tFriendly" },
-  { key: "brief", label: "Лаконичный", icon: "tBrief" }, { key: "mentor", label: "Наставник", icon: "tMentor" },
+  { key: "business", label: "Business", icon: "tBusiness" }, { key: "friendly", label: "Friendly", icon: "tFriendly" },
+  { key: "brief", label: "Brief", icon: "tBrief" }, { key: "mentor", label: "Mentor", icon: "tMentor" },
 ] as const;
 
 const DEMO_COMMANDS: ChatCommand[] = [
-  { kind: "command", name: "new", description: "Начать с чистого контекста" },
-  { kind: "command", name: "compact", description: "Сжать контекст · можно указать, на чём сосредоточиться", takesText: true },
-  { kind: "skill", name: "contract-review", description: "Проверка договора по чек-листу юристов", source: "Юристы" },
-  { kind: "skill", name: "weekly-report", description: "Еженедельный отчёт по шаблону", source: "Отчёты" },
+  { kind: "command", name: "new", description: "Start with a clean context" },
+  { kind: "command", name: "compact", description: "Compact the context · you can say what to focus on", takesText: true },
+  { kind: "skill", name: "contract-review", description: "Review a contract by the checklist of the lawyers", source: "Lawyers" },
+  { kind: "skill", name: "weekly-report", description: "A weekly report by the template", source: "Reports" },
 ];
 
 const AGENT_MODELS: AgentModel[] = [
@@ -484,14 +485,14 @@ const AGENT_MODELS: AgentModel[] = [
 
 function AgentDemo() {
   const [open, setOpen] = useState(true);
-  const [name, setName] = useState("Ада");
+  const [name, setName] = useState("Ada");
   const [value, setValue] = useState("business");
   const [choice, setChoice] = useState<AgentModelChoice>({ connectionId: "giga", model: "max" });
   const close = useCallback(() => setOpen(false), []);
   return (
     <div style={{ position: "relative", height: 560, padding: 12 }} data-demo="agent">
       <div className="row">
-        <AgentButton icon={AGENT_OPTIONS.find((o) => o.key === value)!.icon} label="Агент" expanded={open} onClick={() => setOpen((v) => !v)} />
+        <AgentButton icon={AGENT_OPTIONS.find((o) => o.key === value)!.icon} label="Agent" expanded={open} onClick={() => setOpen((v) => !v)} />
         <b>{name}</b>
       </div>
       {open && (
@@ -512,12 +513,12 @@ function LoginFrame({ view }: { view: string }) {
 
 function LoginDemo({ product, error }: { product: "nabu" | "hammurapi"; error?: boolean }) {
   const nabu = product === "nabu";
-  const [lang, setLang] = useState("ru");
+  const [lang, setLang] = useState("en");
   return (
-    <LoginScreen logo={nabu ? "./nabu.jpg" : "./hammurapi.png"} logoAlt={nabu ? "Логотип Nabu" : "Логотип Hammurapi"}
-      name={nabu ? "NABU" : "HAMMURAPI"} tagline={nabu ? "Building AI future together" : "Спецификация — источник истины"}
-      signIn={{ href: "#login", label: "Войти через GitHub", icon: <GitHubIcon /> }} note="Только для участников организации GreenOnGrey"
-      error={error ? "Не удалось войти. Попробуйте ещё раз." : undefined}
+    <LoginScreen logo={nabu ? "./nabu.jpg" : "./hammurapi.png"} logoAlt={nabu ? "The logo of Nabu" : "The logo of Hammurapi"}
+      name={nabu ? "NABU" : "HAMMURAPI"} tagline={nabu ? "Building AI future together" : "The specification is the source of truth"}
+      signIn={{ href: "#login", label: "Sign in with GitHub", icon: <GitHubIcon /> }} note="Only for members of the organization GreenOnGrey"
+      error={error ? "Could not sign in. Try again." : undefined}
       languages={["en", "ru", "de", "es", "zh"].map((code) => ({ code, label: code.toUpperCase(), active: code === lang }))} onLanguage={setLang} />
   );
 }

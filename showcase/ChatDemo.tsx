@@ -24,12 +24,12 @@ export function ChatDemo({ demo, narrow, full, empty, readOnly, wait, typing, hi
 }) {
   const initial: ChatMessage[] = empty || draft ? [] : notices ? noticeHistory : queue ? queueHistory : subagents ? subagentHistory : typing
     ? [...history.slice(0, 1), { id: "t", role: "assistant", text: "", createdAt: "2026-10-11T14:02:00", status: "streaming",
-        steps: [{ id: "s", text: "Спецификации: чтение FTR.NAB.CMN-0005", status: "running" }] }]
+        steps: [{ id: "s", text: "Specifications: reading FTR.NAB.CMN-0005", status: "running" }] }]
     : wait
-    ? [...history.slice(0, 2), { id: "w", role: "user", text: "Собери перечень изменений", createdAt: "2026-10-11T14:12:00", status: "done",
+    ? [...history.slice(0, 2), { id: "w", role: "user", text: "Collect a list of the changes", createdAt: "2026-10-11T14:12:00", status: "done",
         wait: wait === "queued" ? { state: "queued", position: 2 } : { state: "starting" } }]
     : files
-    ? [...history.slice(0, 1), { id: "f", role: "assistant", text: "Готово: график, отчёт и заметки к релизу — во вложениях.", createdAt: "2026-10-11T14:03:00",
+    ? [...history.slice(0, 1), { id: "f", role: "assistant", text: "Done: the chart, the report and the release notes are attached.", createdAt: "2026-10-11T14:03:00",
         status: "done", attachments: demoFiles }]
     : history;
   const [messages, setMessages] = useState(initial);
@@ -44,9 +44,9 @@ export function ChatDemo({ demo, narrow, full, empty, readOnly, wait, typing, hi
   const note = (text: string): ChatMessage => ({ id: `n${n.current++}`, role: "note", text, createdAt: new Date().toISOString(), status: "done" });
 
   const answer = (id: string) => {
-    setMessages((ms) => ms.map((m) => (m.id === id ? { ...m, status: "streaming", error: undefined, steps: [{ id: "s", text: "Спецификации: чтение", status: "running" }] } : m)));
+    setMessages((ms) => ms.map((m) => (m.id === id ? { ...m, status: "streaming", error: undefined, steps: [{ id: "s", text: "Specifications: reading", status: "running" }] } : m)));
     timer.current = window.setTimeout(() => {
-      setMessages((ms) => ms.map((m) => (m.id === id ? { ...m, status: "done", text: "Готово.", steps: [{ id: "s", text: "Спецификации: чтение", status: "done" }] } : m)));
+      setMessages((ms) => ms.map((m) => (m.id === id ? { ...m, status: "done", text: "Done.", steps: [{ id: "s", text: "Specifications: reading", status: "done" }] } : m)));
       setBusy(false);
     }, 1500);
   };
@@ -55,14 +55,14 @@ export function ChatDemo({ demo, narrow, full, empty, readOnly, wait, typing, hi
     setBusy(true);
     setMessages((ms) => [...ms,
       { id: `u${id}`, role: "user", text, createdAt: new Date().toISOString(), status: "done",
-        mark: skill ? { icon: "spark", text: skill } : voice ? { icon: "mic", text: "голосом" } : undefined,
+        mark: skill ? { icon: "spark", text: skill } : voice ? { icon: "mic", text: "by voice" } : undefined,
         attachments: attachmentIds.map((a) => ({ id: a, fileName: a, href: "#" })) },
       { id, role: "assistant", text: "", createdAt: new Date().toISOString(), status: "pending" }]);
     answer(id);
   };
   // FTR.NAB.CHAT-0001 R1, R2: a reset or a compaction is a divider of the conversation
   const contextEvent = (name: "new" | "compact") => setMessages((ms) => [...ms, { id: `e${n.current++}`, role: "event", text: "", createdAt: new Date().toISOString(), status: "done",
-    event: name === "new" ? { icon: "undo", text: "Контекст сброшен" } : { icon: "compress", text: "Контекст сжат: 42 тыс. → 3 тыс. токенов", details: "Изложение разговора." } }]);
+    event: name === "new" ? { icon: "undo", text: "Context reset" } : { icon: "compress", text: "Context compacted: 42K → 3K tokens", details: "A summary of the conversation." } }]);
   const onRetry = (id: string) => { setBusy(true); answer(id); };
   // FTR.NAB.CHAT-0004: a message goes to the queue; a stop ends the answer in a moment
   const onSendQueued = async (text: string) => {
@@ -74,14 +74,14 @@ export function ChatDemo({ demo, narrow, full, empty, readOnly, wait, typing, hi
   const onCancel = () => {
     window.clearTimeout(timer.current);
     setBusy(false);
-    setMessages((ms) => [...ms.filter((m) => m.status === "done" || m.status === "failed"), note("Ход отменён")]);
+    setMessages((ms) => [...ms.filter((m) => m.status === "done" || m.status === "failed"), note("Turn cancelled")]);
   };
 
   const header: ReactNode = (
     <div className="hd">
-      <button className="iconbtn" onClick={() => setOpen((v) => !v)} aria-label="Разговоры"><Icon name="msg2" /></button>
-      <Avatar name="Ада" agent icon="tBusiness" variant="business" />
-      <div style={{ minWidth: 0 }}><b>Ада</b><div className="small muted">{list.find((c) => c.id === current)?.title}</div></div>
+      <button className="iconbtn" onClick={() => setOpen((v) => !v)} aria-label="Conversations"><Icon name="msg2" /></button>
+      <Avatar name="Ada" agent icon="tBusiness" variant="business" />
+      <div style={{ minWidth: 0 }}><b>Ada</b><div className="small muted">{list.find((c) => c.id === current)?.title}</div></div>
     </div>
   );
   return (
@@ -89,26 +89,26 @@ export function ChatDemo({ demo, narrow, full, empty, readOnly, wait, typing, hi
       <ChatLayout narrow={narrow}>
         <ConversationList conversations={list} currentId={current} open={open} onClose={() => setOpen(false)}
           onPick={(id) => { setCurrent(id); setOpen(false); }}
-          onCreate={async (title) => { const id = `t${n.current++}`; setList((l) => [...l, { id, group: "topic", title, when: "сейчас" }]); setCurrent(id); }} />
-        <Chat agentName="Ада" messages={messages} header={header} busy={busy} emptyHint="Спросите о спецификации или попросите напомнить позже."
+          onCreate={async (title) => { const id = `t${n.current++}`; setList((l) => [...l, { id, group: "topic", title, when: "now" }]); setCurrent(id); }} />
+        <Chat agentName="Ada" messages={messages} header={header} busy={busy} emptyHint="Ask about a specification, or ask for a reminder later."
           empty={draft ? (
             <div className="empty">
               <div className="ic"><Icon name="msg" /></div>
-              <b>Обсуждение задачи ISS.FMS-0007</b>
-              Тема появится в списке разговоров после первого сообщения
+              <b>Discussion of the issue ISS.FMS-0007</b>
+              The topic appears in the list of conversations after the first message
               <div className="row" style={{ marginTop: 12, flexDirection: "column", alignItems: "stretch" }}>
-                {["Уточнить метрику", "Проверить оценку", "Найти дубликаты"].map((s) => (
+                {["Refine the metric", "Check the estimate", "Find duplicates"].map((s) => (
                   <button key={s} className="chip" onClick={() => void onSend(s, [], false)}>{s}</button>
                 ))}
               </div>
             </div>
           ) : undefined}
-          placeholder={draft ? "Что доработать в Discovery?" : undefined}
-          readOnly={readOnly ? <><span className="small muted">Тема в архиве</span><button className="btn sm">Вернуть из архива</button></> : undefined}
+          placeholder={draft ? "What should change in Discovery?" : undefined}
+          readOnly={readOnly ? <><span className="small muted">The topic is archived</span><button className="btn sm">Restore from the archive</button></> : undefined}
           aboveComposer={modes ? (
             <div style={{ padding: "10px 10px 0" }}>
               <div className="mini-seg">
-                {[["spec", "Спецификация"], ["general", "Общий"]].map(([k, l]) => (
+                {[["spec", "Specification"], ["general", "General"]].map(([k, l]) => (
                   <button key={k} className={mode === k ? "on" : ""} aria-pressed={mode === k} onClick={() => setMode(k)}>{l}</button>
                 ))}
               </div>
@@ -121,19 +121,19 @@ export function ChatDemo({ demo, narrow, full, empty, readOnly, wait, typing, hi
           onTranscribe={async () => {
             // the server takes a moment: the wave of FTR.NAB.CHAT-0001 design §3.1 is seen
             await new Promise((ok) => window.setTimeout(ok, 1200));
-            return "Расшифровка записи: проверьте перед отправкой.";
+            return "The transcript of the recording: check it before sending.";
           }}
           loadAttachment={files ? loadDemoFile : undefined}
           loadPreview={files ? loadDemoPreview : undefined}
-          historyError={historyError ? "Не удалось загрузить историю. Проверьте соединение." : undefined} loadingOlder={historyError}
-          hasOlder={!empty} onLoadOlder={() => setMessages((ms) => [{ id: `o${n.current++}`, role: "assistant", text: "Более раннее сообщение.", createdAt: "2026-10-10T09:00:00", status: "done" }, ...ms])}
+          historyError={historyError ? "Could not load the history. Check the connection." : undefined} loadingOlder={historyError}
+          hasOlder={!empty} onLoadOlder={() => setMessages((ms) => [{ id: `o${n.current++}`, role: "assistant", text: "An earlier message.", createdAt: "2026-10-10T09:00:00", status: "done" }, ...ms])}
           confirmations={confirmations}
-          onConfirm={full ? (id, approve) => { setConfirmations((c) => c.filter((x) => x.id !== id)); setMessages((ms) => [...ms, note(approve ? "Вы подтвердили: отправка письма" : "Вы отклонили: отправка письма")]); } : undefined}
+          onConfirm={full ? (id, approve) => { setConfirmations((c) => c.filter((x) => x.id !== id)); setMessages((ms) => [...ms, note(approve ? "You approved: sending the letter" : "You declined: sending the letter")]); } : undefined}
           onCancel={full ? onCancel : undefined}
           commands={full ? [
-            { kind: "command", name: "new", description: "Начать с чистого контекста" },
-            { kind: "command", name: "compact", description: "Сжать контекст", takesText: true },
-            { kind: "skill", name: "contract-review", description: "Проверка договора", source: "Юристы" },
+            { kind: "command", name: "new", description: "Start with a clean context" },
+            { kind: "command", name: "compact", description: "Compact the context", takesText: true },
+            { kind: "skill", name: "contract-review", description: "Review a contract", source: "Lawyers" },
           ] : undefined}
           onCommand={full ? async (name) => { if (name === "new" || name === "compact") contextEvent(name); } : undefined}
           onReset={full ? () => contextEvent("new") : undefined}
@@ -154,21 +154,21 @@ const demoFiles = [
   { id: "logo", fileName: "logo.svg", href: "#", mimeType: "image/svg+xml", size: 410 },
   { id: "data", fileName: "data.zip", href: "#", mimeType: "application/zip", size: 1_204_000 },
   // FTR.NAB.CHAT-0003: documents and spreadsheets — ready, being made and without a preview
-  { id: "contract", fileName: "договор.docx", href: "#", size: 48_300 },
-  { id: "budget", fileName: "бюджет.xlsx", href: "#", size: 21_700 },
-  { id: "draft", fileName: "черновик.docx", href: "#", size: 9_800_000 },
-  { id: "legacy", fileName: "старый.ppt", href: "#", size: 3_100_000 },
+  { id: "contract", fileName: "contract.docx", href: "#", size: 48_300 },
+  { id: "budget", fileName: "budget.xlsx", href: "#", size: 21_700 },
+  { id: "draft", fileName: "draft.docx", href: "#", size: 9_800_000 },
+  { id: "legacy", fileName: "old.ppt", href: "#", size: 3_100_000 },
 ];
 
 const BUDGET: Sheet[] = [
-  { name: "Бюджет", rows: 640, cols: 4, merges: ["A1:D1"], cells: [
-    [{ v: "Бюджет на IV квартал" }, {}, {}, {}],
-    [{ v: "Статья" }, { v: "Октябрь" }, { v: "Ноябрь" }, { v: "Итого" }],
-    [{ v: "Серверы" }, { v: "120 000", n: 120000 }, { v: "125 000", n: 125000 }, { f: "=SUM(B3:C3)" }],
-    [{ v: "Лицензии" }, { v: "48 000", n: 48000 }, { v: "48 000", n: 48000 }, { f: "=SUM(B4:C4)" }],
-    [{ v: "Итого" }, { f: "=SUM(B3:B4)" }, { f: "=SUM(C3:C4)" }, { f: "=SUM(D3:D4)" }],
+  { name: "Budget", rows: 640, cols: 4, merges: ["A1:D1"], cells: [
+    [{ v: "Budget for Q4" }, {}, {}, {}],
+    [{ v: "Item" }, { v: "October" }, { v: "November" }, { v: "Total" }],
+    [{ v: "Servers" }, { v: "120,000", n: 120000 }, { v: "125,000", n: 125000 }, { f: "=SUM(B3:C3)" }],
+    [{ v: "Licences" }, { v: "48,000", n: 48000 }, { v: "48,000", n: 48000 }, { f: "=SUM(B4:C4)" }],
+    [{ v: "Total" }, { f: "=SUM(B3:B4)" }, { f: "=SUM(C3:C4)" }, { f: "=SUM(D3:D4)" }],
   ] },
-  { name: "Допущения", rows: 2, cols: 2, merges: [], cells: [[{ v: "Курс" }, { v: "92,5", n: 92.5 }], [{ v: "Рост" }, { v: "4%", n: 0.04 }]] },
+  { name: "Assumptions", rows: 2, cols: 2, merges: [], cells: [[{ v: "Rate" }, { v: "92.5", n: 92.5 }], [{ v: "Growth" }, { v: "4%", n: 0.04 }]] },
 ];
 
 /** FTR.NAB.CHAT-0003: the previews of the showcase — a converted contract, a budget with formulas, a large
@@ -204,19 +204,19 @@ async function loadDemoFile(a: { id: string }): Promise<Blob> {
   }
   if (a.id === "page") {
     // a slide wider than a desktop, as a deck may be: the preview scales it to the modal instead of cutting it
-    return new Blob(['<!doctype html><title>Каркас презентации</title><style>body{margin:24px;font:16px system-ui;color:#fff;background:#1d1838}' +
+    return new Blob(['<!doctype html><title>A frame of slides</title><style>body{margin:24px;font:16px system-ui;color:#fff;background:#1d1838}' +
       '.slide{width:1440px;height:720px;box-sizing:border-box;padding:96px;background:linear-gradient(135deg,#2a2150,#3b2d7a)}h1{font-size:72px;margin:0 0 24px}' +
       '.card{display:inline-block;border:1px solid #7c5cff;border-radius:12px;padding:16px 24px;font-size:28px}</style>' +
-      '<div class="slide"><h1>Релиз 1.3</h1><div class="card">Файлы агента и их просмотр</div></div>' +
+      '<div class="slide"><h1>Release 1.3</h1><div class="card">Files of the agent and their preview</div></div>' +
       // an outside picture, a relative one (it would go to the site) and a refresh: the preview loads none of them
       '<img src="https://tracker.invalid/pixel.png" alt=""><img src="leak.png" alt="">' +
       '<meta http-equiv="refresh" content="0;url=https://tracker.invalid/">' +
-      '<script>document.body.innerHTML = "скрипт выполнился"</script>'], { type: "text/html" });
+      '<script>document.body.innerHTML = "the script ran"</script>'], { type: "text/html" });
   }
   if (a.id === "logo") {
     return new Blob(['<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="#7c5cff"/><circle cx="32" cy="32" r="14" fill="#fff"/></svg>'], { type: "image/svg+xml" });
   }
-  if (a.id === "notes") return new Blob(["# Релиз 1.3\n\n- волна вместо микрофона\n- **предпросмотр** файлов\n"], { type: "text/markdown" });
+  if (a.id === "notes") return new Blob(["# Release 1.3\n\n- a wave instead of the microphone\n- **preview** of files\n"], { type: "text/markdown" });
   const c = document.createElement("canvas");
   c.width = 320;
   c.height = 200;
@@ -235,35 +235,35 @@ async function loadDemoFile(a: { id: string }): Promise<Blob> {
 /** A turn with subagents: a finished call with a task out of time and a call that runs (FTR.NAB.CMN-0009 design §3). */
 const subagentHistory: ChatMessage[] = [
   { id: "r1", role: "user", text: "/code-review main", createdAt: "2026-10-27T15:00:00", status: "done" },
-  { id: "r2", role: "assistant", text: "## Standards\n\nДва замечания.\n\n## Spec\n\nТребование R3 не выполнено.", createdAt: "2026-10-27T15:00:05", status: "done",
+  { id: "r2", role: "assistant", text: "## Standards\n\nTwo findings.\n\n## Spec\n\nThe requirement R3 is not met.", createdAt: "2026-10-27T15:00:05", status: "done",
     steps: [{ id: "s1", text: "subagent", status: "done", subagents: [
-      { task: 1, description: "Ревью по стандартам", state: "done", tools: 7, result: "Два замечания: имя `x` и дублирование в `api.go`." },
-      { task: 2, description: "Ревью по спецификации", state: "timeout", tools: 12, result: "Требование R3 не выполнено…" },
+      { task: 1, description: "Review by the standards", state: "done", tools: 7, result: "Two findings: the name `x` and a duplication in `api.go`." },
+      { task: 2, description: "Review by the specification", state: "timeout", tools: 12, result: "The requirement R3 is not met…" },
     ] }] },
-  { id: "r3", role: "user", text: "Проверь ещё раз ветку", createdAt: "2026-10-27T15:05:00", status: "done" },
+  { id: "r3", role: "user", text: "Check the branch again", createdAt: "2026-10-27T15:05:00", status: "done" },
   { id: "r4", role: "assistant", text: "", createdAt: "2026-10-27T15:05:02", status: "streaming",
     steps: [{ id: "s2", text: "subagent", status: "running", subagents: [
-      { task: 1, description: "Ревью по стандартам", state: "running", tools: 3 },
-      { task: 2, description: "Ревью по спецификации", state: "done", tools: 5, result: "Замечаний нет." },
+      { task: 1, description: "Review by the standards", state: "running", tools: 3 },
+      { task: 2, description: "Review by the specification", state: "done", tools: 5, result: "No findings." },
     ] }] },
 ];
 
 const queueHistory: ChatMessage[] = [
-  { id: "s1", role: "user", text: "Перескажи CMN-0005 целиком", createdAt: "2026-10-27T13:50:00", status: "done" },
-  { id: "s2", role: "assistant", text: "CMN-0005 описывает UI Kit: состав, токены, компоненты…", createdAt: "2026-10-27T13:50:10", status: "stopped", retryQueued: true },
-  { id: "w1", role: "user", text: "Сравни дизайн чата CHAT-0001 и CHAT-0004", createdAt: "2026-10-27T14:00:00", status: "done" },
-  { id: "w2", role: "assistant", text: "В CHAT-0004 к полю ввода добавлена очередь:", createdAt: "2026-10-27T14:00:05", status: "streaming",
-    steps: [{ id: "s", text: "Спецификации: чтение FTR.NAB.CHAT-0004", status: "running" }] },
-  { id: "q1", role: "user", text: "И добавь таблицу различий", createdAt: "2026-10-27T14:01:00", status: "done", queued: true },
-  { id: "q2", role: "user", text: "Потом проверь макеты", createdAt: "2026-10-27T14:01:20", status: "done", queued: true },
+  { id: "s1", role: "user", text: "Retell CMN-0005 in full", createdAt: "2026-10-27T13:50:00", status: "done" },
+  { id: "s2", role: "assistant", text: "CMN-0005 describes the UI Kit: its parts, tokens, components…", createdAt: "2026-10-27T13:50:10", status: "stopped", retryQueued: true },
+  { id: "w1", role: "user", text: "Compare the design of the chat in CHAT-0001 and CHAT-0004", createdAt: "2026-10-27T14:00:00", status: "done" },
+  { id: "w2", role: "assistant", text: "CHAT-0004 adds a queue to the input:", createdAt: "2026-10-27T14:00:05", status: "streaming",
+    steps: [{ id: "s", text: "Specifications: reading FTR.NAB.CHAT-0004", status: "running" }] },
+  { id: "q1", role: "user", text: "And add a table of the differences", createdAt: "2026-10-27T14:01:00", status: "done", queued: true },
+  { id: "q2", role: "user", text: "Then check the mockups", createdAt: "2026-10-27T14:01:20", status: "done", queued: true },
 ];
 
 /** Notices of a product in a topic (FTR.NAB.CHAT-0002 design §3.1): a short one and one folded past twelve lines. */
 const noticeHistory: ChatMessage[] = [
-  { id: "nu", role: "user", text: "Метрика должна считаться по заказам", createdAt: "2026-10-21T14:01:00", status: "done" },
-  { id: "na", role: "assistant", text: "Передал исследователю, пришлю итог сюда.", createdAt: "2026-10-21T14:02:00", status: "done" },
+  { id: "nu", role: "user", text: "The metric should count orders", createdAt: "2026-10-21T14:01:00", status: "done" },
+  { id: "na", role: "assistant", text: "I passed it to the researcher and will post the result here.", createdAt: "2026-10-21T14:02:00", status: "done" },
   { id: "nn", role: "assistant", variant: "notice", mark: { icon: "plug", text: "Hammurapi" }, createdAt: "2026-10-21T14:19:00", status: "done",
-    text: "**Анализ обновлён · ревизия 4**\n\n- Метрика считается по заказам аренды\n- Окно оценки сдвинуто на 12 января" },
+    text: "**Analysis updated · revision 4**\n\n- The metric counts rental orders\n- The evaluation window moved to January 12" },
   { id: "nl", role: "assistant", variant: "notice", mark: { icon: "plug", text: "Hammurapi" }, createdAt: "2026-10-21T14:40:00", status: "done",
-    text: ["**Анализ обновлён · ревизия 5**", "", ...Array.from({ length: 14 }, (_, i) => `- Изменение ${i + 1}`)].join("\n") },
+    text: ["**Analysis updated · revision 5**", "", ...Array.from({ length: 14 }, (_, i) => `- Change ${i + 1}`)].join("\n") },
 ];
