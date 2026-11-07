@@ -145,6 +145,7 @@
   },
   "graph": {
     "zoomIn": "Acercar",
-    "zoomOut": "Alejar"
+    "zoomOut": "Alejar",
+    "resetLayout": "Devolver los nodos a su sitio"
   }
 }

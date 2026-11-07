@@ -4,6 +4,22 @@ Versions follow semver. A visible change of the look is at least a minor (FTR.NA
 Since `1.0.0` the contract of the kit — class names, tokens, props, icon names, keys of strings — changes only
 in a major.
 
+## 1.14.0
+
+The row layout and dragging of `Graph` (FTR.HMR.DEV-0002 R15). Both are opt-in: the graph of Nabu does not change.
+
+- `rows` (the new type `GraphRow`) lays the nodes out in rows instead of the force layout: a row per entry that has
+  nodes, top to bottom in the given order, its label at the left; in a row the nodes by `GraphNode.order`, then id,
+  left to right. A node of no given row goes to a last row without a label. A link inside a row is an arc: above when
+  it goes right, below when it goes left. The field grows with the longest row.
+- `draggable` lets the user move a node. A move neither pins nor opens the node. The button
+  «Put the nodes back» (the string `graph.resetLayout`) joins «+» and «−» after a move, and new data puts every node
+  back in its place.
+- Fixed on the way: dragging the field follows the pointer when the box of the graph has other proportions than the
+  field.
+- New classes: `.g-row` (the label and the line between rows); `.g-e path` takes the look of `.g-e line`.
+- The showcase gets the section «Graph: rows».
+
 ## 1.13.0
 
 A new component (FTR.HMR.DEV-0002, FTR.NAB.CMN-0003 R19): `Graph`, the graph of the memory of Nabu, moved to the kit.

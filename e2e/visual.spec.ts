@@ -22,6 +22,19 @@ for (const theme of ["light", "dark"] as const) {
     await expect(s.locator(".gwrap")).toHaveScreenshot(`graph-pinned-${theme}.png`);
   });
 
+  // FTR.HMR.DEV-0002 R15: a moved node and the button that puts it back
+  test(`graph-rows moved ${theme}`, async ({ page }, info) => {
+    test.skip(info.project.name === "phone", "the buttons of the graph are a computer's");
+    const s = await openSection(page, "graph-rows", theme);
+    const box = (await s.getByRole("button", { name: /^FTR\.HMR\.CMN-0005,/ }).locator("circle").boundingBox())!;
+    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+    await page.mouse.down();
+    await page.mouse.move(box.x + box.width / 2 + 60, box.y + box.height / 2 + 40, { steps: 6 });
+    await page.mouse.up();
+    await page.mouse.move(0, 0);
+    await expect(s.locator(".gwrap")).toHaveScreenshot(`graph-rows-moved-${theme}.png`);
+  });
+
   test(`open menu ${theme}`, async ({ page }) => {
     const s = await openSection(page, "overlay", theme);
     await s.getByRole("button", { name: "Open the menu" }).click();

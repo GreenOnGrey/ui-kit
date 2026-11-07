@@ -520,3 +520,25 @@ test("KIT-03 Graph: the depth of the focus widens the highlight (FTR.HMR.DEV-000
   await expect(directed.locator(".g-n.hl")).toHaveCount(7);
   await expect(far).toHaveClass(/\bhl\b/);
 });
+
+test("KIT-08 Graph: a dragged node moves without pinning, and the button puts it back (FTR.HMR.DEV-0002)", async ({ page }, info) => {
+  test.skip(info.project.name === "phone", "the buttons of the graph are a computer's");
+  const s = await openSection(page, "graph-rows");
+  const g = s.getByRole("group", { name: "Features in rows" });
+  const node = g.getByRole("button", { name: /^FTR\.HMR\.CMN-0005,/ });
+  const circle = node.locator("circle");
+  const before = await circle.boundingBox();
+  await circle.hover();
+  await page.mouse.down();
+  await page.mouse.move(before!.x + before!.width / 2 + 60, before!.y + before!.height / 2 + 40, { steps: 6 });
+  await page.mouse.up();
+  const after = await circle.boundingBox();
+  expect(after!.x - before!.x).toBeGreaterThan(40);
+  await expect(node).toHaveAttribute("aria-pressed", "false");
+  const back = s.getByRole("button", { name: "Put the nodes back" });
+  await back.click();
+  await expect(back).toHaveCount(0);
+  expect((await circle.boundingBox())!.x).toBeCloseTo(before!.x, 0);
+  await node.click();
+  await expect(node).toHaveAttribute("aria-pressed", "true");
+});
