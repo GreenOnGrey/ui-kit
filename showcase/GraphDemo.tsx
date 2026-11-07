@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Graph, type GraphEdge, type GraphNode, type GraphSelection } from "../src";
+import { Graph, type GraphEdge, type GraphNode, type GraphRow, type GraphSelection } from "../src";
 
 // Invented data: people and topics as in the memory of Nabu, and features of a
 // specification with the links «builds on» and «changes» as in Hammurapi.
@@ -54,4 +54,20 @@ export function FeatureGraph() {
         focus="FTR.HMR.DEV-0002" depth={depth} onOpen={setOpened} nodeLabel={(n) => `${n.label}, ${n.title}`} />
     </div>
   );
+}
+
+// The features in rows: the key without its prefix is the label, the number of the key the order.
+const ROWS: GraphRow[] = [{ id: "HMR.CMN", label: "HMR · CMN" }, { id: "HMR.DEV", label: "HMR · DEV" }, { id: "NAB.CMN", label: "NAB · CMN" }];
+const inRows = (n: GraphNode): GraphNode => {
+  const [, d, rest] = n.id.split(".");
+  const [sys, num] = rest.split("-");
+  return { ...n, label: `${sys}-${num}`, row: `${d}.${sys}`, order: Number(num), group: d === "NAB" ? 1 : 2 };
+};
+const ROW_FEATURES = FEATURES.map(inRows);
+
+/** Features in rows by domain and system, ascending by number; the nodes can be dragged. */
+export function RowGraph() {
+  const [selected, setSelected] = useState<GraphSelection>(null);
+  return <Graph nodes={ROW_FEATURES} edges={FEATURE_LINKS} ariaLabel="Features in rows" selected={selected} onSelect={setSelected}
+    rows={ROWS} draggable nodeLabel={(n) => `${n.id}, ${n.title}`} legend={[{ group: 2, label: "HMR" }, { group: 1, label: "NAB" }]} />;
 }

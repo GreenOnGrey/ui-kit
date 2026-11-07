@@ -10,7 +10,7 @@ import { LoginScreen } from "../src/login";
 import pkg from "../package.json";
 import { ChatDemo } from "./ChatDemo";
 import { Example, Section } from "./Example";
-import { FeatureGraph, PeopleGraph } from "./GraphDemo";
+import { FeatureGraph, PeopleGraph, RowGraph } from "./GraphDemo";
 import { LNG } from "./i18n";
 import { SECTIONS } from "./sections";
 
@@ -312,6 +312,10 @@ function Sections() {
 
       <Section id="graph-directed" lead="Arrows, a dashed link, a faded node and a dashed node that is not in the data. A focus highlights a node and its neighbours within one or two steps; Enter or a double click opens a node when the product passes onOpen.">
         <Example label="Features of a specification, focus on FTR.HMR.DEV-0002" source={<FeatureGraph />}><FeatureGraph /></Example>
+      </Section>
+
+      <Section id="graph-rows" lead="The row layout: a row per domain and system, in a row the nodes ascend left to right; a link inside a row is an arc. With draggable a node can be moved, and a button puts the moved nodes back.">
+        <Example label="Features in rows, nodes can be dragged" source={<RowGraph />}><RowGraph /></Example>
       </Section>
     </>
   );
