@@ -1,0 +1,67 @@
+import { describe, expect, it } from "vitest";
+import { html } from "../testing";
+import { Graph, layout, neighbours, type GraphEdge, type GraphNode } from "./Graph";
+
+const nodes: GraphNode[] = [
+  { id: "a", label: "A", group: 1, size: 9 }, { id: "b", label: "B", group: 2 }, { id: "c", label: "C", group: 2 },
+  { id: "d", label: "D", group: 3, dashed: true }, { id: "e", label: "E", muted: true, hideLabel: true },
+];
+const edges: GraphEdge[] = [
+  { source: "a", target: "b", directed: true }, { source: "b", target: "c", directed: true, dashed: true, title: "R13" },
+  { source: "c", target: "d", directed: true }, { source: "d", target: "e" },
+];
+const draw = (props: Partial<Parameters<typeof Graph>[0]> = {}) =>
+  html(<Graph nodes={nodes} edges={edges} ariaLabel="Links" selected={null} onSelect={() => {}} {...props} />);
+
+describe("Graph (FTR.HMR.DEV-0002 KIT-03)", () => {
+  it("neighbours: one step, then two, edges taken both ways", () => {
+    expect([...neighbours(edges, "b", 1)].toSorted()).toEqual(["a", "b", "c"]);
+    expect([...neighbours(edges, "b", 2)].toSorted()).toEqual(["a", "b", "c", "d"]);
+  });
+
+  it("a focus highlights the node and its neighbours and fades the rest", () => {
+    const out = draw({ focus: "b", depth: 1 });
+    expect(out).toContain('class="dimmed"');
+    expect(out).toMatch(/class="g-n g-c2 hl focus"[^>]*aria-label="B"/);
+    expect(out).toMatch(/class="g-n g-c3 dashed"[^>]*aria-label="D"/);
+    expect(draw({ focus: "b", depth: 2 })).toMatch(/class="g-n g-c3 dashed hl"[^>]*aria-label="D"/);
+  });
+
+  it("without a focus, or with one outside the data, nothing is faded", () => {
+    expect(draw()).not.toContain('class="dimmed"');
+    expect(draw({ focus: "gone" })).not.toContain('class="dimmed"');
+  });
+});
+
+describe("Graph (FTR.HMR.DEV-0002 KIT-04)", () => {
+  it("the same data gives the same places", () => {
+    const one = layout(nodes, edges).map((n) => [n.x, n.y]);
+    const two = layout(nodes, edges).map((n) => [n.x, n.y]);
+    expect(two).toEqual(one);
+  });
+});
+
+describe("Graph (FTR.HMR.DEV-0002 KIT-02)", () => {
+  it("directed edges get the arrow, dashed ones their class, titles a tooltip", () => {
+    const out = draw();
+    const id = /<marker id="(g-arrow-[^"]+)"/.exec(out)?.[1];
+    expect(id).toBeTruthy();
+    expect(out).toContain(`marker-end="url(#${id})"`);
+    expect(out).toContain('class="g-e dashed"');
+    expect(out).toContain("<title>R13</title>");
+    expect(out).toMatch(/class="g-n g-c1 small muted"[^>]*aria-label="E"/);
+  });
+
+  it("an undirected graph has no arrow; the legend comes from the product", () => {
+    const out = html(<Graph nodes={nodes.slice(0, 2)} edges={[{ source: "a", target: "b", weight: 3 }]} ariaLabel="People"
+      selected={null} onSelect={() => {}} legend={[{ group: 1, label: "People" }, { group: 2, label: "Topics" }]} />);
+    expect(out).not.toContain("g-arrow");
+    expect(out).toContain('<i class="g-c1"></i>People');
+    expect(out).toContain('stroke-width="2.5"');
+    expect(out).toContain('aria-label="Zoom in"');
+  });
+
+  it("a node label for screen readers comes from the product", () => {
+    expect(draw({ nodeLabel: (n) => `${n.label}, 3 links` })).toContain('aria-label="A, 3 links"');
+  });
+});

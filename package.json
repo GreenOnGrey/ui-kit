@@ -1,6 +1,6 @@
 {
   "name": "@green-on-grey/ui-kit",
-  "version": "1.12.0",
+  "version": "1.13.0",
   "description": "UI kit of the Nabu and Hammurapi products: styles, components, the chat and the sign-in screen",
   "license": "Apache-2.0",
   "repository": {
@@ -55,10 +55,12 @@
     "react-i18next": "^17.0.0"
   },
   "dependencies": {
+    "d3-force": "^3.0.1",
     "postcss": "^8.5.29"
   },
   "devDependencies": {
     "@playwright/test": "^1.64.0",
+    "@types/d3-force": "^3.0.10",
     "@types/node": "^26.6.2",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",

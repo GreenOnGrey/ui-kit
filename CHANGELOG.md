@@ -4,6 +4,24 @@ Versions follow semver. A visible change of the look is at least a minor (FTR.NA
 Since `1.0.0` the contract of the kit — class names, tokens, props, icon names, keys of strings — changes only
 in a major.
 
+## 1.13.0
+
+A new component (FTR.HMR.DEV-0002, FTR.NAB.CMN-0003 R19): `Graph`, the graph of the memory of Nabu, moved to the kit.
+
+- `Graph` draws nodes and links with a force layout (`d3-force`, now a dependency of the kit). The same data gives the
+  same picture. Hovering highlights the neighbours, a click pins a node or a link, the wheel zooms, dragging moves.
+- The look is that of Nabu, and so are the classes `.gwrap`, `.g-n`, `.g-e`, `.gleg`, `.gzoom`. The kinds of nodes
+  `.p` and `.t` (the legend `.p`, `.tp`) become the groups `g-c1` and `g-c2` with the same colours; `g-c3`…`g-c6`
+  are added. A product drops its own rules of these classes.
+- Fixed on the way: the wheel zooms without scrolling the page, a pan keeps the pinned selection, and two graphs on
+  one page get their own arrows.
+- New for Hammurapi: `GraphEdge.directed` (an arrow), `GraphEdge.dashed`, `GraphNode.dashed` (a node not in the
+  data), `GraphNode.muted`, `focus` with `depth` 1 or 2, and `onOpen` on Enter or a double click. Without `onOpen`
+  Enter pins the node, as before.
+- The product passes the labels, `ariaLabel`, `nodeLabel` and the legend. The kit adds the strings `graph.zoomIn`
+  and `graph.zoomOut`.
+- The showcase gets the sections «Graph» and «Graph: directed».
+
 ## 1.12.0
 
 A visible change of the showcase only: it speaks English. The labels, the invented data and the strings of the

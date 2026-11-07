@@ -4,5 +4,6 @@ export { Button, IconButton } from "./components/Button";
 export { Tabs } from "./components/Tabs";
 export { Menu } from "./components/Menu";
 export { TopBar, type LinkComponent, type TopBarSection } from "./components/TopBar";
+export { Graph, neighbours, type GraphNode, type GraphEdge, type GraphSelection } from "./components/Graph";
 export { Modal, ToastProvider, useToast, Avatar, Switch, Empty, Loading, useOutside, type ToastSpec } from "./components/ui";
 export { UIKIT_NS } from "./i18n";

@@ -12,7 +12,7 @@ export default defineConfig({
       entry: { index: "src/index.ts", chat: "src/chat/index.ts", login: "src/login/index.ts", locales: "src/locales/index.ts" },
       formats: ["es"],
     },
-    rollupOptions: { external: [/^react($|\/)/, /^react-dom($|\/)/, "i18next", "react-i18next"] },
+    rollupOptions: { external: [/^react($|\/)/, /^react-dom($|\/)/, "i18next", "react-i18next", /^d3-/] },
   },
   test: { environment: "node", include: ["src/**/*.test.{ts,tsx}", "bin/**/*.test.ts"] },
 });

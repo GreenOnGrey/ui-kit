@@ -142,5 +142,9 @@
     "everywhere": "Die Änderung gilt in allen Kanälen und verbundenen Diensten.",
     "capImage": "Bilder",
     "capReasoning": "Reasoning"
+  },
+  "graph": {
+    "zoomIn": "Vergrößern",
+    "zoomOut": "Verkleinern"
   }
 }
