@@ -10,6 +10,7 @@ import { LoginScreen } from "../src/login";
 import pkg from "../package.json";
 import { ChatDemo } from "./ChatDemo";
 import { Example, Section } from "./Example";
+import { FeatureGraph, PeopleGraph } from "./GraphDemo";
 import { LNG } from "./i18n";
 import { SECTIONS } from "./sections";
 
@@ -303,6 +304,14 @@ function Sections() {
 
       <Section id="markdown" lead="Headings, lists, tables, code, emphasis. Markup from the text is never inserted.">
         <Example><Markdown text={"## Summary\n\n**24** requirements of 26 are covered.\n\n1. `KIT-01`: tokens\n2. `NAB-01`: comparison of screens\n\n| Step | Status |\n|---|---|\n| 1 | done |\n\n```\nnpm run lint\n```"} /></Example>
+      </Section>
+
+      <Section id="graph" lead="Nodes and links. Hovering shows the neighbours, a click pins them, the wheel zooms and dragging moves. The product passes the labels, the groups and the legend.">
+        <Example label="People and topics" source={<PeopleGraph />}><PeopleGraph /></Example>
+      </Section>
+
+      <Section id="graph-directed" lead="Arrows, a dashed link, a faded node and a dashed node that is not in the data. A focus highlights a node and its neighbours within one or two steps; Enter or a double click opens a node when the product passes onOpen.">
+        <Example label="Features of a specification, focus on FTR.HMR.DEV-0002" source={<FeatureGraph />}><FeatureGraph /></Example>
       </Section>
     </>
   );

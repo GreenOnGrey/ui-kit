@@ -142,5 +142,9 @@
     "everywhere": "El cambio se aplica en todos los canales y servicios conectados.",
     "capImage": "imágenes",
     "capReasoning": "razonamiento"
+  },
+  "graph": {
+    "zoomIn": "Acercar",
+    "zoomOut": "Alejar"
   }
 }

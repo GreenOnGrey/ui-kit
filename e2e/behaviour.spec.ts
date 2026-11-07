@@ -495,3 +495,28 @@ test("FTR.NAB.CHAT-0001 INP-02 the field grows with its lines up to three, then 
   await height(3);
   expect(await list.evaluate((el) => el.scrollTop)).toBe(0);
 });
+
+test("KIT-05 Graph: Enter opens a node with onOpen; without it Enter pins, as in Nabu (FTR.HMR.DEV-0002)", async ({ page }) => {
+  const d = await openSection(page, "graph-directed");
+  const directed = d.getByRole("group", { name: "Links of features" });
+  await directed.getByRole("button", { name: /^FTR\.HMR\.CMN-0001,/ }).focus();
+  await page.keyboard.press("Enter");
+  await expect(d.getByText("Opened: FTR.HMR.CMN-0001")).toBeVisible();
+  const s = await openSection(page, "graph");
+  const people = s.getByRole("group", { name: "The graph of people and topics" });
+  const anna = people.getByRole("button", { name: "Anna Petrova" });
+  await anna.focus();
+  await page.keyboard.press("Enter");
+  await expect(anna).toHaveAttribute("aria-pressed", "true");
+});
+
+test("KIT-03 Graph: the depth of the focus widens the highlight (FTR.HMR.DEV-0002)", async ({ page }) => {
+  const s = await openSection(page, "graph-directed");
+  const directed = s.getByRole("group", { name: "Links of features" });
+  const far = directed.getByRole("button", { name: /^FTR\.HMR\.CMN-0002,/ });
+  await expect(directed.locator(".g-n.hl")).toHaveCount(6);
+  await expect(far).not.toHaveClass(/\bhl\b/);
+  await s.getByRole("button", { name: "Depth: 1" }).click();
+  await expect(directed.locator(".g-n.hl")).toHaveCount(7);
+  await expect(far).toHaveClass(/\bhl\b/);
+});

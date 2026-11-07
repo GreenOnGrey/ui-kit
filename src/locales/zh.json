@@ -142,5 +142,9 @@
     "everywhere": "更改在所有渠道和已连接的服务中生效。",
     "capImage": "图片",
     "capReasoning": "推理"
+  },
+  "graph": {
+    "zoomIn": "放大",
+    "zoomOut": "缩小"
   }
 }

@@ -14,6 +14,14 @@ for (const theme of ["light", "dark"] as const) {
   }
 
   // what a section shows only after a click
+  // FTR.HMR.DEV-0002: a pinned node of the graph and its neighbours
+  test(`graph pinned ${theme}`, async ({ page }) => {
+    const s = await openSection(page, "graph", theme);
+    await s.getByRole("button", { name: "Anna Petrova" }).click();
+    await page.mouse.move(0, 0);
+    await expect(s.locator(".gwrap")).toHaveScreenshot(`graph-pinned-${theme}.png`);
+  });
+
   test(`open menu ${theme}`, async ({ page }) => {
     const s = await openSection(page, "overlay", theme);
     await s.getByRole("button", { name: "Open the menu" }).click();
