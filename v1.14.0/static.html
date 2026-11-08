@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>UI Kit — styles without React</title>
+    <!-- The whole kit in one stylesheet (R8): this page has no script. -->
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body style="padding: 24px">
+    <div class="stack" style="max-width: 520px">
+      <div class="row"><button class="btn primary">Save</button><button class="btn">Cancel</button><button class="btn ghost sm">Later</button></div>
+      <div class="field"><label for="n">Name</label><input id="n" class="inp" value="Release 1.4" /><div class="hint">Up to 120 characters</div></div>
+      <div class="chips"><span class="chip">EN</span><span class="chip on">RU</span></div>
+      <table class="t"><thead><tr><th>User</th><th>Status</th></tr></thead><tbody><tr><td>Ada</td><td><span class="st">Active</span></td></tr></tbody></table>
+      <div class="hintbox">Connect the mail to let the agent sort letters.</div>
+      <div class="modal" role="dialog" aria-label="New topic">
+        <header>New topic</header>
+        <div class="mb"><div class="field"><label for="t">Topic</label><input id="t" class="inp" /></div></div>
+        <footer><button class="btn ghost">Cancel</button><button class="btn primary">Create</button></footer>
+      </div>
+    </div>
+  </body>
+</html>

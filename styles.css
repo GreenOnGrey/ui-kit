@@ -510,8 +510,10 @@ h3.sec {
   touch-action: none;
   cursor: grab;
 }
-.g-e line {
+.g-e line,
+.g-e path {
   stroke: var(--border-strong);
+  fill: none;
   transition: opacity 0.15s;
 }
 .g-e .hit {
@@ -519,7 +521,8 @@ h3.sec {
   stroke-width: 12;
   cursor: pointer;
 }
-.g-e.dashed line:first-child {
+.g-e.dashed line:first-child,
+.g-e.dashed path:first-child {
   stroke: var(--violet);
   stroke-dasharray: 6 4;
 }
@@ -599,14 +602,30 @@ h3.sec {
 svg.dimmed .g-n:not(.hl) {
   opacity: 0.22;
 }
-svg.dimmed .g-e:not(.hl) line {
+svg.dimmed .g-e:not(.hl) line,
+svg.dimmed .g-e:not(.hl) path {
   opacity: 0.12;
 }
-svg.dimmed .g-e.hl line:first-child {
+svg.dimmed .g-e.hl line:first-child,
+svg.dimmed .g-e.hl path:first-child {
   stroke: var(--text-2);
 }
-svg.dimmed .g-e.dashed.hl line:first-child {
+svg.dimmed .g-e.dashed.hl line:first-child,
+svg.dimmed .g-e.dashed.hl path:first-child {
   stroke: var(--violet);
+}
+/* FTR.HMR.DEV-0002 R15: the rows of the row layout, a label at the left and a line between rows */
+.g-row {
+  pointer-events: none;
+}
+.g-row text {
+  font: 600 12px var(--font);
+  fill: var(--text-2);
+  dominant-baseline: middle;
+}
+.g-row line {
+  stroke: var(--border);
+  stroke-dasharray: 2 4;
 }
 .gleg {
   position: absolute;
@@ -645,6 +664,10 @@ svg.dimmed .g-e.dashed.hl line:first-child {
   font-weight: 600;
   color: var(--text-2);
   cursor: pointer;
+}
+.gzoom button svg {
+  display: block;
+  margin: auto;
 }
 @media (max-width: 860px) {
   .gzoom {
