@@ -104,6 +104,15 @@
   stroke: var(--violet);
   stroke-dasharray: 6 4;
 }
+/* a double line: the line 3 wider (Graph.tsx), a line of the colour of the field inside it (FTR.HMR.DEV-0003 R15) */
+.g-e.double .inner {
+  stroke: var(--surface);
+  stroke-width: 1.5;
+  pointer-events: none;
+}
+.g-e.double.dashed .inner {
+  stroke-dasharray: 6 4;
+}
 .gwrap marker path {
   fill: var(--border-strong);
 }

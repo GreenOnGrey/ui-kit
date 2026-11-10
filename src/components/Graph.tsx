@@ -19,7 +19,9 @@ export type GraphNode = {
   row?: string;
   order?: number;
 };
-export type GraphEdge = { source: string; target: string; weight?: number; directed?: boolean; dashed?: boolean; title?: string };
+/** A link; `double` draws it as a double line — another layer of links, told apart without colour
+ * (FTR.HMR.DEV-0003 R15); it combines with `dashed`. */
+export type GraphEdge = { source: string; target: string; weight?: number; directed?: boolean; dashed?: boolean; double?: boolean; title?: string };
 export type GraphSelection = { kind: "node"; id: string } | { kind: "edge"; source: string; target: string } | null;
 /** A row of the row layout, top to bottom in the order given; the label is drawn at its left. */
 export type GraphRow = { id: string; label: string };
@@ -235,16 +237,19 @@ export function Graph({ nodes, edges, ariaLabel, selected, onSelect, focus, dept
             const l = edgeLine(a, b, !!e.directed, !!rows);
             const marker = e.directed ? `url(#${arrow})` : undefined;
             return (
-              <g key={`${e.source}\u0000${e.target}\u0000${i}`} className={`g-e${e.dashed ? " dashed" : ""}${edgeOn(e) ? " hl" : ""}`}
+              <g key={`${e.source}\u0000${e.target}\u0000${i}`} className={`g-e${e.dashed ? " dashed" : ""}${e.double ? " double" : ""}${edgeOn(e) ? " hl" : ""}`}
                 onClick={() => onSelect({ kind: "edge", source: e.source, target: e.target })}>
                 {l.d ? (
                   <>
-                    <path d={l.d} strokeWidth={1 + (e.weight ?? 1) * 0.5} markerEnd={marker} />
+                    {/* a double line takes the arrow on its inner line: the size of a marker follows the width of the line */}
+                    <path d={l.d} strokeWidth={1 + (e.weight ?? 1) * 0.5 + (e.double ? 3 : 0)} markerEnd={e.double ? undefined : marker} />
+                    {e.double && <path className="inner" d={l.d} markerEnd={marker} />}
                     <path className="hit" d={l.hit} />
                   </>
                 ) : (
                   <>
-                    <line x1={l.x1} y1={l.y1} x2={l.x2} y2={l.y2} strokeWidth={1 + (e.weight ?? 1) * 0.5} markerEnd={marker} />
+                    <line x1={l.x1} y1={l.y1} x2={l.x2} y2={l.y2} strokeWidth={1 + (e.weight ?? 1) * 0.5 + (e.double ? 3 : 0)} markerEnd={e.double ? undefined : marker} />
+                    {e.double && <line className="inner" x1={l.x1} y1={l.y1} x2={l.x2} y2={l.y2} markerEnd={marker} />}
                     <line className="hit" x1={a.x} y1={a.y} x2={b.x} y2={b.y} />
                   </>
                 )}
