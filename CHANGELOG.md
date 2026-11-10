@@ -4,6 +4,15 @@ Versions follow semver. A visible change of the look is at least a minor (FTR.NA
 Since `1.0.0` the contract of the kit — class names, tokens, props, icon names, keys of strings — changes only
 in a major.
 
+## 1.16.0
+
+A draft of the product in the composer of `Chat` (FTR.NAB.CMN-0005 tech §3.4). Opt-in: nothing changes on the screen.
+
+- `draft: { text, seq }` puts `text` into the field before what the user has written, once per `seq`, focuses the
+  field and puts the cursor at the end. The user finishes the message and sends it: «Ask the agent» on another
+  screen no longer sends a half-written message.
+- `onDraftTaken()` tells the product the draft is in the field.
+
 ## 1.15.0
 
 The double edge of `Graph` (FTR.HMR.DEV-0003 R15): another layer of links, told apart without colour. Opt-in: the

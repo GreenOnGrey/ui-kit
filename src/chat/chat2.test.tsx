@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { html } from "../testing";
 import { AgentMenu } from "./AgentMenu";
+import { Chat, withDraft } from "./Chat";
 import { CommandPalette, matchCommands } from "./CommandPalette";
 import { ContextMeter, tokens } from "./ContextMeter";
 import { MessageView } from "./MessageView";
@@ -77,5 +78,22 @@ describe("agent menu", () => {
     const one = html(<AgentMenu {...base} models={{ label: "Model", value: "a", onPick: () => {}, options: [{ key: "a", label: "Only" }] }} />);
     expect(one).not.toContain('class="radio');
     expect(html(<AgentMenu {...base} models={{ label: "Model", value: "", onPick: () => {}, options: [], empty: "No models" }} />)).toContain("No models");
+  });
+});
+
+describe("draft", () => {
+  it("puts the draft of the product into the field and does not send it", () => {
+    let sent = false;
+    const out = html(<Chat agentName="Ada" messages={[]} draft={{ text: "Regenerate the gate: ", seq: 1 }}
+      onSend={() => { sent = true; return Promise.resolve(); }} />);
+    expect(out).toMatch(/<textarea[^>]*>Regenerate the gate: <\/textarea>/);
+    expect(sent).toBe(false);
+  });
+
+  it("goes before what the user has written, once", () => {
+    expect(withDraft("", "Fix: ")).toBe("Fix: ");
+    expect(withDraft("  \n", "Fix: ")).toBe("Fix: ");
+    expect(withDraft("  the title", "Fix: ")).toBe("Fix: the title");
+    expect(withDraft("Fix: the title", "Fix: ")).toBe("Fix: the title");
   });
 });

@@ -155,6 +155,11 @@ export interface ChatProps {
   /** FTR.NAB.CHAT-0003 R13–R16: the preview of a document (PDF of its first pages) or of a spreadsheet (sheets).
    * Without it documents and spreadsheets download, as before. */
   loadPreview?(attachment: ChatAttachment): Promise<OfficePreview>;
+  /** A text the product puts into the composer: a new `seq` puts `text` before what the field holds, focuses the field
+   * and puts the cursor at the end. The user finishes the message and sends it. */
+  draft?: { text: string; seq: number };
+  /** The draft is in the field: the product may forget it. */
+  onDraftTaken?(): void;
   /** The files attached to the message being written, after every change. */
   onPendingChange?(uploads: ChatUpload[]): void;
   /** The text of a recording; `null`: it failed and the product has told the user. A rejection
