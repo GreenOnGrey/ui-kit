@@ -17,7 +17,8 @@ import { clock, useRecorder } from "./useRecorder";
 export function Chat(props: ChatProps) {
   const t = useKitT();
   const toast = useToast();
-  const [text, setText] = useState("");
+  // FTR.NAB.CMN-0005 tech §3.4: a draft of the product is in the field from the mount
+  const [text, setText] = useState(() => props.draft?.text ?? "");
   const [pending, setPending] = useState<ChatUpload[]>([]);
   const [uploading, setUploading] = useState(false);
   const [skill, setSkill] = useState<string | null>(null);
@@ -37,6 +38,8 @@ export function Chat(props: ChatProps) {
   const listRef = useRef<HTMLDivElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const fieldRef = useRef<HTMLTextAreaElement>(null);
+  const draftSeen = useRef(props.draft?.seq);
+  const caretToEnd = useRef(props.draft !== undefined);
   const maxSeconds = props.voiceMaxSeconds ?? 300;
   const recorder = useRecorder(maxSeconds, () => void stopAndTranscribe());
   const { messages, busy = false } = props;
@@ -159,7 +162,32 @@ export function Chat(props: ChatProps) {
 
   // design §3.1: the field grows with its lines up to three, then scrolls (its max-height in CSS); a change of
   // its width (a turned phone, a resized panel) wraps the lines anew
-  useLayoutEffect(() => keepListEnd(listRef.current, () => fitField(fieldRef.current)), [text]);
+  useLayoutEffect(() => {
+    keepListEnd(listRef.current, () => fitField(fieldRef.current));
+    const el = fieldRef.current;
+    if (caretToEnd.current && el) {
+      caretToEnd.current = false;
+      el.focus();
+      el.setSelectionRange(el.value.length, el.value.length);
+    }
+  }, [text]);
+
+  // FTR.NAB.CMN-0005 tech §3.4: the product puts a text into the field («Ask the agent» on another screen); the user
+  // finishes it and sends it. A new `seq` is a new draft; the draft of the mount is in the field already
+  const onDraftTaken = props.onDraftTaken;
+  const draftSeq = props.draft?.seq;
+  const draftText = props.draft?.text;
+  const draftTaken = useRef<number | undefined>(undefined);
+  useEffect(() => {
+    if (draftSeq === undefined || draftText === undefined || draftSeq === draftTaken.current) return;
+    draftTaken.current = draftSeq;
+    if (draftSeq !== draftSeen.current) {
+      draftSeen.current = draftSeq;
+      caretToEnd.current = true;
+      setText((x) => withDraft(x, draftText)); // oxlint-disable-line react/set-state-in-effect
+    }
+    onDraftTaken?.();
+  }, [draftSeq, draftText, onDraftTaken]);
   useEffect(() => {
     const el = fieldRef.current;
     if (!el || typeof ResizeObserver === "undefined") return;
@@ -390,4 +418,11 @@ function useStableLoader<A, R>(load: ((a: A) => Promise<R>) | undefined): ((a: A
   return useMemo(() => has
     ? (a: A) => latest.current ? latest.current(a) : Promise.reject(new Error("no loader"))
     : undefined, [has]);
+}
+
+/** The field with a draft of the product: the draft goes before what the user has written, once. */
+export function withDraft(field: string, draft: string): string {
+  if (!field.trim()) return draft;
+  if (field.startsWith(draft)) return field;
+  return draft + field.trimStart();
 }
