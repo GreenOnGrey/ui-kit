@@ -310,7 +310,7 @@ function Sections() {
         <Example label="People and topics" source={<PeopleGraph />}><PeopleGraph /></Example>
       </Section>
 
-      <Section id="graph-directed" lead="Arrows, a dashed link, a faded node and a dashed node that is not in the data. A focus highlights a node and its neighbours within one or two steps; Enter or a double click opens a node when the product passes onOpen.">
+      <Section id="graph-directed" lead="Arrows, a dashed link, double links of another layer (plain and dashed), a faded node and a dashed node that is not in the data. A focus highlights a node and its neighbours within one or two steps; Enter or a double click opens a node when the product passes onOpen.">
         <Example label="Features of a specification, focus on FTR.HMR.DEV-0002" source={<FeatureGraph />}><FeatureGraph /></Example>
       </Section>
 

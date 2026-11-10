@@ -29,6 +29,8 @@ const FEATURE_LINKS: GraphEdge[] = [
   { source: "FTR.HMR.DEV-0002", target: "FTR.NAB.CMN-0005", directed: true },
   { source: "FTR.HMR.DEV-0001", target: "FTR.HMR.CMN-0001", directed: true },
   { source: "FTR.HMR.DEV-0003", target: "FTR.HMR.DEV-0002", directed: true },
+  { source: "FTR.HMR.DEV-0003", target: "FTR.HMR.DEV-0001", directed: true, double: true, title: "architecture: builds on A3" },
+  { source: "FTR.HMR.DEV-0003", target: "FTR.HMR.CMN-0005", directed: true, double: true, dashed: true, title: "architecture: changes A5" },
   { source: "FTR.HMR.CMN-0001", target: "FTR.HMR.CMN-0002", directed: true },
 ];
 

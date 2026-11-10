@@ -4,6 +4,16 @@ Versions follow semver. A visible change of the look is at least a minor (FTR.NA
 Since `1.0.0` the contract of the kit — class names, tokens, props, icon names, keys of strings — changes only
 in a major.
 
+## 1.15.0
+
+The double edge of `Graph` (FTR.HMR.DEV-0003 R15): another layer of links, told apart without colour. Opt-in: the
+graphs of Nabu and of Hammurapi do not change.
+
+- `GraphEdge.double` draws the link as a double line: the line 3 wider than its weight gives, a line of the colour of
+  the field inside it; the arrow is on the inner line, of the usual size.
+  It combines with `dashed` (a double dashed line).
+- New classes: `.g-e.double`, the inner line `.g-e.double .inner`.
+
 ## 1.14.0
 
 The row layout and dragging of `Graph` (FTR.HMR.DEV-0002 R15). Both are opt-in: the graph of Nabu does not change.

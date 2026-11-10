@@ -115,3 +115,12 @@ describe("Graph (FTR.HMR.DEV-0002 KIT-07)", () => {
     expect(draw({ draggable: true })).not.toContain("Put the nodes back");
   });
 });
+
+describe("Graph (FTR.HMR.DEV-0003 R15)", () => {
+  it("a double edge gets its class and an inner line; a plain one has none", () => {
+    const out = html(<Graph nodes={nodes} edges={[...edges.slice(0, 1).map((e) => ({ ...e, double: true, dashed: true })), edges[1]]}
+      ariaLabel="g" selected={null} onSelect={() => {}} />);
+    expect(out).toMatch(/class="g-e dashed double"/);
+    expect((out.match(/class="inner"/g) ?? []).length).toBe(1);
+  });
+});
