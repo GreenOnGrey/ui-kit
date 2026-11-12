@@ -82,6 +82,10 @@ const PATHS = {
   compress: '<path d="M4 14h6v6M20 10h-6V4M14 10l7-7M3 21l7-7"/>',
   // a double chevron to the right: a panel folds to the right edge (FTR.HMR.SPEC-0001 R8)
   chevrons: '<path d="m6 6 6 6-6 6M13 6l6 6-6 6"/>',
+  // the cost of a run of an agent: two stacked coins (FTR.HMR.DEV-0004 R4)
+  coins: '<ellipse cx="9" cy="7" rx="6" ry="2.6"/><path d="M3 7v4c0 1.4 2.7 2.6 6 2.6s6-1.2 6-2.6V7"/><path d="M3 11v5.4C3 17.8 5.7 19 9 19c1 0 2-.1 2.8-.3"/><ellipse cx="16" cy="14" rx="5" ry="2.2"/><path d="M11 14v3.6c0 1.2 2.2 2.2 5 2.2s5-1 5-2.2V14"/>',
+  // the log of a run of an agent: a window with a prompt (FTR.HMR.DEV-0004 R8)
+  terminal: '<rect x="3" y="4" width="18" height="16" rx="2.5"/><path d="m7 9.5 3 2.5-3 2.5M12.5 15H17"/>',
 } as const;
 
 export type IconName = keyof typeof PATHS;
