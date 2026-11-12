@@ -405,7 +405,7 @@ function SelectDemo() {
   const [run, setRun] = useState("r2");
   const [zone, setZone] = useState("msk");
   return (
-    <div className="select-demo" style={{ display: "flex", gap: 16, flexWrap: "wrap", alignItems: "flex-start", minHeight: 200 }}>
+    <div className="select-demo" style={{ display: "flex", gap: 16, flexWrap: "wrap", alignItems: "flex-start", minHeight: 260 }}>
       <Select label="Time zone" value={zone} options={ZONES} onChange={setZone} />
       <Select label="Run" small value={run} options={RUNS} onChange={setRun} />
     </div>

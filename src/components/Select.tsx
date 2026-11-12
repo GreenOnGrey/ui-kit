@@ -7,8 +7,8 @@ export type SelectOption<V extends string> = { value: V; label: ReactNode };
 /** `.select`: the choice of one value from a list drawn by the kit, not by the browser — the list follows the
  * theme (FTR.NAB.CMN-0005 tech §3.3). The keyboard of a listbox: arrows, Home and End move, Enter and
  * Space choose, Escape and Tab close; a click outside closes. `label` names the list for a screen reader; the field
- * is read as the label and the chosen value. The list is placed fixed by the field, so a scrolling panel does not cut
- * it; without room below it opens upwards. */
+ * is read as the label and the chosen value. The list is placed fixed by the field and follows it on a scroll, so a
+ * scrolling panel does not cut it; without room below it opens upwards. */
 export function Select<V extends string>({ value, options, onChange, label, small, className }: {
   value: V; options: SelectOption<V>[]; onChange: (value: V) => void; label: string; small?: boolean; className?: string;
 }) {
@@ -22,8 +22,8 @@ export function Select<V extends string>({ value, options, onChange, label, smal
   const current = Math.max(0, options.findIndex((o) => o.value === value));
   const [place, setPlace] = useState<CSSProperties>({});
 
-  // the place of the list by the field; a scroll or a resize of the window closes it, as a native select does
-  const measure = () => {
+  // the place of the list by the field; it follows the field on a scroll or a resize of the window
+  const measure = useCallback(() => {
     const r = button.current?.getBoundingClientRect();
     if (!r) return;
     const below = window.innerHeight - r.bottom - 8;
@@ -31,21 +31,20 @@ export function Select<V extends string>({ value, options, onChange, label, smal
     const up = below < 200 && above > below;
     setPlace({ position: "fixed", left: r.left, minWidth: r.width, maxHeight: Math.min(280, Math.max(up ? above : below, 120)),
       ...(up ? { bottom: window.innerHeight - r.top + 4 } : { top: r.bottom + 4 }) });
-  };
+  }, []);
   useEffect(() => {
     if (!open) return;
-    const away = (e: Event) => { if (!list.current?.contains(e.target as Node)) setOpen(false); };
-    const resize = () => setOpen(false);
-    window.addEventListener("scroll", away, true);
-    window.addEventListener("resize", resize);
-    return () => { window.removeEventListener("scroll", away, true); window.removeEventListener("resize", resize); };
-  }, [open]);
+    const follow = (e: Event) => { if (!list.current?.contains(e.target as Node)) measure(); };
+    window.addEventListener("scroll", follow, true);
+    window.addEventListener("resize", measure);
+    return () => { window.removeEventListener("scroll", follow, true); window.removeEventListener("resize", measure); };
+  }, [open, measure]);
 
   const show = () => {
     measure();
     setActive(current);
     setOpen(true);
-    requestAnimationFrame(() => list.current?.focus());
+    requestAnimationFrame(() => list.current?.focus({ preventScroll: true }));
   };
   const pick = (i: number) => {
     setOpen(false);
@@ -54,7 +53,13 @@ export function Select<V extends string>({ value, options, onChange, label, smal
   };
   const move = (i: number) => {
     setActive(i);
-    list.current?.querySelector<HTMLElement>(`#${CSS.escape(`${id}-${i}`)}`)?.scrollIntoView({ block: "nearest" });
+    // the list scrolls itself to the option, the page stays where it is
+    const box = list.current;
+    const opt = box?.querySelector<HTMLElement>(`#${CSS.escape(`${id}-${i}`)}`);
+    if (box && opt) {
+      if (opt.offsetTop < box.scrollTop) box.scrollTop = opt.offsetTop;
+      else if (opt.offsetTop + opt.offsetHeight > box.scrollTop + box.clientHeight) box.scrollTop = opt.offsetTop + opt.offsetHeight - box.clientHeight;
+    }
   };
   const onButtonKey = (e: KeyboardEvent) => {
     if (e.key === "ArrowDown" || e.key === "ArrowUp" || e.key === "Enter" || e.key === " ") {
