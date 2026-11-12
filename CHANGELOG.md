@@ -4,6 +4,19 @@ Versions follow semver. A visible change of the look is at least a minor (FTR.NA
 Since `1.0.0` the contract of the kit — class names, tokens, props, icon names, keys of strings — changes only
 in a major.
 
+## 1.18.0
+
+`Select` — the choice of one value from a list drawn by the kit (FTR.NAB.CMN-0005 tech §3.3). The list of a native
+`select` is drawn by the browser and does not follow the theme; this one does. Opt-in: nothing changes on the screens
+of the products until they use it.
+
+- `Select({ value, options: { value, label }[], onChange, label, small?, className? })`: classes `.select`,
+  `.select-btn`, `.select-list`, `.select-opt`, `.select-val`; the field looks like `.inp`, `small` like `.btn.sm`.
+- The keyboard of a listbox: arrows, Home and End move, Enter and Space choose, Escape and Tab close; a click outside
+  closes; the focus returns to the field.
+- The icon `down` — the chevron of a closed list.
+- `.sel` (the native `select` of Nabu) stays as it is.
+
 ## 1.17.0
 
 Two icons for the cost and the log of a run of an agent (FTR.HMR.DEV-0004 R4, R8). Opt-in: nothing changes on the

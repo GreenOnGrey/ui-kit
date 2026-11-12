@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState, type MouseEvent, type ReactNode } from "react";
 import {
-  Avatar, Button, Empty, GitHubIcon, Icon, IconButton, Loading, Markdown, Menu, Modal, Switch, Tabs, TopBar, useToast,
+  Avatar, Button, Empty, GitHubIcon, Icon, IconButton, Loading, Markdown, Menu, Modal, Select, Switch, Tabs, TopBar, useToast,
   type LinkComponent,
 } from "../src";
 import { ICON_NAMES } from "../src/components/Icon";
@@ -135,6 +135,7 @@ function Sections() {
             <div className="field"><label htmlFor="f4">Note</label><textarea id="f4" className="inp" rows={2} defaultValue="Text" /></div>
           </div>
         </Example>
+        <Example label="Select: a list drawn by the kit, in the theme; the arrows, Enter and Escape"><SelectDemo /></Example>
         <Example label="Switch"><SwitchDemo /></Example>
         <Example label="Search"><form className="search" role="search" style={{ maxWidth: 320 }}><Icon name="search" /><input placeholder="Search" aria-label="Search" /></form></Example>
       </Section>
@@ -393,6 +394,23 @@ const profileSections: ReactNode = (
 );
 const modalBody: ReactNode = <div className="field"><label htmlFor="m1">Topic</label><input id="m1" className="inp" /><div className="hint">A topic has a history of its own.</div></div>;
 const modalFooter = (close: () => void): ReactNode => <><Button variant="ghost" onClick={close}>Cancel</Button><Button variant="primary" onClick={close}>Create</Button></>;
+
+const RUNS = [
+  { value: "r2", label: "Run 2 of 2 · 12 Nov 2026, 22:24 · Done" },
+  { value: "r1", label: "Run 1 of 2 · 11 Nov 2026, 09:38 · Failed" },
+];
+const ZONES = [{ value: "msk", label: "Europe/Moscow" }, { value: "utc", label: "UTC" }, { value: "ber", label: "Europe/Berlin" }];
+
+function SelectDemo() {
+  const [run, setRun] = useState("r2");
+  const [zone, setZone] = useState("msk");
+  return (
+    <div className="select-demo" style={{ display: "flex", gap: 16, flexWrap: "wrap", alignItems: "flex-start", minHeight: 260 }}>
+      <Select label="Time zone" value={zone} options={ZONES} onChange={setZone} />
+      <Select label="Run" small value={run} options={RUNS} onChange={setRun} />
+    </div>
+  );
+}
 
 function MenuDemo() {
   const [open, setOpen] = useState(false);
