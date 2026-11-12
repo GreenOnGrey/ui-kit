@@ -54,6 +54,83 @@
   padding: 9px 12px;
   background: var(--surface);
 }
+/* Select (FTR.NAB.CMN-0005 tech §3.3): the field of .inp, a list drawn by the kit */
+.select {
+  position: relative;
+  display: inline-block;
+  max-width: 100%;
+}
+.select-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-m);
+  padding: 8px 10px 8px 12px;
+  background: var(--surface);
+  text-align: left;
+}
+.select-btn .i {
+  flex: none;
+  color: var(--muted);
+}
+.select-btn[aria-expanded="true"] {
+  border-color: var(--violet);
+}
+.select.sm .select-btn {
+  padding: 5px 8px 5px 10px;
+  font-size: 13px;
+  border-radius: var(--r-s);
+}
+.select-val {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.select-list {
+  position: absolute;
+  z-index: 50;
+  top: calc(100% + 4px);
+  left: 0;
+  min-width: 100%;
+  max-width: min(480px, calc(100vw - 32px));
+  max-height: 280px;
+  overflow: auto;
+  padding: 4px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-m);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+.select-list:focus {
+  outline: none;
+}
+.select-opt {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  border-radius: var(--r-s);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.select.sm .select-opt {
+  padding: 5px 8px;
+  font-size: 13px;
+}
+.select-opt.active {
+  background: var(--surface-2);
+}
+.select-opt[aria-selected="true"] {
+  color: var(--violet);
+  font-weight: 500;
+}
+.select-opt .i {
+  flex: none;
+}
 textarea.inp {
   resize: vertical;
   min-height: 80px;

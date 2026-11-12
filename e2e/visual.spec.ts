@@ -35,6 +35,14 @@ for (const theme of ["light", "dark"] as const) {
     await expect(s.locator(".gwrap")).toHaveScreenshot(`graph-rows-moved-${theme}.png`);
   });
 
+  // FTR.NAB.CMN-0005 qa CMP-13: the list of a select is drawn by the kit and follows the theme
+  test(`open select ${theme}`, async ({ page }) => {
+    const s = await openSection(page, "forms", theme);
+    await s.getByRole("button", { name: "Run" }).click();
+    await expect(s.getByRole("listbox", { name: "Run" })).toBeVisible();
+    await expect(s.locator(".select-demo")).toHaveScreenshot(`select-${theme}.png`);
+  });
+
   test(`open menu ${theme}`, async ({ page }) => {
     const s = await openSection(page, "overlay", theme);
     await s.getByRole("button", { name: "Open the menu" }).click();

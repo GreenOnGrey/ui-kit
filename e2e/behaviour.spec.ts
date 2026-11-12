@@ -54,6 +54,36 @@ test("CMP-05 the menu closes by Escape and by a click outside", async ({ page })
   await expect(page.locator(".menu")).toHaveCount(0);
 });
 
+test("CMP-13 a select opens by the keyboard, the arrows move, Enter chooses, Escape and a click outside close", async ({ page }) => {
+  const s = await openSection(page, "forms");
+  const button = s.getByRole("button", { name: "Run" });
+  await expect(button).toContainText("Run 2 of 2");
+  // the field is read as the label and the chosen value
+  await expect(button).toHaveAccessibleName(/^Run Run 2 of 2/);
+  await button.focus();
+  await page.keyboard.press("ArrowDown");
+  const list = s.getByRole("listbox", { name: "Run" });
+  await expect(list).toBeFocused();
+  await expect(list.getByRole("option", { selected: true })).toContainText("Run 2 of 2");
+  await page.keyboard.press("ArrowDown");
+  await page.keyboard.press("Enter");
+  await expect(list).toHaveCount(0);
+  await expect(button).toContainText("Run 1 of 2");
+  await expect(button).toBeFocused();
+  await expect(button).toHaveAttribute("aria-expanded", "false");
+  await button.click();
+  await page.keyboard.press("Escape");
+  await expect(list).toHaveCount(0);
+  await expect(button).toBeFocused();
+  await expect(button).toContainText("Run 1 of 2");
+  await button.click();
+  await list.getByRole("option", { name: /Run 2 of 2/ }).click();
+  await expect(button).toContainText("Run 2 of 2");
+  await button.click();
+  await s.locator("h2").click();
+  await expect(list).toHaveCount(0);
+});
+
 test("KIT-01 the tokens follow the theme and the choice of the system", async ({ page }) => {
   const token = (name: string) => page.evaluate((n) => getComputedStyle(document.documentElement).getPropertyValue(n).trim(), name);
   await openSection(page, "tokens", "light");
