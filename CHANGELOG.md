@@ -4,6 +4,14 @@ Versions follow semver. A visible change of the look is at least a minor (FTR.NA
 Since `1.0.0` the contract of the kit — class names, tokens, props, icon names, keys of strings — changes only
 in a major.
 
+## 1.17.0
+
+Two icons for the cost and the log of a run of an agent (FTR.HMR.DEV-0004 R4, R8). Opt-in: nothing changes on the
+screens of the products until they use them.
+
+- `coins` — two stacked coins: the cost of a gate, a service or a feature.
+- `terminal` — a window with a prompt: the log of a run.
+
 ## 1.16.0
 
 A draft of the product in the composer of `Chat` (FTR.NAB.CMN-0005 tech §3.4). Opt-in: nothing changes on the screen.
