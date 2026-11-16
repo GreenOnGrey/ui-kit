@@ -4,6 +4,18 @@ Versions follow semver. A visible change of the look is at least a minor (FTR.NA
 Since `1.0.0` the contract of the kit — class names, tokens, props, icon names, keys of strings — changes only
 in a major.
 
+## 1.19.0
+
+`Modal` keeps the focus where the user types (FTR.NAB.CMN-0005 qa CMP-01). The dialog took the first field of the
+form on every render of the component that holds it: a product passes a new `onClose` on each render, the effect
+ran again, and the caret jumped from the field being typed in to the first one — a letter of the description of a
+group landed in its name. The focus is now set once, when the dialog opens, and no render takes it from the field
+the user types in; Escape and the backdrop close with the handler of the latest render.
+
+- The showcase dialog has a form with two fields, and `CMP-01` types into the second one: the focus stays.
+- The dialog of the showcase is taller and stays centred, so every row of the four `modal` snapshots changes: the
+  baselines are made by the `update-snapshots` workflow.
+
 ## 1.18.0
 
 `Select` — the choice of one value from a list drawn by the kit (FTR.NAB.CMN-0005 tech §3.3). The list of a native

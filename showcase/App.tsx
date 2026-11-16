@@ -179,7 +179,7 @@ function Sections() {
         <Example label="Error text under a field"><div className="err-text">Could not save.</div></Example>
       </Section>
 
-      <Section id="overlay" lead="A menu closes on Escape and on a click outside. A modal puts the focus into its first field.">
+      <Section id="overlay" lead="A menu closes on Escape and on a click outside. A modal puts the focus into its first field when it opens and leaves it to the field the user types in.">
         <Example label="Menu" source={<div className="menu" role="dialog" aria-label="Profile">{profileSections}</div>}><MenuDemo /></Example>
         <Example label="Modal: plain and wide" source={<Modal title="New topic" onClose={noop} footer={modalFooter(noop)}>{modalBody}</Modal>}><ModalDemo /></Example>
       </Section>
@@ -392,7 +392,11 @@ const profileSections: ReactNode = (
     <div className="sec"><button className="action"><Icon name="plug" />Connections</button><button className="action danger"><Icon name="out" />Sign out</button></div>
   </>
 );
-const modalBody: ReactNode = <div className="field"><label htmlFor="m1">Topic</label><input id="m1" className="inp" /><div className="hint">A topic has a history of its own.</div></div>;
+// the markup of the dialog for the snippet beside the demo: the fields of the demo keep state, this one does not
+const modalBody: ReactNode = (<>
+  <div className="field"><label htmlFor="m1">Topic</label><input id="m1" className="inp" /><div className="hint">A topic has a history of its own.</div></div>
+  <div className="field"><label htmlFor="m2">Description</label><input id="m2" className="inp" /></div>
+</>);
 const modalFooter = (close: () => void): ReactNode => <><Button variant="ghost" onClick={close}>Cancel</Button><Button variant="primary" onClick={close}>Create</Button></>;
 
 const RUNS = [
@@ -427,15 +431,23 @@ function MenuDemo() {
   );
 }
 
+/** The form lives beside the dialog, as in the products: every letter renders the demo and makes a new `close`,
+ *  and the dialog must neither take the focus from the field being typed in nor forget how to close (CMP-01). */
 function ModalDemo() {
   const [open, setOpen] = useState<"" | "plain" | "wide">("");
-  const close = useCallback(() => setOpen(""), []);
+  const [topic, setTopic] = useState("");
+  const [note, setNote] = useState("");
+  const close = () => { setOpen(""); setTopic(""); setNote(""); };
   return (
     <div className="row">
       <Button onClick={() => setOpen("plain")}>Open a dialog</Button>
       <Button onClick={() => setOpen("wide")}>Open a wide dialog</Button>
       {open && (
-        <Modal title="New topic" wide={open === "wide"} onClose={close} footer={modalFooter(close)}>{modalBody}</Modal>
+        <Modal title="New topic" wide={open === "wide"} onClose={close} footer={modalFooter(close)}>
+          <div className="field"><label htmlFor="m1">Topic</label><input id="m1" className="inp" value={topic} onChange={(e) => setTopic(e.target.value)} />
+            <div className="hint">A topic has a history of its own.</div></div>
+          <div className="field"><label htmlFor="m2">Description</label><input id="m2" className="inp" value={note} onChange={(e) => setNote(e.target.value)} /></div>
+        </Modal>
       )}
     </div>
   );

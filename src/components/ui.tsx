@@ -8,10 +8,16 @@ export function Modal({ title, onClose, children, footer, wide = false }: {
   title: ReactNode; onClose: () => void; children: ReactNode; footer?: ReactNode; wide?: boolean;
 }) {
   const ref = useRef<HTMLDivElement>(null);
+  // The first field takes the focus once, when the dialog opens — not on every render: a product keeps the form
+  // beside its dialog, the form renders again on every letter and makes a new onClose with it, and the caret must
+  // stay in the field being typed in (ui-kit 1.19.0).
+  useEffect(() => {
+    ref.current?.querySelector<HTMLElement>("input, textarea, select, button.primary")?.focus();
+  }, []);
+  // Escape follows the handler of the latest render
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
     document.addEventListener("keydown", onKey);
-    ref.current?.querySelector<HTMLElement>("input, textarea, select, button.primary")?.focus();
     return () => document.removeEventListener("keydown", onKey);
   }, [onClose]);
   return (

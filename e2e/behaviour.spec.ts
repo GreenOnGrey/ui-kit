@@ -3,12 +3,19 @@ import { demo, expect, openSection, send, test } from "./fixtures";
 // The behaviour that needs a real browser: focus, the keyboard, scrolling,
 // the layout by width (FTR.NAB.CMN-0005 qa §3–4).
 
-test("CMP-01 the modal takes the focus and closes by Escape and by the backdrop", async ({ page }) => {
+test("CMP-01 the modal takes the focus, keeps it while the form is typed in, and closes by Escape and by the backdrop", async ({ page }) => {
   const s = await openSection(page, "overlay");
   await s.getByRole("button", { name: "Open a dialog" }).click();
   const dialog = page.getByRole("dialog");
   await expect(dialog).toHaveAttribute("aria-modal", "true");
   await expect(dialog.getByLabel("Topic")).toBeFocused();
+  // the form beside the dialog renders again on every letter, and the handler of the close with it: the focus
+  // must stay in the field being typed in (ui-kit 1.19.0)
+  const note = dialog.getByLabel("Description");
+  await note.focus();
+  await page.keyboard.type("a note of its own");
+  await expect(note).toBeFocused();
+  await expect(note).toHaveValue("a note of its own");
   await page.keyboard.press("Escape");
   await expect(dialog).toHaveCount(0);
   await s.getByRole("button", { name: "Open a dialog" }).click();
