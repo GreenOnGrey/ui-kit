@@ -148,8 +148,10 @@ export interface ChatProps {
   /** FTR.NAB.CHAT-0004 R8: stops the answer being written. «Stop» takes the place of «Send» while the field is empty. */
   onStop?(answerId: string): Promise<void>;
   onConfirm?(id: string, approve: boolean): void;
-  /** `null`: the upload failed and the product has told the user. */
-  onUpload?(file: File): Promise<ChatUpload | null>;
+  /** `onProgress` reports the share of the file already sent, 0..1; without a call the chip of the file shows a
+   * wave until the upload ends (FTR.NAB.CMN-0005 design §6.5). `null`: the upload failed and the product has told
+   * the user. */
+  onUpload?(file: File, onProgress?: (share: number) => void): Promise<ChatUpload | null>;
   /** Loads a file of a message for its preview (R34): images, PDF and Markdown open in the chat. Without it files are links. */
   loadAttachment?(attachment: ChatAttachment): Promise<Blob>;
   /** FTR.NAB.CHAT-0003 R13–R16: the preview of a document (PDF of its first pages) or of a spreadsheet (sheets).

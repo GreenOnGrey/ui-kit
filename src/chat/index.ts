@@ -1,4 +1,4 @@
-export { Chat, VoiceButton } from "./Chat";
+export { Chat, UploadChip, VoiceButton } from "./Chat";
 export { ChatLayout, ConversationList, NewTopicModal } from "./ConversationList";
 export { AttachmentList, AttachmentPreview, columnName, fileSize, parseTable, previewIcon, previewKind, type LoadAttachment, type LoadOfficePreview,
   type PreviewKind } from "./Attachments";

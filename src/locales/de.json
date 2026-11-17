@@ -30,6 +30,8 @@
     "hideSteps": "Schritte ausblenden",
     "unread": "{count, plural, one {# ungelesene Antwort} other {# ungelesene Antworten}}",
     "retry": "Wiederholen",
+    "dropFiles": "Dateien zum Anhängen hier ablegen",
+    "uploading": "Wird hochgeladen: {name}",
     "tooLarge": "Die Datei ist zu groß.",
     "stop": "Stoppen",
     "voice": {

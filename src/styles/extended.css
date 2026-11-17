@@ -134,8 +134,15 @@
    the dividers of events, the bar of a recording, the models of the agent. */
 .composer-wrap{position:relative;border-top:1px solid var(--border)}
 .composer-wrap .composer{border-top:0}
+/* FTR.NAB.CMN-0005 design §6.5: the hint of files dragged over the chat; it takes no pointer events, so the drop
+   lands on the chat itself (ui-kit 1.20.0) */
+.dropzone{position:absolute;inset:4px;z-index:20;display:grid;place-items:center;border:2px dashed var(--violet);border-radius:var(--r-m);background:var(--violet-soft);pointer-events:none}
+.dropzone>div{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:500;color:var(--violet-text)}
 /* .field of the forms has a margin under it: in the composer the field stands on the line of the buttons */
 .composer .field{flex:1;display:flex;align-items:flex-end;gap:6px;min-width:0;margin-bottom:0}
+/* FTR.NAB.CMN-0005 design §6.5: the icons of the composer stand on the middle line, as the ring of the context does,
+   whether the field is one line or three (ui-kit 1.20.0) */
+.composer > .iconbtn,.composer > .voicewait{align-self:center}
 .composer .field textarea{min-width:0}
 .composer .field.recognizing textarea{opacity:.55;cursor:progress;background:var(--surface-2)}
 .composer .field.with-skill{flex-wrap:wrap}

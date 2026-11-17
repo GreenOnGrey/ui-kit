@@ -30,6 +30,8 @@
     "hideSteps": "Ocultar pasos",
     "unread": "{count, plural, one {# respuesta sin leer} other {# respuestas sin leer}}",
     "retry": "Reintentar",
+    "dropFiles": "Suelte los archivos para adjuntarlos",
+    "uploading": "Subiendo {name}",
     "tooLarge": "El archivo es demasiado grande.",
     "stop": "Detener",
     "voice": {

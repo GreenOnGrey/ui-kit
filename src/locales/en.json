@@ -30,6 +30,8 @@
     "hideSteps": "Hide steps",
     "unread": "{count, plural, one {# unread answer} other {# unread answers}}",
     "retry": "Retry",
+    "dropFiles": "Drop files to attach them",
+    "uploading": "Uploading {name}",
     "tooLarge": "The file is too large.",
     "stop": "Stop",
     "voice": {

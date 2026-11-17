@@ -5,7 +5,7 @@ import {
 } from "../src";
 import { ICON_NAMES } from "../src/components/Icon";
 import tokensCss from "../src/styles/tokens.css?raw";
-import { AgentButton, AgentSettingsMenu, CommandPalette, ContextMeter, MessageView, VoiceButton, type AgentModel, type AgentModelChoice, type ChatCommand } from "../src/chat";
+import { AgentButton, AgentSettingsMenu, CommandPalette, ContextMeter, MessageView, UploadChip, VoiceButton, type AgentModel, type AgentModelChoice, type ChatCommand } from "../src/chat";
 import { LoginScreen } from "../src/login";
 import pkg from "../package.json";
 import { ChatDemo } from "./ChatDemo";
@@ -284,9 +284,17 @@ function Sections() {
             <MessageView busy={false} m={{ id: "e3", role: "event", text: "", createdAt: "2026-10-11T14:07:00", status: "done", event: { icon: "cpu", text: "Model: GigaChat 2 Max" } }} />
           </div>
         </Example>
-        <Example label="Chosen files above the input" box>
+        <Example label="Files above the input: two on their way — with the share the product has reported and before its first report, a wave — and one chosen" box>
           <div className="pending-files">
+            <UploadChip fileName="contract.docx" progress={0.42} />
+            <UploadChip fileName="budget.xlsx" progress={null} />
             <span className="chip"><Icon name="clip" size={12} />plan.pdf<IconButton label="Remove" style={{ width: 18, height: 18 }}><Icon name="x" size={12} /></IconButton></span>
+          </div>
+        </Example>
+        <Example label="A file while it goes: the chip stands at once, «Send» waits for its end; the share the product reports, or a wave before the first one — drag a file onto the chat, or pick one" box>
+          <div className="row" style={{ alignItems: "flex-start", gap: 16 }}>
+            <div className="sc-stage sc-box"><ChatDemo demo="upload" upload="share" /></div>
+            <div className="sc-stage sc-box"><ChatDemo demo="upload-wave" upload="wave" /></div>
           </div>
         </Example>
         <Example label="A narrow place, such as a side panel: modes above the input, the list of conversations over the feed">

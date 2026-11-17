@@ -1,4 +1,4 @@
-import { demo, expect, openSection, send, test } from "./fixtures";
+import { demo, dragFiles, expect, openSection, send, test } from "./fixtures";
 
 // The behaviour that needs a real browser: focus, the keyboard, scrolling,
 // the layout by width (FTR.NAB.CMN-0005 qa §3–4).
@@ -415,6 +415,39 @@ test.describe("chat", () => {
     await expect(chat.locator(".pending-files .chip")).toHaveCount(1);
     await chat.getByRole("button", { name: "Remove" }).click();
     await expect(chat.locator(".pending-files")).toHaveCount(0);
+  });
+
+  test("CHAT-24 a file dropped on the chat is attached at once, with the share of its upload", async ({ page }) => {
+    const s = await openSection(page, "chat");
+    const chat = demo(s, "upload");
+    const dataTransfer = await dragFiles(page, [{ name: "plan.pdf" }, { name: "notes.md" }]);
+    // the hint appears over the chat, and only where the chat takes files at all
+    await demo(s, "readonly").locator(".nb-chat").dispatchEvent("dragenter", { dataTransfer, bubbles: true, cancelable: true });
+    await expect(demo(s, "readonly").locator(".dropzone")).toHaveCount(0);
+    await chat.locator(".nb-chat").dispatchEvent("dragenter", { dataTransfer, bubbles: true, cancelable: true });
+    await expect(chat.locator(".dropzone")).toBeVisible();
+    await chat.locator(".nb-chat").dispatchEvent("drop", { dataTransfer, bubbles: true, cancelable: true });
+    await expect(chat.locator(".dropzone")).toHaveCount(0);
+    // every file of the drop stands before its upload ends, with the share; nothing can be sent with them half-way
+    const chips = chat.locator(".pending-files .chip");
+    await expect(chips).toHaveCount(2);
+    await expect(chips.nth(0)).toContainText("plan.pdf");
+    await expect(chips.nth(1)).toContainText("notes.md");
+    await expect(chips.nth(0).locator(".uppc")).toHaveText("42%");
+    await expect(chips.nth(0).locator(".upbar")).toHaveAttribute("aria-valuenow", "42");
+    await expect(chips.nth(0).getByRole("button")).toHaveCount(0);
+    await expect(chat.getByRole("button", { name: "Send" })).toBeDisabled();
+    // a product that reports no share: the bar waits for the first one, and there is no number
+    const wave = demo(s, "upload-wave");
+    await wave.locator(".nb-chat").dispatchEvent("drop", { dataTransfer, bubbles: true, cancelable: true });
+    const bar = wave.locator(".pending-files .chip .upbar").first();
+    await expect(bar).not.toHaveAttribute("aria-valuenow");
+    await expect(wave.locator(".pending-files .uppc")).toHaveCount(0);
+    // a file over the limit is refused by the same path as one picked in the dialog
+    const big = await dragFiles(page, [{ name: "big.bin", bytes: 5_000_001 }]);
+    await chat.locator(".nb-chat").dispatchEvent("drop", { dataTransfer: big, bubbles: true, cancelable: true });
+    await expect(page.getByRole("alert").filter({ hasText: "big.bin" })).toBeVisible();
+    await expect(chips).toHaveCount(2); // big.bin never started
   });
 
   test("CHAT-13, CHAT-14 cancelling and confirming exist only where the product handles them", async ({ page }) => {

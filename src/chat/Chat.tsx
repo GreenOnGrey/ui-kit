@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type DragEvent, type KeyboardEvent } from "react";
 import { Icon } from "../components/Icon";
 import { useToast } from "../components/ui";
 import { useKitT } from "../i18n";
@@ -20,7 +20,10 @@ export function Chat(props: ChatProps) {
   // FTR.NAB.CMN-0005 tech §3.4: a draft of the product is in the field from the mount
   const [text, setText] = useState(() => props.draft?.text ?? "");
   const [pending, setPending] = useState<ChatUpload[]>([]);
-  const [uploading, setUploading] = useState(false);
+  // FTR.NAB.CMN-0005 design §6.5: a chosen file stands in the composer at once, before the product has its id
+  const [uploads, setUploads] = useState<Uploading[]>([]);
+  const uploadSeq = useRef(0);
+  const [over, setOver] = useState(false);
   const [skill, setSkill] = useState<string | null>(null);
   const [active, setActive] = useState(0);
   const [paletteClosed, setPaletteClosed] = useState(false);
@@ -97,8 +100,10 @@ export function Chat(props: ChatProps) {
 
   const send = async (body: string, asText = false) => {
     const msg = body.trim();
-    // FTR.NAB.CHAT-0004 R1: without allowQueue a message waits for the answer, as before
-    if ((!msg && pending.length === 0 && !skill) || busy || (answer && !props.allowQueue) || props.readOnly) return;
+    if (!msg && pending.length === 0 && !skill) return;
+    // FTR.NAB.CHAT-0004 R1: without allowQueue a message waits for the answer, as before. A file still on its way
+    // holds the message back: it would go without the attachment (design §6.5)
+    if (cannotSend || props.readOnly) return;
     // R4: a command typed in full runs; an unknown one waits for «Send as text»
     if (!asText && !skill && props.commands && msg.startsWith("/")) {
       const [word, ...rest] = msg.slice(1).split(/\s+/);
@@ -202,19 +207,54 @@ export function Chat(props: ChatProps) {
     return () => ro.disconnect();
   }, [recorder.recording]);
 
-  const attach = async (files: FileList | null) => {
-    if (!files?.length || !props.onUpload) return;
-    setUploading(true);
-    for (const f of Array.from(files)) {
-      if (props.upload && f.size > props.upload.maxBytes) {
-        toast({ kind: "error", title: t("chat.tooLarge"), text: f.name });
-        continue;
-      }
-      const a = await props.onUpload(f).catch(() => null);
+  const attach = async (files: FileList | File[] | null) => {
+    const onUpload = props.onUpload;
+    if (!files?.length || !onUpload) return;
+    const chosen = Array.from(files).filter((f) => {
+      if (!props.upload || f.size <= props.upload.maxBytes) return true;
+      toast({ kind: "error", title: t("chat.tooLarge"), text: f.name });
+      return false;
+    });
+    // design §6.5: every chosen file stands at once, with the share of its own upload; the end of an upload puts the
+    // id of the file in its place. The files of one choice go side by side, so the chips of the second do not wait
+    await Promise.all(chosen.map(async (f) => {
+      const key = ++uploadSeq.current;
+      setUploads((x) => [...x, { key, fileName: f.name, progress: null }]);
+      const report = (share: number) => setUploads((x) => x.map((u) => (u.key === key ? { ...u, progress: Math.min(1, Math.max(0, share)) } : u)));
+      const a = await onUpload(f, report).catch(() => null);
+      setUploads((x) => x.filter((u) => u.key !== key));
       if (a) setPending((x) => [...x, a]);
-    }
-    setUploading(false);
+    }));
     if (fileRef.current) fileRef.current.value = "";
+  };
+
+  // design §6.5: files dropped on the chat are attached as the picker attaches them. The counter of dragenter and
+  // dragleave keeps the hint from blinking as the pointer crosses the children of the chat.
+  const canDrop = !!props.onUpload && !props.readOnly;
+  const drags = useRef(0);
+  const dragEnter = (e: DragEvent<HTMLElement>) => {
+    if (!canDrop || !filesDragged(e)) return;
+    e.preventDefault();
+    drags.current += 1;
+    setOver(true);
+  };
+  const dragOver = (e: DragEvent<HTMLElement>) => {
+    if (!filesDragged(e)) return;
+    e.preventDefault();
+    e.dataTransfer.dropEffect = canDrop ? "copy" : "none";
+  };
+  const dragLeave = () => {
+    if (!canDrop) return;
+    drags.current = Math.max(0, drags.current - 1);
+    if (drags.current === 0) setOver(false);
+  };
+  const drop = (e: DragEvent<HTMLElement>) => {
+    if (!filesDragged(e)) return;
+    // a file dropped on the chat never opens in the browser, even where the chat takes none
+    e.preventDefault();
+    drags.current = 0;
+    setOver(false);
+    if (canDrop) void attach(droppedFiles(e.dataTransfer));
   };
 
   // R20: the recognized text goes into the field; the user checks and sends it
@@ -252,8 +292,11 @@ export function Chat(props: ChatProps) {
     props.onStop?.(id).catch(() => setStopping(null));
   };
   const left = maxSeconds - recorder.seconds;
+  // design §6.5: the field with nothing to send, a turn or a recording in the way, or a file still on its way
+  const cannotSend = (!text.trim() && pending.length === 0 && !skill) || busy || (!!answer && !props.allowQueue) || recognizing || uploads.length > 0;
   return (
-    <section className="nb-chat" aria-label={t("chat.title")}>
+    <section className="nb-chat" aria-label={t("chat.title")}
+      onDragEnter={dragEnter} onDragOver={dragOver} onDragLeave={dragLeave} onDrop={drop}>
       {props.header}
       <div className="msgs" ref={listRef} aria-live="polite">
         {props.hasOlder && props.onLoadOlder && (
@@ -290,7 +333,7 @@ export function Chat(props: ChatProps) {
         <div className="composer-wrap">
           {paletteOpen && <CommandPalette items={items} active={Math.min(active, Math.max(items.length - 1, 0))} onPick={pick} onHover={setActive} />}
           {props.aboveComposer}
-          {pending.length > 0 && (
+          {pending.length + uploads.length > 0 && (
             <div className="pending-files">
               {pending.map((f) => (
                 <span key={f.id} className="chip">
@@ -299,6 +342,7 @@ export function Chat(props: ChatProps) {
                     onClick={() => setPending((x) => x.filter((y) => y.id !== f.id))}><Icon name="x" size={12} /></button>
                 </span>
               ))}
+              {uploads.map((u) => <UploadChip key={u.key} fileName={u.fileName} progress={u.progress} />)}
             </div>
           )}
           {unknown && (
@@ -310,7 +354,7 @@ export function Chat(props: ChatProps) {
           <div className="composer">
             {props.onUpload && !recorder.recording && (
               <>
-                <button className="iconbtn" aria-label={t("chat.attach")} disabled={uploading} onClick={() => fileRef.current?.click()}><Icon name="clip" /></button>
+                <button className="iconbtn" aria-label={t("chat.attach")} disabled={uploads.length > 0} onClick={() => fileRef.current?.click()}><Icon name="clip" /></button>
                 <input ref={fileRef} type="file" multiple hidden accept={props.upload?.accept} onChange={(e) => attach(e.target.files)} />
               </>
             )}
@@ -346,7 +390,7 @@ export function Chat(props: ChatProps) {
             ) : props.onCancel && busy ? (
               <button className="iconbtn fill" aria-label={t("chat.stop")} onClick={props.onCancel}><Icon name="stop" /></button>
             ) : (
-              <button className="iconbtn fill" aria-label={t("chat.send")} disabled={(!text.trim() && pending.length === 0 && !skill) || busy || (!!answer && !props.allowQueue) || recognizing} onClick={() => send(text)}>
+              <button className="iconbtn fill" aria-label={t("chat.send")} disabled={cannotSend} onClick={() => send(text)}>
                 <Icon name="send" />
               </button>
             ))}
@@ -354,8 +398,35 @@ export function Chat(props: ChatProps) {
           {recorder.error && <div className="err-text" style={{ padding: "0 12px 8px" }}>{t("chat.voice.micDenied")}</div>}
         </div>
       )}
+      {/* design §6.5: the same action without the picker; a pointer-only hint — the attach button is its accessible path */}
+      {over && (
+        <div className="dropzone" aria-hidden="true">
+          <div><Icon name="clip" size={22} /><span>{t("chat.dropFiles")}</span></div>
+        </div>
+      )}
       {viewing && loadFile && <AttachmentPreview a={viewing} load={loadFile} loadPreview={loadPreview} onClose={() => setViewing(null)} />}
     </section>
+  );
+}
+
+/** A file in flight: the chip of the composer before the product has an id for the file
+ *  (FTR.NAB.CMN-0005 design §6.5). `progress` is the share the product has reported, or null before the first. */
+interface Uploading { key: number; fileName: string; progress: number | null }
+
+/** The chip of a file that is still on its way: the name at once, the share the product has reported, or a wave
+ *  until it reports the first one. */
+export function UploadChip({ fileName, progress }: { fileName: string; progress: number | null }) {
+  const t = useKitT();
+  const pct = progress === null ? null : Math.min(100, Math.max(0, Math.round(progress * 100)));
+  return (
+    <span className={`chip uploading${pct === null ? " waiting" : ""}`}>
+      <Icon name="clip" size={12} />{fileName}
+      <span className="upbar" role="progressbar" aria-label={t("chat.uploading", { name: fileName })}
+        aria-valuemin={0} aria-valuemax={100} aria-valuenow={pct ?? undefined}>
+        <i style={pct === null ? undefined : { width: `${pct}%` }} />
+      </span>
+      {pct !== null && <span className="uppc">{pct}%</span>}
+    </span>
   );
 }
 
@@ -377,6 +448,17 @@ export function VoiceButton({ supported, recognizing, onStart }: { supported: bo
       <Icon name="mic" />
     </button>
   );
+}
+
+/** The files of a drop without the folders: a browser hands a dropped folder as a file named after it (design §6.5). */
+function droppedFiles(dt: DataTransfer): File[] {
+  const entries = Array.from(dt.items ?? [], (i) => i.webkitGetAsEntry?.() ?? null);
+  return Array.from(dt.files).filter((_, i) => !entries[i]?.isDirectory);
+}
+
+/** The drag carries files (not a text, not a link of the page): only such a drag is a drop of attachments. */
+function filesDragged(e: DragEvent<HTMLElement>) {
+  return Array.from(e.dataTransfer?.types ?? []).includes("Files");
 }
 
 /** A touch screen without a mouse: its on-screen keyboard has no Shift+Enter, so Enter breaks the line. */

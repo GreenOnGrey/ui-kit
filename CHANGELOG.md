@@ -4,6 +4,24 @@ Versions follow semver. A visible change of the look is at least a minor (FTR.NA
 Since `1.0.0` the contract of the kit — class names, tokens, props, icon names, keys of strings — changes only
 in a major.
 
+## 1.20.0
+
+The field of the chat: the icons on the middle line, the files dragged onto the chat, a file in the composer from the
+choice (FTR.NAB.CMN-0005 design §6.5).
+
+- The attach, microphone and send buttons are centred vertically, as the ring of the context already was — with a
+  field of one line and of three.
+- Files dropped on the chat are attached as the picker attaches them: a dashed hint over the chat while the pointer
+  carries files, the same `onUpload` and the same `upload.maxBytes`. A chat without `onUpload` and a read-only one
+  take no drops. New key: `chat.dropFiles`.
+- A chosen file stands in the composer at once with the share of its upload: `onUpload(file, onProgress)`. The bar
+  shows the percentage when the product reports it and a wave before the first report. «Send» waits for every file to
+  arrive. A file on its way has no cross: the product has no id to cancel yet. The chip is the new `UploadChip`,
+  exported for the showcase as `VoiceButton` is.
+- The showcase: the chips of two files on their way, a demo of an upload that never ends, and a snapshot of the drop
+  (`chat drop`). Every composer changes, and the baselines of the `chat` section are made by the `update-snapshots`
+  workflow.
+
 ## 1.19.0
 
 `Modal` keeps the focus where the user types (FTR.NAB.CMN-0005 qa CMP-01). The dialog took the first field of the
