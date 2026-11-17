@@ -1,4 +1,4 @@
-import { test as base, expect, type Locator, type Page } from "@playwright/test";
+import { test as base, expect, type JSHandle, type Locator, type Page } from "@playwright/test";
 
 // The pages of the showcase for tests: web fonts are not loaded, so a snapshot
 // does not depend on a font server.
@@ -19,6 +19,15 @@ export async function openSection(page: Page, id: string, theme: "light" | "dark
   const section = page.locator(`#${id}`);
   await expect(section).toBeVisible();
   return section;
+}
+
+/** A drag of files from the desktop: the `DataTransfer` a browser builds of them (FTR.NAB.CMN-0005 design §6.5). */
+export async function dragFiles(page: Page, files: { name: string; bytes?: number }[]): Promise<JSHandle<DataTransfer>> {
+  return page.evaluateHandle((list) => {
+    const dt = new DataTransfer();
+    for (const f of list) dt.items.add(new File([new Uint8Array(f.bytes ?? 1)], f.name));
+    return dt;
+  }, files);
 }
 
 /** Sends what the composer holds as its user does: Enter on a computer; its button on a touch screen, where Enter

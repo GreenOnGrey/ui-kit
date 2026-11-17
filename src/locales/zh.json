@@ -30,6 +30,8 @@
     "hideSteps": "隐藏步骤",
     "unread": "{count} 条未读回复",
     "retry": "重试",
+    "dropFiles": "松开即可附加文件",
+    "uploading": "正在上传 {name}",
     "tooLarge": "文件太大。",
     "stop": "停止",
     "voice": {

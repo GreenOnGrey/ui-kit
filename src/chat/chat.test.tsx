@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { html } from "../testing";
 import { AgentButton, AgentMenu } from "./AgentMenu";
-import { Chat, VoiceButton } from "./Chat";
+import { Chat, UploadChip, VoiceButton } from "./Chat";
 import { ConversationList } from "./ConversationList";
 import { MessageView, markTime, visibleSteps } from "./MessageView";
 import type { ChatMessage, ChatStep } from "./types";
@@ -63,6 +63,25 @@ describe("message", () => {
 });
 
 describe("chat", () => {
+  it("CHAT-24 draws a file that is still on its way: the name at once, the share the product has reported", () => {
+    const out = html(<UploadChip fileName="plan.pdf" progress={0.42} />);
+    expect(out).toContain("plan.pdf");
+    expect(out).toContain(">42%<");
+    expect(out).toContain('role="progressbar" aria-label="Uploading plan.pdf" aria-valuemin="0" aria-valuemax="100" aria-valuenow="42"');
+    expect(out).toContain('<i style="width:42%">');
+    expect(out).not.toContain("waiting");
+    expect(out).not.toContain('aria-label="Remove"');
+  });
+
+  it("CHAT-24 shows a wave, not a share, until the product reports the first one", () => {
+    const out = html(<UploadChip fileName="plan.pdf" progress={null} />);
+    expect(out).toContain('class="chip uploading waiting"');
+    expect(out).not.toContain("aria-valuenow");
+    expect(out).not.toContain("%");
+    const ru = html(<UploadChip fileName="план.pdf" progress={0.5} />, "ru");
+    expect(ru).toContain('aria-label="Загрузка план.pdf"');
+  });
+
   it("CHAT-13 has no control without its handler", () => {
     const out = html(<Chat agentName="Ada" messages={[msg({})]} onSend={send} busy />);
     for (const label of ["Attach files", "Hold to record", "Stop", "Earlier messages", "Confirm the action"]) expect(out, label).not.toContain(label);

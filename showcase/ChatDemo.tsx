@@ -1,12 +1,12 @@
 import { useRef, useState, type ReactNode } from "react";
 import { Avatar, Icon } from "../src";
-import { Chat, ChatLayout, ConversationList, type ChatMessage, type OfficePreview, type Sheet } from "../src/chat";
+import { Chat, ChatLayout, ConversationList, type ChatMessage, type ChatUpload, type OfficePreview, type Sheet } from "../src/chat";
 import { confirmations as fixtureConfirmations, conversations, history } from "./fixtures";
 
 /** The chat of the showcase on invented data: the buttons work without a server
  * (design §3). `full` turns on what not every chat has — cancelling a turn and
  * confirming an action; `narrow` is the side panel of Hammurapi. */
-export function ChatDemo({ demo, narrow, full, empty, readOnly, wait, typing, historyError, listOpen = false, modes, files, notices, draft, queue, subagents }: {
+export function ChatDemo({ demo, narrow, full, empty, readOnly, wait, typing, historyError, listOpen = false, modes, files, notices, draft, queue, subagents, upload }: {
   /** The name of the example: tests find the demo by it, not by its place on the page. */
   demo: string;
   narrow?: boolean; full?: boolean; empty?: boolean; readOnly?: boolean; wait?: "starting" | "queued"; typing?: boolean; historyError?: boolean;
@@ -21,6 +21,9 @@ export function ChatDemo({ demo, narrow, full, empty, readOnly, wait, typing, hi
   queue?: boolean;
   /** The steps of subagents: one running, one done with a failed task (FTR.NAB.CMN-0009). */
   subagents?: boolean;
+  /** FTR.NAB.CMN-0005 design §6.5: an upload that takes its time — the chip of the file stands in the composer,
+   *  «Send» waits for it; `wave` is the product that reports no share at all. */
+  upload?: "share" | "wave";
 }) {
   const initial: ChatMessage[] = empty || draft ? [] : notices ? noticeHistory : queue ? queueHistory : subagents ? subagentHistory : typing
     ? [...history.slice(0, 1), { id: "t", role: "assistant", text: "", createdAt: "2026-10-11T14:02:00", status: "streaming",
@@ -117,7 +120,10 @@ export function ChatDemo({ demo, narrow, full, empty, readOnly, wait, typing, hi
           upload={{ maxBytes: 5_000_000 }} onSend={queue ? onSendQueued : onSend} onRetry={onRetry}
           allowQueue={queue} onStop={queue ? onStop : undefined}
           onCancelQueued={queue ? async (id) => setMessages((ms) => ms.filter((m) => m.id !== id)) : undefined}
-          onUpload={async (f) => ({ id: f.name, fileName: f.name })}
+          // design §6.5: the demo of an upload in flight — the share of the file is reported, the answer never comes
+          onUpload={upload
+            ? (_f, onProgress) => { if (upload === "share") onProgress?.(0.42); return new Promise<ChatUpload | null>(() => {}); }
+            : async (f) => ({ id: f.name, fileName: f.name })}
           onTranscribe={async () => {
             // the server takes a moment: the wave of FTR.NAB.CHAT-0001 design §3.1 is seen
             await new Promise((ok) => window.setTimeout(ok, 1200));

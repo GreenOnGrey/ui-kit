@@ -1,5 +1,5 @@
 import { SECTIONS } from "../showcase/sections";
-import { expect, openSection, test } from "./fixtures";
+import { demo, dragFiles, expect, openSection, test } from "./fixtures";
 
 // KIT-02, CMP-10: every section of the showcase in both themes, at the width of
 // a desktop and of a phone (the projects). A changed snapshot is a visible
@@ -43,6 +43,16 @@ for (const theme of ["light", "dark"] as const) {
     await expect(s.locator(".select-demo")).toHaveScreenshot(`select-${theme}.png`);
   });
 
+  // FTR.NAB.CMN-0005 design §6.5: the files dragged over the chat
+  test(`chat drop ${theme}`, async ({ page }) => {
+    const s = await openSection(page, "chat", theme);
+    const chat = demo(s, "history");
+    const dataTransfer = await dragFiles(page, [{ name: "plan.pdf" }]);
+    await chat.locator(".nb-chat").dispatchEvent("dragenter", { dataTransfer, bubbles: true, cancelable: true });
+    await expect(chat.locator(".dropzone")).toBeVisible();
+    await expect(chat).toHaveScreenshot(`chat-drop-${theme}.png`);
+  });
+
   test(`open menu ${theme}`, async ({ page }) => {
     const s = await openSection(page, "overlay", theme);
     await s.getByRole("button", { name: "Open the menu" }).click();
@@ -84,9 +94,9 @@ for (const theme of ["light", "dark"] as const) {
   // FTR.NAB.CHAT-0004 design §3 p. 7: «Stopping…» after a click on «Stop»
   test(`stopping ${theme}`, async ({ page }) => {
     const s = await openSection(page, "chat", theme);
-    const demo = s.locator('[data-demo="message-queue"]');
-    await demo.getByRole("button", { name: "Stop the answer" }).click();
-    await expect(demo.locator(".stopmark").last()).toHaveScreenshot(`stopping-${theme}.png`);
+    const queue = s.locator('[data-demo="message-queue"]');
+    await queue.getByRole("button", { name: "Stop the answer" }).click();
+    await expect(queue.locator(".stopmark").last()).toHaveScreenshot(`stopping-${theme}.png`);
   });
 
   // FTR.NAB.CMN-0009 design §3 p. 2: a finished step of subagents opened, with the result of a task
