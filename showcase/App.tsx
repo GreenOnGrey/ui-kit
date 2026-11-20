@@ -10,7 +10,8 @@ import { LoginScreen } from "../src/login";
 import pkg from "../package.json";
 import { ChatDemo } from "./ChatDemo";
 import { Example, Section } from "./Example";
-import { FeatureGraph, PeopleGraph, RowGraph } from "./GraphDemo";
+import { FeatureGraph, LargeGraph, PeopleGraph, RowGraph } from "./GraphDemo";
+import { Charts, ComboDemo, EmptyChart, FailingCombo } from "./DataDemo";
 import { LNG } from "./i18n";
 import { SECTIONS } from "./sections";
 
@@ -325,6 +326,20 @@ function Sections() {
 
       <Section id="graph-rows" lead="The row layout: a row per domain and system, in a row the nodes ascend left to right; a link inside a row is an arc. With draggable a node can be moved, and a button puts the moved nodes back.">
         <Example label="Features in rows, nodes can be dragged" source={<RowGraph />}><RowGraph /></Example>
+      </Section>
+
+      <Section id="graph-large" lead="150 nodes and 600 links, the limit of the memory of Nabu. A graph of more than 60 nodes is laid out in a Web Worker: the page keeps working, an indicator shows until the picture is there. New data starts from the places the nodes had; a dragged node stays where it was put; center brings a node to the middle.">
+        <Example label="A large set; find a node to centre it" source={<LargeGraph />}><LargeGraph /></Example>
+      </Section>
+
+      <Section id="chart" lead="Bars, stacked bars and lines over the days of a month, in SVG. A hover or the arrow keys show the values of a day; the legend hides a series; a line can take the right axis. The same numbers as a table, for a screen reader.">
+        <Example label="Cost; messages and records" source={<Charts />}><Charts /></Example>
+        <Example label="No data" source={<EmptyChart />}><EmptyChart /></Example>
+      </Section>
+
+      <Section id="combobox" lead="A field with suggestions from the product: they come after a pause in typing, grouped, with the match in bold. The arrows, Enter and Escape; a second Escape clears the field. Case and «ё» do not matter.">
+        <Example label="People and topics" source={<ComboDemo />}><ComboDemo /></Example>
+        <Example label="A source that fails" source={<FailingCombo />}><FailingCombo /></Example>
       </Section>
     </>
   );

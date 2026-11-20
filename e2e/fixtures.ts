@@ -18,6 +18,8 @@ export async function openSection(page: Page, id: string, theme: "light" | "dark
   await page.goto(`/?embed=1&theme=${theme}&lng=${lng}#${id}`);
   const section = page.locator(`#${id}`);
   await expect(section).toBeVisible();
+  // a large graph is laid out in a worker: the section is ready when nothing in it is busy (FTR.NAB.MEM-0001 R24)
+  await expect(section.locator('[aria-busy="true"]')).toHaveCount(0, { timeout: 15_000 });
   return section;
 }
 

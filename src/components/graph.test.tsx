@@ -41,6 +41,45 @@ describe("Graph (FTR.HMR.DEV-0002 KIT-04)", () => {
   });
 });
 
+describe("Graph (FTR.NAB.MEM-0001 MEM-UK-04)", () => {
+  const people: GraphNode[] = Array.from({ length: 8 }, (_, i) => ({ id: `n${i}`, label: `N${i}` }));
+  const links: GraphEdge[] = people.slice(1).map((n, i) => ({ source: people[i].id, target: n.id }));
+
+  it("a pinned node stays where it was dragged", () => {
+    const again = layout(people, links, { pinned: { n0: { x: 100, y: 120 } } });
+    expect(again.find((n) => n.id === "n0")).toMatchObject({ x: 100, y: 120 });
+  });
+
+  it("the same data laid out from its last places hardly moves: the picture does not jump", () => {
+    const star: GraphEdge[] = people.slice(1).map((n) => ({ source: "n0", target: n.id }));
+    const first = layout(people, star);
+    const start = Object.fromEntries(first.map((n) => [n.id, { x: n.x!, y: n.y! }]));
+    for (const n of layout(people, star, { start })) {
+      expect(Math.hypot(n.x! - start[n.id].x, n.y! - start[n.id].y)).toBeLessThan(30);
+    }
+  });
+
+  it("a new node starts next to its placed neighbours", () => {
+    const first = layout(people.slice(0, 4), links.slice(0, 3));
+    const start = Object.fromEntries(first.map((n) => [n.id, { x: n.x!, y: n.y! }]));
+    const grown = layout(people.slice(0, 5), links.slice(0, 4), { start });
+    const n4 = grown.find((n) => n.id === "n4")!, n3 = grown.find((n) => n.id === "n3")!;
+    expect(Math.hypot(n4.x! - n3.x!, n4.y! - n3.y!)).toBeLessThan(200);
+  });
+
+  it("a large graph is not laid out during render: the indicator is drawn instead", () => {
+    const many: GraphNode[] = Array.from({ length: 80 }, (_, i) => ({ id: `m${i}`, label: `M${i}` }));
+    const out = html(<Graph nodes={many} edges={[]} ariaLabel="Many" selected={null} onSelect={() => {}} />);
+    expect(out).toContain('aria-busy="true"');
+    expect(out).toContain("Laying out the graph");
+  });
+
+  it("a draggable graph marks its field so the nodes show a hand", () => {
+    expect(draw({ draggable: true })).toContain('class="gwrap drag"');
+    expect(draw()).toContain('class="gwrap"');
+  });
+});
+
 describe("Graph (FTR.HMR.DEV-0002 KIT-02)", () => {
   it("directed edges get the arrow, dashed ones their class, titles a tooltip", () => {
     const out = draw();

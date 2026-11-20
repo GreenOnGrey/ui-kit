@@ -612,3 +612,118 @@ test("KIT-08 Graph: a dragged node moves without pinning, and the button puts it
   await node.click();
   await expect(node).toHaveAttribute("aria-pressed", "true");
 });
+
+// FTR.NAB.MEM-0001 qa MEM-UK-02: the values of a day by the keyboard, the same numbers as a table
+test("MEM-UK-02 Chart: the arrows show the values of a day; the table has every day", async ({ page }) => {
+  const s = await openSection(page, "chart");
+  const chart = s.getByRole("img", { name: "Cost, $" });
+  await chart.focus();
+  await page.keyboard.press("ArrowRight");
+  const tip = s.locator(".chart-tip");
+  await expect(tip).toContainText("1");
+  await expect(tip).toContainText("Collection");
+  await page.keyboard.press("ArrowRight");
+  await expect(tip.locator("b")).toHaveText("2");
+  await s.getByRole("button", { name: "Show as a table" }).first().click();
+  await expect(s.locator(".chart-table tbody tr")).toHaveCount(30);
+  // the legend hides a series
+  const key = s.getByRole("button", { name: "Compaction" }).first();
+  await key.click();
+  await expect(key).toHaveAttribute("aria-pressed", "false");
+});
+
+// MEM-UK-03: suggestions by groups with the match in bold; the keyboard; a failing source
+test("MEM-UK-03 Combobox: groups, the keyboard, a second Escape clears; an error offers a retry", async ({ page }) => {
+  const s = await openSection(page, "combobox");
+  const field = s.getByRole("combobox", { name: "Person or topic" });
+  await field.fill("PETR");
+  const list = s.getByRole("listbox", { name: "Person or topic" });
+  await expect(list.getByRole("group")).toHaveCount(2);
+  await expect(list.getByRole("option")).toHaveCount(3);
+  await expect(list.getByRole("option").first().locator("b")).toHaveText("Petr");
+  await page.keyboard.press("ArrowDown");
+  await expect(list.getByRole("option").nth(1)).toHaveAttribute("aria-selected", "true");
+  await page.keyboard.press("Enter");
+  await expect(s.locator(".chip", { hasText: "Ilya Petrov" })).toBeVisible();
+  await expect(field).toHaveValue("");
+  await field.fill("zzz");
+  await expect(list).toContainText("Nothing found");
+  await page.keyboard.press("Escape");
+  await expect(list).toHaveCount(0);
+  await page.keyboard.press("Escape");
+  await expect(field).toHaveValue("");
+
+  const failing = s.getByRole("combobox", { name: "A source that fails" });
+  await failing.fill("a");
+  await expect(s.getByRole("button", { name: "Retry" })).toBeVisible();
+});
+
+// MEM-UK-04, MEM-GR-06 (FTR.NAB.MEM-0001 R21, R24): a large graph is laid out off the main thread, a found node is
+// centred, a dragged node keeps a frame under 50 ms
+test("MEM-UK-04 Graph: a large set is centred on a found node and dragged without long frames", async ({ page }, info) => {
+  test.skip(info.project.name === "phone", "dragging with a mouse");
+  const s = await openSection(page, "graph-large");
+  const g = s.getByRole("group", { name: "A large graph" });
+  await expect(g.locator(".g-n")).toHaveCount(150);
+  await s.getByRole("combobox", { name: "Find a node" }).fill("Topic 7");
+  await expect(s.getByRole("option", { name: /Topic 7/ })).toBeVisible();
+  await page.keyboard.press("ArrowDown");
+  await page.keyboard.press("Enter");
+  const node = g.getByRole("button", { name: "Topic 7", exact: true });
+  await expect(node).toHaveAttribute("aria-pressed", "true");
+  // after the animation the node stands in the middle of the field
+  await page.waitForTimeout(400);
+  const field = (await g.boundingBox())!, circle = (await node.locator("circle").boundingBox())!;
+  expect(Math.abs(circle.x + circle.width / 2 - (field.x + field.width / 2))).toBeLessThan(40);
+  expect(Math.abs(circle.y + circle.height / 2 - (field.y + field.height / 2))).toBeLessThan(40);
+
+  // the frames while a node is dragged
+  await page.evaluate(() => {
+    const w = window as unknown as { frames_: number[]; stop_: boolean };
+    w.frames_ = [];
+    w.stop_ = false;
+    let last = performance.now();
+    const tick = (now: number) => { if (w.stop_) return; w.frames_.push(now - last); last = now; requestAnimationFrame(tick); };
+    requestAnimationFrame(tick);
+    // only the frames of the drag: after the release a headless browser draws nothing and slows its frames down
+    addEventListener("pointerup", () => { w.stop_ = true; }, { once: true, capture: true });
+  });
+  const c = (await node.locator("circle").boundingBox())!;
+  await page.mouse.move(c.x + c.width / 2, c.y + c.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(c.x + 160, c.y + 90, { steps: 30 });
+  await page.mouse.up();
+  const frames = await page.evaluate(() => {
+    const w = window as unknown as { frames_: number[]; stop_: boolean };
+    w.stop_ = true;
+    return w.frames_.slice(1).toSorted((a, b) => a - b);
+  });
+  const p95 = frames[Math.floor(frames.length * 0.95)];
+  expect(p95).toBeLessThan(50);
+  expect((await node.locator("circle").boundingBox())!.x - c.x).toBeGreaterThan(80);
+  await expect(s.getByRole("button", { name: "Put the nodes back" })).toBeVisible();
+
+  // choosing the same node again centres it again, at the place where it is drawn now
+  const find = s.getByRole("combobox", { name: "Find a node" });
+  await find.fill("Topic 7");
+  await expect(s.getByRole("option", { name: /Topic 7/ })).toBeVisible();
+  await page.keyboard.press("Enter");
+  await page.waitForTimeout(400);
+  const f2 = (await g.boundingBox())!, c2 = (await node.locator("circle").boundingBox())!;
+  expect(Math.abs(c2.x + c2.width / 2 - (f2.x + f2.width / 2))).toBeLessThan(40);
+});
+
+// MEM-UK-03: Escape in the field closes its list and stops there, so a dialog around it stays open
+test("MEM-UK-03 Combobox: Escape closes the list and does not reach a dialog", async ({ page }) => {
+  const s = await openSection(page, "combobox");
+  let reached = false;
+  await page.exposeFunction("escapeReached", () => { reached = true; });
+  await page.evaluate(() => document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") (window as unknown as { escapeReached: () => void }).escapeReached();
+  }));
+  await s.getByRole("combobox", { name: "Person or topic" }).fill("petr");
+  await expect(s.getByRole("option")).toHaveCount(3);
+  await page.keyboard.press("Escape");
+  await expect(s.getByRole("listbox")).toHaveCount(0);
+  expect(reached).toBe(false);
+});

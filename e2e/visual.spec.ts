@@ -43,6 +43,27 @@ for (const theme of ["light", "dark"] as const) {
     await expect(s.locator(".select-demo")).toHaveScreenshot(`select-${theme}.png`);
   });
 
+  // FTR.NAB.MEM-0001 design §3.4: the suggestions by groups with the match in bold, and the error with a retry
+  test(`open combobox ${theme}`, async ({ page }) => {
+    const s = await openSection(page, "combobox", theme);
+    await s.getByRole("combobox", { name: "Person or topic" }).fill("petr");
+    await expect(s.getByRole("option")).toHaveCount(3);
+    await expect(s.getByRole("listbox", { name: "Person or topic" })).toHaveScreenshot(`combobox-open-${theme}.png`);
+    await s.getByRole("combobox", { name: "A source that fails" }).fill("a");
+    await expect(s.getByRole("button", { name: "Retry" })).toBeVisible();
+    await expect(s.getByRole("listbox", { name: "A source that fails" })).toHaveScreenshot(`combobox-error-${theme}.png`);
+  });
+
+  // FTR.NAB.MEM-0001 design §3.8: the values of a day under the pointer, and the table
+  test(`chart tip ${theme}`, async ({ page }) => {
+    const s = await openSection(page, "chart", theme);
+    const chart = s.getByRole("img", { name: "Cost, $" });
+    await chart.focus();
+    for (let i = 0; i < 10; i++) await page.keyboard.press("ArrowRight");
+    await expect(s.locator(".chart-tip")).toBeVisible();
+    await expect(s.locator(".chart").first()).toHaveScreenshot(`chart-tip-${theme}.png`);
+  });
+
   // FTR.NAB.CMN-0005 design §6.5: the files dragged over the chat
   test(`chat drop ${theme}`, async ({ page }) => {
     const s = await openSection(page, "chat", theme);

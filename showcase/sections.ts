@@ -4,7 +4,8 @@
 export const SECTIONS = [
   ["tokens", "Tokens"], ["type", "Typography"], ["buttons", "Buttons"], ["forms", "Fields and forms"], ["chips", "Chips and tabs"],
   ["data", "Data"], ["messages", "Messages"], ["overlay", "Menus and modals"], ["toasts", "Toasts"], ["avatars", "Avatars"],
-  ["icons", "Icons"], ["topbar", "Top bar"], ["login", "Sign-in"], ["chat", "Chat"], ["states", "States"], ["markdown", "Markdown"], ["graph", "Graph"], ["graph-directed", "Graph: directed"], ["graph-rows", "Graph: rows"],
+  ["icons", "Icons"], ["topbar", "Top bar"], ["login", "Sign-in"], ["chat", "Chat"], ["states", "States"], ["markdown", "Markdown"], ["graph", "Graph"], ["graph-directed", "Graph: directed"], ["graph-rows", "Graph: rows"], ["graph-large", "Graph: a large set"],
+  ["chart", "Chart"], ["combobox", "Field with suggestions"],
 ] as const;
 
 export type SectionId = (typeof SECTIONS)[number][0];

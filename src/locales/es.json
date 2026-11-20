@@ -148,6 +148,18 @@
   "graph": {
     "zoomIn": "Acercar",
     "zoomOut": "Alejar",
-    "resetLayout": "Devolver los nodos a su sitio"
+    "resetLayout": "Devolver los nodos a su sitio",
+    "layingOut": "Organizando el grafo…"
+  },
+  "chart": {
+    "empty": "Sin datos",
+    "showTable": "Ver como tabla",
+    "hideTable": "Ocultar la tabla"
+  },
+  "combo": {
+    "clear": "Borrar",
+    "none": "Sin resultados",
+    "error": "No se pudo cargar",
+    "retry": "Reintentar"
   }
 }

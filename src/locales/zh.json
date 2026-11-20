@@ -148,6 +148,18 @@
   "graph": {
     "zoomIn": "放大",
     "zoomOut": "缩小",
-    "resetLayout": "恢复节点位置"
+    "resetLayout": "恢复节点位置",
+    "layingOut": "正在布局图…"
+  },
+  "chart": {
+    "empty": "暂无数据",
+    "showTable": "以表格显示",
+    "hideTable": "隐藏表格"
+  },
+  "combo": {
+    "clear": "清除",
+    "none": "未找到",
+    "error": "无法加载",
+    "retry": "重试"
   }
 }
