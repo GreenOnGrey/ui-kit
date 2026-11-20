@@ -148,6 +148,18 @@
   "graph": {
     "zoomIn": "Zoom in",
     "zoomOut": "Zoom out",
-    "resetLayout": "Put the nodes back"
+    "resetLayout": "Put the nodes back",
+    "layingOut": "Laying out the graph…"
+  },
+  "chart": {
+    "empty": "No data",
+    "showTable": "Show as a table",
+    "hideTable": "Hide the table"
+  },
+  "combo": {
+    "clear": "Clear",
+    "none": "Nothing found",
+    "error": "Could not load",
+    "retry": "Retry"
   }
 }

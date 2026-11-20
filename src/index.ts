@@ -6,5 +6,7 @@ export { Menu } from "./components/Menu";
 export { Select, type SelectOption } from "./components/Select";
 export { TopBar, type LinkComponent, type TopBarSection } from "./components/TopBar";
 export { Graph, neighbours, type GraphNode, type GraphEdge, type GraphSelection, type GraphRow } from "./components/Graph";
+export { Chart, type ChartSeries } from "./components/Chart";
+export { Combobox, type ComboItem } from "./components/Combobox";
 export { Modal, ToastProvider, useToast, Avatar, Switch, Empty, Loading, useOutside, type ToastSpec } from "./components/ui";
 export { UIKIT_NS } from "./i18n";

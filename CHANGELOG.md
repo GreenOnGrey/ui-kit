@@ -4,6 +4,30 @@ Versions follow semver. A visible change of the look is at least a minor (FTR.NA
 Since `1.0.0` the contract of the kit — class names, tokens, props, icon names, keys of strings — changes only
 in a major.
 
+## 1.21.0
+
+A chart, a field with suggestions and a graph for large sets (FTR.NAB.MEM-0001 R21, R22, R24, R26, R28; design §3.3,
+§3.4, §3.8).
+
+- `Chart`: bars, stacked bars and lines over time in SVG, without a library. The width follows the box; a hover or the
+  arrow keys show the values of a point; the legend hides a series; a line can take the right axis (`axis: "right"`);
+  «Show as a table» gives the same numbers to a screen reader. New keys: `chart.empty`, `chart.showTable`,
+  `chart.hideTable`.
+- `Combobox`: a field with suggestions the product loads (`load(q, signal)`): after a pause of `debounceMs`, an old
+  answer is never shown, groups, the match in bold regardless of case and «ё», the arrows, Enter and Escape, a second
+  Escape clears. New keys: `combo.clear`, `combo.none`, `combo.error`, `combo.retry`.
+- `Graph`: a graph of more than 60 nodes is laid out in a Web Worker (inlined in the package) with an indicator over
+  the field, `aria-busy` and the key `graph.layingOut`; a smaller one is laid out during render as before, so its
+  picture does not change. New data starts from the places the nodes had (`keepPositions`, on by default); dragged
+  nodes stay where they were put across data, and «Put the nodes back» lays the graph out afresh. `center` is a request
+  `{ id }`: each new one brings its node to the middle of the field, where it is drawn, smoothly unless reduced motion
+  is asked for. The handlers live on the field, nodes
+  and edges are memoised and the neighbours come from an adjacency map, so a hover or a drag redraws only what
+  changed. A draggable graph marks its field `gwrap drag`: the nodes show a hand.
+- The showcase: the sections «Graph: a large set» (150 nodes, 600 links, a field that finds and centres a node),
+  «Chart» and «Field with suggestions»; the graph of people and topics can be dragged. Their baselines are made by the
+  `update-snapshots` workflow.
+
 ## 1.20.0
 
 The field of the chat: the icons on the middle line, the files dragged onto the chat, a file in the composer from the

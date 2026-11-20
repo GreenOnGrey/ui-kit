@@ -148,6 +148,18 @@
   "graph": {
     "zoomIn": "Vergrößern",
     "zoomOut": "Verkleinern",
-    "resetLayout": "Knoten zurücksetzen"
+    "resetLayout": "Knoten zurücksetzen",
+    "layingOut": "Graph wird angeordnet…"
+  },
+  "chart": {
+    "empty": "Keine Daten",
+    "showTable": "Als Tabelle anzeigen",
+    "hideTable": "Tabelle ausblenden"
+  },
+  "combo": {
+    "clear": "Leeren",
+    "none": "Nichts gefunden",
+    "error": "Laden fehlgeschlagen",
+    "retry": "Erneut versuchen"
   }
 }
