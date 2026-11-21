@@ -16,6 +16,10 @@ export default defineConfig({
   testDir: "e2e",
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
+  // A run of the suite on a shared runner is not free of races: a picture or a layout of the showcase can arrive
+  // between the check and the screenshot of a section, and the same commit then passes on one run and fails on
+  // another (FTR.NAB.CMN-0005 qa §1, decision 14). A retry hides that noise; a real change of the look fails twice.
+  retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI ? [["github"], ["html", { open: "never" }]] : "list",
   snapshotPathTemplate: "{testDir}/__screenshots__/{arg}-{projectName}{ext}",
   expect: { toHaveScreenshot: { maxDiffPixels: 0, animations: "disabled", caret: "hide" } },

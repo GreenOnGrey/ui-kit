@@ -247,7 +247,7 @@ test.describe("chat", () => {
   test("FTR.NAB.CHAT-0001 ATT-08, ATT-09 an image is a thumbnail; PDF, Markdown and a table open in the preview, Escape closes it; the rest downloads", async ({ page }) => {
     const s = await openSection(page, "chat");
     const chat = demo(s, "files");
-    await expect(chat.locator(".att-thumb img")).toBeVisible();
+    await expect(chat.getByRole("button", { name: "Open chart.png" }).locator("img")).toBeVisible();
     await chat.getByRole("button", { name: "Open release-notes.md" }).click();
     const dialog = page.getByRole("dialog");
     await expect(dialog.getByRole("heading", { name: "Release 1.3" })).toBeVisible();
