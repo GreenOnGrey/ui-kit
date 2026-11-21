@@ -53,6 +53,10 @@ jobs:
       - run: npm ci --no-audit --no-fund
       - run: npx playwright install --with-deps chromium
       - run: npm run test:e2e
+      # a failed snapshot must be inspectable: the actual picture, the expected one and the diff
+      - if: failure()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with: { name: test-results, path: test-results, retention-days: 7 }
 
   # R24: a changed snapshot is a visible change. It needs a changelog entry and
   # a version of at least the next minor.

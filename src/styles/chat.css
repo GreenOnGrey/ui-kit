@@ -7,6 +7,10 @@
   gap: 12px;
   overflow-y: auto;
   min-height: 0;
+  /* The feed keeps its own place: a new message scrolls it to the end and older ones keep the view. The anchor
+     of the browser moved the feed by a pixel on every frame while a spinner turned — a rotating square is wider
+     than its box, and the overflow of the feed kept changing (FTR.NAB.CMN-0005 tech §3.4, decision 35). */
+  overflow-anchor: none;
 }
 .m {
   max-width: 88%;
