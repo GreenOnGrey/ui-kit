@@ -21,6 +21,9 @@ decisions 13 and 14; tech decisions 33 and 34).
   border of `.inp` instead of a grey pill. `.mini-seg` takes the same border and the radius of a field.
 - The showcase: the section «Fields and forms» shows a row of controls and the three sizes; `CMP-14` measures every
   control of a row — one height, one border colour.
+- The chat feed keeps its own place and no longer hands its scroll to the anchor of the browser (`overflow-anchor:
+  none`): the rotating waiting spinner is wider than its box, and the anchor moved the feed a pixel on every frame
+  — the section of the chat could not be captured as two identical frames (tech decision 35).
 
 ## 1.21.0
 
