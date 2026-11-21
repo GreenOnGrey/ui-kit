@@ -1,4 +1,4 @@
-import { useEffect, useId, useRef, useState, type KeyboardEvent } from "react";
+import { useId, useLayoutEffect, useRef, useState, type KeyboardEvent } from "react";
 import { useKitT } from "../i18n";
 
 /** A series of a chart: `color` is a colour of the graph (g-c1…g-c6); a line can take the right axis, a scale of
@@ -52,9 +52,13 @@ export function Chart({ x, series, stacked, height = 200, format = plain, ariaLa
   const [at, setAt] = useState<number | null>(null);
   const [table, setTable] = useState(false);
 
-  useEffect(() => {
+  // The width of the box is known before the first paint: a chart that starts at the fallback width and widens
+  // after the observer answers flashes, and a snapshot of the showcase catches the wrong frame (R28, design §3.8).
+  useLayoutEffect(() => {
     const el = box.current;
-    if (!el || typeof ResizeObserver === "undefined") return;
+    if (!el) return;
+    setWidth(Math.max(200, Math.round(el.getBoundingClientRect().width)));
+    if (typeof ResizeObserver === "undefined") return;
     const ro = new ResizeObserver(([e]) => setWidth(Math.max(200, Math.round(e.contentRect.width))));
     ro.observe(el);
     return () => ro.disconnect();
