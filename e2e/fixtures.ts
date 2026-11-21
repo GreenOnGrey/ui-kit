@@ -20,6 +20,14 @@ export async function openSection(page: Page, id: string, theme: "light" | "dark
   await expect(section).toBeVisible();
   // a large graph is laid out in a worker: the section is ready when nothing in it is busy (FTR.NAB.MEM-0001 R24)
   await expect(section.locator('[aria-busy="true"]')).toHaveCount(0, { timeout: 15_000 });
+  // the pictures are decoded and the layout has settled: a picture that arrives after the snapshot made the same
+  // commit pass on one machine and fail on another (FTR.NAB.CMN-0005 qa §1, decision 14)
+  await page.evaluate(async () => {
+    await document.fonts.ready;
+    await Promise.all([...document.images].map((i) => (i.complete ? null : new Promise((r) => { i.onload = i.onerror = () => r(null); }))));
+    await new Promise(requestAnimationFrame);
+    await new Promise(requestAnimationFrame);
+  });
   return section;
 }
 
