@@ -22,6 +22,11 @@
   --r-s: 6px;
   --r-m: 10px;
   --r-l: 16px;
+  /* The heights of the controls (FTR.NAB.CMN-0005 design §1, decision 33): a control has its own size by default,
+     and a row of controls (`.ctlrow`) gives every control in it one height. */
+  --ctl-s: 30px;
+  --ctl-m: 36px;
+  --ctl-l: 44px;
   --font: "Onest", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
   --overlay: rgba(27, 24, 48, 0.35);
@@ -202,10 +207,11 @@ svg.i {
   display: flex;
   align-items: center;
   gap: 8px;
-  background: var(--surface-2);
-  border: 1px solid var(--border);
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
   border-radius: var(--r-m);
-  padding: 7px 12px;
+  height: var(--ctl-h, var(--ctl-m));
+  padding: 0 12px;
   color: var(--muted);
 }
 .search input {
@@ -278,7 +284,8 @@ svg.i {
   border: 1px solid var(--border-strong);
   background: var(--surface);
   border-radius: var(--r-m);
-  padding: 8px 14px;
+  height: var(--ctl-h, var(--ctl-m));
+  padding: 0 14px;
   font-size: 14px;
   font-weight: 500;
   text-decoration: none;
@@ -310,7 +317,8 @@ svg.i {
   color: #fff;
 }
 .btn.sm {
-  padding: 5px 10px;
+  height: var(--ctl-h, var(--ctl-s));
+  padding: 0 10px;
   font-size: 13px;
 }
 .btn[disabled] {
@@ -320,8 +328,8 @@ svg.i {
 .iconbtn {
   border: 0;
   background: none;
-  width: 36px;
-  height: 36px;
+  width: var(--ctl-h, var(--ctl-m));
+  height: var(--ctl-h, var(--ctl-m));
   border-radius: var(--r-m);
   display: grid;
   place-items: center;
@@ -957,7 +965,8 @@ svg.dimmed .g-e.dashed.hl path:first-child {
   width: 100%;
   border: 1px solid var(--border-strong);
   border-radius: var(--r-m);
-  padding: 9px 12px;
+  height: var(--ctl-h, var(--ctl-l));
+  padding: 0 12px;
   background: var(--surface);
 }
 /* Select (FTR.NAB.CMN-0005 tech §3.3): the field of .inp, a list drawn by the kit */
@@ -973,7 +982,8 @@ svg.dimmed .g-e.dashed.hl path:first-child {
   width: 100%;
   border: 1px solid var(--border-strong);
   border-radius: var(--r-m);
-  padding: 8px 10px 8px 12px;
+  height: var(--ctl-h, var(--ctl-l));
+  padding: 0 10px 0 12px;
   background: var(--surface);
   text-align: left;
 }
@@ -985,7 +995,8 @@ svg.dimmed .g-e.dashed.hl path:first-child {
   border-color: var(--violet);
 }
 .select.sm .select-btn {
-  padding: 5px 8px 5px 10px;
+  height: var(--ctl-h, var(--ctl-s));
+  padding: 0 8px 0 10px;
   font-size: 13px;
   border-radius: var(--r-s);
 }
@@ -1038,6 +1049,9 @@ svg.dimmed .g-e.dashed.hl path:first-child {
   flex: none;
 }
 textarea.inp {
+  /* a field of many lines keeps its own height (tech §3.2) */
+  height: auto;
+  padding: 9px 12px;
   resize: vertical;
   min-height: 80px;
 }
@@ -1089,6 +1103,32 @@ textarea.inp {
   left: 18px;
 }
 
+/* A row of controls (FTR.NAB.CMN-0005 design §1, decision 33): the search, a field, a selection, a button and a
+   segment in it are one height. The product puts one class on the container; the elements are not aligned by hand. */
+.ctlrow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  --ctl-h: var(--ctl-m);
+}
+.ctlrow.sm {
+  --ctl-h: var(--ctl-s);
+}
+.ctlrow.lg {
+  --ctl-h: var(--ctl-l);
+}
+.ctlrow > .search {
+  flex: 1 1 240px;
+  max-width: 420px;
+}
+@media (max-width: 860px) {
+  .ctlrow > .search {
+    flex: 1 1 100%;
+    max-width: none;
+  }
+}
+
 /* Messages, bubbles, the typing mark, the composer, the transcript of a recording. */
 .msgs {
   flex: 1;
@@ -1098,6 +1138,10 @@ textarea.inp {
   gap: 12px;
   overflow-y: auto;
   min-height: 0;
+  /* The feed keeps its own place: a new message scrolls it to the end and older ones keep the view. The anchor
+     of the browser moved the feed by a pixel on every frame while a spinner turned — a rotating square is wider
+     than its box, and the overflow of the feed kept changing (FTR.NAB.CMN-0005 tech §3.4, decision 35). */
+  overflow-anchor: none;
 }
 .m {
   max-width: 88%;
@@ -1343,13 +1387,15 @@ textarea.inp {
 }
 .mini-seg {
   display: flex;
-  border: 1px solid var(--border);
-  border-radius: var(--r-s);
+  height: var(--ctl-h, var(--ctl-s));
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-m);
   overflow: hidden;
 }
 .mini-seg button {
   font-size: 12px;
-  padding: 4px 10px;
+  height: 100%;
+  padding: 0 10px;
   color: var(--text-2);
   background: none;
   border: 0;
@@ -1869,7 +1915,7 @@ select.inp.inherit {
 @media (prefers-reduced-motion:reduce){
 .spin{animation:none}}
 .page.wide{padding-inline:max(28px,calc((100% - 1320px) / 2 + 28px))}
-.sel{border:1px solid var(--border-strong);border-radius:var(--r-m);padding:6px 8px;font-size:13px;background:var(--surface);color:var(--text);max-width:200px}
+.sel{border:1px solid var(--border-strong);border-radius:var(--r-m);height:var(--ctl-h,var(--ctl-m));padding:0 8px;font-size:13px;background:var(--surface);color:var(--text);max-width:200px}
 .panel{border:1px solid var(--border);border-radius:var(--r-m);background:var(--surface);box-shadow:var(--shadow);padding:16px;font-size:14px;position:sticky;top:0;max-height:calc(100vh - 150px);overflow-y:auto}
 .panel-h{display:flex;align-items:flex-start;gap:6px}
 .panel h4{margin:0 0 4px;font-size:16px;font-weight:600}
