@@ -1,3 +1,4 @@
+import type { Locator } from "@playwright/test";
 import { demo, dragFiles, expect, openSection, send, test } from "./fixtures";
 
 // The behaviour that needs a real browser: focus, the keyboard, scrolling,
@@ -731,4 +732,19 @@ test("MEM-UK-03 Combobox: Escape closes the list and does not reach a dialog", a
   await page.keyboard.press("Escape");
   await expect(s.getByRole("listbox")).toHaveCount(0);
   expect(reached).toBe(false);
+});
+
+/** The heights of the children of a row of controls, in pixels. */
+const heights = (row: Locator) =>
+  row.evaluate((el) => [...el.children].map((c) => Math.round((c as HTMLElement).getBoundingClientRect().height)));
+
+// R27, design §1: a row of controls gives every control in it one height, and the search is a field like the rest
+test("CMP-14 a row of controls is one height, and the search has the border of a field", async ({ page }) => {
+  const s = await openSection(page, "forms");
+  const row = s.locator(".ctlrow").first();
+  expect(new Set(await heights(row))).toEqual(new Set([36]));
+  const border = (sel: string) => row.locator(sel).first().evaluate((el) => getComputedStyle(el).borderTopColor);
+  expect(await border(".search")).toBe(await border(".inp"));
+  expect(new Set(await heights(s.locator(".ctlrow.sm").first()))).toEqual(new Set([30]));
+  expect(new Set(await heights(s.locator(".ctlrow.lg").first()))).toEqual(new Set([44]));
 });

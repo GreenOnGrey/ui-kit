@@ -4,6 +4,24 @@ Versions follow semver. A visible change of the look is at least a minor (FTR.NA
 Since `1.0.0` the contract of the kit — class names, tokens, props, icon names, keys of strings — changes only
 in a major.
 
+## 1.22.0
+
+Three heights of a control and a row that gives them to every control (FTR.NAB.CMN-0005 R27; design §1, §2;
+decisions 13 and 14; tech decisions 33 and 34).
+
+- Three tokens: `--ctl-s: 30px`, `--ctl-m: 36px`, `--ctl-l: 44px`. A control reads its own size from them —
+  `.btn` and `.iconbtn` 36, `.btn.sm` 30, `.sel` and `.search` 36, `.mini-seg` 30, `.inp` and the field of `Select`
+  44, `.select.sm` 30; `textarea.inp` keeps its own height. Before, every control took its size from its padding:
+  the search was 38.5 px, the field 42.5, a native select 33.5 and a segment 28, and in one row they did not match.
+- A row of controls, `.ctlrow` (`sm`, `lg`): every field, search, selection, button and segment in it is one height.
+  The product puts one class on the container instead of aligning the elements by hand. The search of a row grows
+  up to 420 px and takes the whole line on a phone. A product cannot set the tokens (R23), so the size of a row is
+  its choice of class.
+- The search field looks like a field everywhere, the top bar included: the surface fill and the `border-strong`
+  border of `.inp` instead of a grey pill. `.mini-seg` takes the same border.
+- The showcase: the section «Fields and forms» shows a row of controls and the three sizes; `CMP-14` measures every
+  control of a row — one height, one border colour.
+
 ## 1.21.0
 
 A chart, a field with suggestions and a graph for large sets (FTR.NAB.MEM-0001 R21, R22, R24, R26, R28; design §3.3,

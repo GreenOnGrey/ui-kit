@@ -22,6 +22,11 @@
   --r-s: 6px;
   --r-m: 10px;
   --r-l: 16px;
+  /* The heights of the controls (FTR.NAB.CMN-0005 design §1, decision 33): a control has its own size by default,
+     and a row of controls (`.ctlrow`) gives every control in it one height. */
+  --ctl-s: 30px;
+  --ctl-m: 36px;
+  --ctl-l: 44px;
   --font: "Onest", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
   --overlay: rgba(27, 24, 48, 0.35);

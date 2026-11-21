@@ -139,6 +139,22 @@ function Sections() {
         <Example label="Select: a list drawn by the kit, in the theme; the arrows, Enter and Escape"><SelectDemo /></Example>
         <Example label="Switch"><SwitchDemo /></Example>
         <Example label="Search"><form className="search" role="search" style={{ maxWidth: 320 }}><Icon name="search" /><input placeholder="Search" aria-label="Search" /></form></Example>
+        <Example label="A row of controls: the search, a field, a selection, a button and a segment are one height (R27)">
+          <div className="ctlrow">
+            <form className="search" role="search"><Icon name="search" /><input placeholder="Search" aria-label="Search" /></form>
+            <input className="inp" style={{ width: 170 }} placeholder="Person or topic" aria-label="Person or topic" />
+            <select className="sel" aria-label="Source"><option>All sources</option><option>Mail</option></select>
+            <button className="btn">Apply</button>
+            <div className="mini-seg" role="group" aria-label="View"><button className="on" aria-pressed="true">Table</button><button aria-pressed="false">Graph</button></div>
+          </div>
+        </Example>
+        <Example label="The three heights of a row: sm — a dense row, the default — a row of filters, lg — a form">
+          <div style={{ display: "grid", gap: 10 }}>
+            <div className="ctlrow sm"><input className="inp" style={{ width: 150 }} placeholder="Dense" aria-label="Dense field" /><button className="btn">Dense</button><div className="mini-seg" role="group" aria-label="Dense view"><button className="on">One</button><button>Two</button></div></div>
+            <div className="ctlrow"><input className="inp" style={{ width: 150 }} placeholder="Row" aria-label="Row field" /><select className="sel" aria-label="Row selection"><option>Every</option></select><button className="btn">Row</button></div>
+            <div className="ctlrow lg"><input className="inp" style={{ width: 150 }} placeholder="Form" aria-label="Form field" /><button className="btn primary">Form</button></div>
+          </div>
+        </Example>
       </Section>
 
       <Section id="chips" lead="A chip is a choice among a few values, or a label. Tabs switch the view; the arrow keys move the choice.">

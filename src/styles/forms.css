@@ -51,7 +51,8 @@
   width: 100%;
   border: 1px solid var(--border-strong);
   border-radius: var(--r-m);
-  padding: 9px 12px;
+  height: var(--ctl-h, var(--ctl-l));
+  padding: 0 12px;
   background: var(--surface);
 }
 /* Select (FTR.NAB.CMN-0005 tech §3.3): the field of .inp, a list drawn by the kit */
@@ -67,7 +68,8 @@
   width: 100%;
   border: 1px solid var(--border-strong);
   border-radius: var(--r-m);
-  padding: 8px 10px 8px 12px;
+  height: var(--ctl-h, var(--ctl-l));
+  padding: 0 10px 0 12px;
   background: var(--surface);
   text-align: left;
 }
@@ -79,7 +81,8 @@
   border-color: var(--violet);
 }
 .select.sm .select-btn {
-  padding: 5px 8px 5px 10px;
+  height: var(--ctl-h, var(--ctl-s));
+  padding: 0 8px 0 10px;
   font-size: 13px;
   border-radius: var(--r-s);
 }
@@ -132,6 +135,9 @@
   flex: none;
 }
 textarea.inp {
+  /* a field of many lines keeps its own height (tech §3.2) */
+  height: auto;
+  padding: 9px 12px;
   resize: vertical;
   min-height: 80px;
 }
@@ -181,4 +187,30 @@ textarea.inp {
 }
 .sw.on::after {
   left: 18px;
+}
+
+/* A row of controls (FTR.NAB.CMN-0005 design §1, decision 33): the search, a field, a selection, a button and a
+   segment in it are one height. The product puts one class on the container; the elements are not aligned by hand. */
+.ctlrow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  --ctl-h: var(--ctl-m);
+}
+.ctlrow.sm {
+  --ctl-h: var(--ctl-s);
+}
+.ctlrow.lg {
+  --ctl-h: var(--ctl-l);
+}
+.ctlrow > .search {
+  flex: 1 1 240px;
+  max-width: 420px;
+}
+@media (max-width: 860px) {
+  .ctlrow > .search {
+    flex: 1 1 100%;
+    max-width: none;
+  }
 }

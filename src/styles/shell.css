@@ -34,10 +34,11 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  background: var(--surface-2);
-  border: 1px solid var(--border);
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
   border-radius: var(--r-m);
-  padding: 7px 12px;
+  height: var(--ctl-h, var(--ctl-m));
+  padding: 0 12px;
   color: var(--muted);
 }
 .search input {
