@@ -691,7 +691,12 @@ test("MEM-UK-04 Graph: a large set is centred on a found node and dragged withou
   const c = (await node.locator("circle").boundingBox())!;
   await page.mouse.move(c.x + c.width / 2, c.y + c.height / 2);
   await page.mouse.down();
-  await page.mouse.move(c.x + 160, c.y + 90, { steps: 30 });
+  // the drag lasts 40 frames: a percentile of three or four frames is the slowest one, and a single
+  // slow frame of a busy runner failed the check (MEM-GR-06, tech §7.2)
+  for (let i = 1; i <= 40; i++) {
+    await page.mouse.move(c.x + c.width / 2 + 160 * (i / 40), c.y + c.height / 2 + 90 * (i / 40));
+    await page.evaluate(() => new Promise(requestAnimationFrame));
+  }
   await page.mouse.up();
   const frames = await page.evaluate(() => {
     const w = window as unknown as { frames_: number[]; stop_: boolean };
