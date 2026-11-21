@@ -18,7 +18,7 @@ decisions 13 and 14; tech decisions 33 and 34).
   up to 420 px and takes the whole line on a phone. A product cannot set the tokens (R23), so the size of a row is
   its choice of class.
 - The search field looks like a field everywhere, the top bar included: the surface fill and the `border-strong`
-  border of `.inp` instead of a grey pill. `.mini-seg` takes the same border.
+  border of `.inp` instead of a grey pill. `.mini-seg` takes the same border and the radius of a field.
 - The showcase: the section «Fields and forms» shows a row of controls and the three sizes; `CMP-14` measures every
   control of a row — one height, one border colour.
 

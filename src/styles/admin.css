@@ -56,7 +56,7 @@
   display: flex;
   height: var(--ctl-h, var(--ctl-s));
   border: 1px solid var(--border-strong);
-  border-radius: var(--r-s);
+  border-radius: var(--r-m);
   overflow: hidden;
 }
 .mini-seg button {
