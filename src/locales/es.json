@@ -143,7 +143,8 @@
     "modelCompactWarn": "El contexto se compactará antes de la próxima respuesta",
     "everywhere": "El cambio se aplica en todos los canales y servicios conectados.",
     "capImage": "imágenes",
-    "capReasoning": "razonamiento"
+    "capReasoning": "razonamiento",
+    "priceLegend": "Precios por 1 M de tokens, USD: entrada / salida / lectura de caché"
   },
   "graph": {
     "zoomIn": "Acercar",

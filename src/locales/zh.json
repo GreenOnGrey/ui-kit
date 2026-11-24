@@ -143,7 +143,8 @@
     "modelCompactWarn": "下次回答前将压缩上下文",
     "everywhere": "更改在所有渠道和已连接的服务中生效。",
     "capImage": "图片",
-    "capReasoning": "推理"
+    "capReasoning": "推理",
+    "priceLegend": "每 100 万 token 的价格（USD）：输入 / 输出 / 缓存读取"
   },
   "graph": {
     "zoomIn": "放大",

@@ -7,7 +7,7 @@ export {
   AgentSettingsMenu, agentModelKey, agentModelOptions, type AgentModel, type AgentModelChoice, type AgentModelState,
 } from "./AgentSettingsMenu";
 export { CommandPalette } from "./CommandPalette";
-export { ContextMeter, tokens } from "./ContextMeter";
+export { ContextMeter, money, tokens } from "./ContextMeter";
 export { MessageView, NOTICE_LINES, SubagentStep } from "./MessageView";
 export { useRecorder } from "./useRecorder";
 export type {

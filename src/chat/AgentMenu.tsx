@@ -14,6 +14,8 @@ export interface AgentModelOption {
   sub?: string;
   /** The capabilities: images, reasoning, the window. */
   badges?: { icon?: IconName; text: string }[];
+  /** The price of a million tokens, already formatted: input / output / read cache. */
+  price?: string;
   /** Under the row of the chosen model: the context will be compacted. */
   warn?: ReactNode;
 }
@@ -95,11 +97,16 @@ export function AgentMenu({ label, name, options, value, optionsLabel, hint, nar
                   onClick={() => !on && models.onPick(m.key)}>
                   {!single && <span className={`radio${on ? " on" : ""}`} aria-hidden="true" />}
                   <span className="body">
-                    <span className="nm">{m.label}</span>
-                    {m.sub && <span className="sub">{m.sub}</span>}
-                    {m.badges && m.badges.length > 0 && (
-                      <span className="badges">
-                        {m.badges.map((b) => <span key={b.text} className="cap">{b.icon && <Icon name={b.icon} size={11} />}{b.text}</span>)}
+                    <span className="top">
+                      <span className="nm" title={m.label}>{m.label}</span>
+                      {m.price && <span className="price" title={t("agent.priceLegend")}>{m.price}</span>}
+                    </span>
+                    {(m.sub || (m.badges && m.badges.length > 0)) && (
+                      <span className="meta">
+                        {m.sub && <span className="sub">{m.sub}</span>}
+                        {m.badges?.map((b) => (b.icon
+                          ? <span key={b.text} className="cap ic" title={b.text} aria-label={b.text}><Icon name={b.icon} size={11} /></span>
+                          : <span key={b.text} className="cap">{b.text}</span>))}
                       </span>
                     )}
                     {on && m.warn && <span className="warn">{m.warn}</span>}
@@ -108,6 +115,7 @@ export function AgentMenu({ label, name, options, value, optionsLabel, hint, nar
               );
             })}
           </div>
+          {models.options.some((m) => m.price) && <div className="hint" style={{ marginTop: 6 }}>{t("agent.priceLegend")}</div>}
         </>
       )}
       {hint && <div className="hint" style={{ marginTop: 10 }}>{hint}</div>}

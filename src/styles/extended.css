@@ -110,7 +110,7 @@
 /* The agent: its round button and its menu — the name and the options of the product as tiles. */
 .agentbtn{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;color:#fff;background:linear-gradient(135deg,var(--violet),#12A876);border:0;cursor:pointer;box-shadow:0 0 0 3px var(--violet-soft);flex:none}
 .agentbtn.s{width:28px;height:28px;box-shadow:none}
-.agentmenu{position:absolute;top:62px;left:16px;width:340px;max-width:calc(100% - 32px);background:var(--surface);border:1px solid var(--border);border-radius:var(--r-l);box-shadow:var(--shadow-l, 0 12px 32px rgba(0,0,0,.18));padding:14px;z-index:20}
+.agentmenu{position:absolute;top:62px;left:16px;width:340px;max-width:calc(100% - 32px);max-height:calc(100dvh - 78px);overflow-y:auto;overscroll-behavior:contain;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-l);box-shadow:var(--shadow-l, 0 12px 32px rgba(0,0,0,.18));padding:14px;z-index:20}
 .agentmenu .lab{font-size:12px;color:var(--muted);margin:0 0 6px}
 .agentoptions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 /* a narrow place — a side panel: the tiles go in one column, or a long label would not fit */
@@ -187,17 +187,25 @@
 .voicewait i:nth-child(4){animation-delay:.45s}
 .voicewait i:nth-child(5){animation-delay:.6s}
 @keyframes nb-wave{0%,100%{transform:scaleY(.3)}50%{transform:scaleY(1)}}
-.agentmodels{display:flex;flex-direction:column;gap:4px}
-.agentmodel{display:flex;gap:10px;align-items:flex-start;width:100%;padding:8px;border:0;border-radius:var(--r-m);background:none;color:var(--text);text-align:left}
+/* The models of the agent: the list keeps its own height, so a menu of many
+   models never leaves the screen (FTR.NAB.CHAT-0001 design §3.3). */
+.agentmodels{display:flex;flex-direction:column;gap:4px;max-height:min(38vh, 300px);overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin}
+.agentmodel{display:flex;gap:10px;align-items:flex-start;width:100%;padding:6px 8px;border:0;border-radius:var(--r-m);background:none;color:var(--text);text-align:left}
 .agentmodel.on{background:var(--violet-soft)}
 .agentmodel:disabled{cursor:default}
 .agentmodel .radio{width:16px;height:16px;border-radius:50%;border:1.5px solid var(--border-strong);margin-top:2px;flex:none}
 .agentmodel .radio.on{border:5px solid var(--violet)}
-.agentmodel .body{display:flex;flex-direction:column;gap:2px;min-width:0}
-.agentmodel .nm{font-size:14px;font-weight:500}
+.agentmodel .body{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1}
+.agentmodel .top{display:flex;align-items:baseline;gap:8px;min-width:0}
+.agentmodel .nm{font-size:14px;font-weight:500;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* the connection and the capabilities in one line under the name */
+.agentmodel .meta{display:flex;align-items:center;gap:6px;flex-wrap:wrap;min-width:0;font-size:12px;color:var(--muted)}
 .agentmodel .sub{font-size:12px;color:var(--muted)}
-.agentmodel .badges{display:flex;gap:4px;flex-wrap:wrap;margin-top:2px}
 .agentmodel .cap{display:inline-flex;align-items:center;gap:3px;font-size:11px;padding:1px 7px;border-radius:999px;background:var(--surface-2);color:var(--text-2)}
+/* a capability the icons alone tell (images, reasoning): the chip is the icon, the title is the word */
+.agentmodel .cap.ic{padding:1px 5px}
+/* the price of a million tokens: on the line of the name, at its right */
+.agentmodel .price{margin-left:auto;flex:none;font-size:12px;color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums}
 .agentmodel .warn{font-size:12px;color:var(--amber);margin-top:2px}
 /* FTR.NAB.CHAT-0001 R34: the files of a message and their preview */
 .m.a .atts{justify-content:flex-start}

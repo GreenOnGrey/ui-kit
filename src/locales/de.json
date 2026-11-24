@@ -143,7 +143,8 @@
     "modelCompactWarn": "Der Kontext wird vor der nächsten Antwort komprimiert",
     "everywhere": "Die Änderung gilt in allen Kanälen und verbundenen Diensten.",
     "capImage": "Bilder",
-    "capReasoning": "Reasoning"
+    "capReasoning": "Reasoning",
+    "priceLegend": "Preise pro 1 Mio. Token, USD: Eingabe / Ausgabe / Cache-Lesen"
   },
   "graph": {
     "zoomIn": "Vergrößern",

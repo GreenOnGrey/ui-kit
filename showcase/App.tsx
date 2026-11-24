@@ -561,8 +561,18 @@ const DEMO_COMMANDS: ChatCommand[] = [
 ];
 
 const AGENT_MODELS: AgentModel[] = [
-  { connectionId: "deepseek", model: "flash", name: "DeepSeek V4.1 Flash", connection: "DeepSeek", caps: { image: true, reasoning: true, contextWindow: 1_000_000 } },
-  { connectionId: "giga", model: "max", name: "GigaChat 2 Max", connection: "GigaChat", caps: { image: true, reasoning: false, contextWindow: 131_072 } },
+  { connectionId: "deepseek", model: "flash", name: "DeepSeek V4.1 Flash", connection: "DeepSeek",
+    caps: { image: true, reasoning: true, contextWindow: 1_000_000 }, price: { input: 0.14, output: 0.28, cacheRead: 0.014 } },
+  { connectionId: "deepseek", model: "pro", name: "DeepSeek V4.1 Pro", connection: "DeepSeek",
+    caps: { image: true, reasoning: true, contextWindow: 1_000_000 }, price: { input: 1.74, output: 3.48, cacheRead: 0.145 } },
+  { connectionId: "giga", model: "max", name: "GigaChat 2 Max", connection: "GigaChat",
+    caps: { image: true, reasoning: false, contextWindow: 131_072 } },
+  { connectionId: "giga", model: "lite", name: "GigaChat 2 Lite", connection: "GigaChat",
+    caps: { image: false, reasoning: false, contextWindow: 131_072 } },
+  { connectionId: "zai", model: "glm-4.6", name: "GLM-4.6", connection: "Z.AI",
+    caps: { image: false, reasoning: true, contextWindow: 200_000 }, price: { input: 0.6, output: 2.2, cacheRead: 0.11 } },
+  { connectionId: "anthropic", model: "sonnet", name: "Claude Sonnet 4.5", connection: "Anthropic",
+    caps: { image: true, reasoning: true, contextWindow: 200_000 }, price: { input: 3, output: 15, cacheRead: 0.3, cacheWrite: 3.75 } },
 ];
 
 function AgentDemo() {

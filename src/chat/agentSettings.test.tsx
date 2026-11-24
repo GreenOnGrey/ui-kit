@@ -5,6 +5,7 @@ import { AgentSettingsMenu, agentModelOptions, type AgentModel, type AgentModelS
 // FTR.HMR.SPEC-0001: one menu of the agent for every product.
 const model = (name: string, window: number, image = false): AgentModel => ({
   connectionId: "c1", model: name, name, connection: "DeepSeek", caps: { image, reasoning: true, contextWindow: window },
+  price: { input: 0.14, output: 0.28, cacheRead: 0.014 },
 });
 const flash = model("flash", 128_000, true);
 const pro = model("pro", 1_000_000);
@@ -43,6 +44,18 @@ describe("the menu of the agent of every product (AGM)", () => {
     expect(out).toContain("По умолчанию");
     expect(out).toContain("Изменение действует во всех каналах и подключённых сервисах.");
     expect(out).toContain('class="agentmenu"');
+  });
+
+  it("AGM-05 shows the price of a million tokens and the legend under the list (R16)", () => {
+    const { options } = agentModelOptions(t, "en", state({}));
+    expect(options[1].price).toBe("0.14 / 0.28 / 0.014");
+    const out = html(<AgentSettingsMenu {...base} models={state({})} onModel={() => {}} />, "en");
+    expect(out).toContain('class="price"');
+    expect(out).toContain("Prices per 1M tokens, USD: input / output / cache read");
+    // a model without a price — no legend, no number a user could read as free
+    const noPrice = { ...flash, price: undefined };
+    const plain = html(<AgentSettingsMenu {...base} models={state({ available: [noPrice], model: noPrice, defaultModel: noPrice })} onModel={() => {}} />, "en");
+    expect(plain).not.toContain("Prices per 1M tokens");
   });
 
   it("AGM-04 without models there is no model block; the hint of the product replaces the kit's", () => {

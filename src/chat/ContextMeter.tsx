@@ -11,6 +11,12 @@ export function tokens(n: number, lng: string): string {
   return new Intl.NumberFormat(intlLocale(lng), { notation: "compact", maximumFractionDigits: 1 }).format(n);
 }
 
+/** A price of a million tokens as the service of the agent stores it: the
+ * providers give a float with a long tail, four decimals are enough for the row. */
+export function money(n: number, lng: string): string {
+  return new Intl.NumberFormat(intlLocale(lng), { maximumFractionDigits: 4 }).format(n);
+}
+
 /** The fill of the context window by a ring next to the send button
  * (FTR.NAB.CHAT-0001 R3, design §3.1): grey, amber from 70 %, red from 90 %.
  * A click shows the numbers; a full context (from 90 %) offers to compact or to reset, off while the agent answers. */

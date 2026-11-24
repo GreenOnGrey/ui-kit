@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import type { TFunction } from "i18next";
 import { useKitT } from "../i18n";
 import { AgentMenu, type AgentModelOption, type AgentOption } from "./AgentMenu";
-import { tokens } from "./ContextMeter";
+import { money, tokens } from "./ContextMeter";
 
 /** A model the agent can run on, as the service of the agent gives it
  * (FTR.NAB.CHAT-0001 tech §2.2: `availableModels`, `model`, `defaultModel`). */
@@ -14,6 +14,10 @@ export interface AgentModel {
   /** The connection the model comes through: grey under its name. */
   connection: string;
   caps: { image: boolean; reasoning: boolean; contextWindow: number };
+  /** What a million tokens cost, in US dollars (FTR.NAB.CHAT-0001 R16). The
+   * written cache is left to the administrator: the user sees the input, the
+   * output and the read cache. */
+  price?: { input: number; output: number; cacheRead: number; cacheWrite?: number };
 }
 
 /** What the user chose; null — the default model. */
@@ -43,15 +47,20 @@ export function agentModelOptions(t: TFunction, lng: string, s: AgentModelState)
     ...(m.caps.reasoning ? [{ icon: "brain" as const, text: t("agent.capReasoning") }] : []),
     ...(m.caps.contextWindow > 0 ? [{ text: tokens(m.caps.contextWindow, lng) }] : []),
   ];
+  // R16: the price of a million tokens — the input, the output and the read
+  // cache; the price of the written cache is the administrator's
+  const price = (m: AgentModel | null) =>
+    m?.price ? `${money(m.price.input, lng)} / ${money(m.price.output, lng)} / ${money(m.price.cacheRead, lng)}` : undefined;
   // R17: a context larger than 80 % of the window will be compacted
   const warn = (m: AgentModel) =>
     m.caps.contextWindow > 0 && s.contextTokens > 0.8 * m.caps.contextWindow ? t("agent.modelCompactWarn") : undefined;
   const choice = s.available.length > 1;
   const models: AgentModelOption[] = s.available.map((m) => ({
-    key: agentModelKey(m), label: m.name, sub: m.connection, badges: badges(m), warn: choice ? warn(m) : undefined,
+    key: agentModelKey(m), label: m.name, sub: m.connection, badges: badges(m), price: price(m), warn: choice ? warn(m) : undefined,
   }));
   const options: AgentModelOption[] = choice
-    ? [{ key: "", label: t("agent.modelDefault"), sub: s.defaultModel?.name ?? "—", warn: s.defaultModel ? warn(s.defaultModel) : undefined }, ...models]
+    ? [{ key: "", label: t("agent.modelDefault"), sub: s.defaultModel?.name ?? "—", price: price(s.defaultModel),
+        warn: s.defaultModel ? warn(s.defaultModel) : undefined }, ...models]
     : models;
   const value = s.chosen && s.model ? agentModelKey(s.model) : choice ? "" : (s.model ? agentModelKey(s.model) : "");
   return { options, value };
