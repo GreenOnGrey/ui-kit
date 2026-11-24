@@ -4,6 +4,21 @@ Versions follow semver. A visible change of the look is at least a minor (FTR.NA
 Since `1.0.0` the contract of the kit — class names, tokens, props, icon names, keys of strings — changes only
 in a major.
 
+## 1.23.0
+
+The menu of the agent: a compact row with the price, and a list that never leaves the screen (FTR.NAB.CHAT-0001
+R16; design §3.3; FTR.NAB.CMN-0005 design §6.6).
+
+- The row of a model is two lines instead of three: the name, then one grey line with the connection, the badges
+  and the price of a million tokens — input / output / read cache, USD (the written cache stays with the
+  administrator). The legend under the list names the order and the unit; without a price neither appears, so a
+  zero is never read as free. `AgentModel` takes `price`, `AgentModelOption` takes the formatted `price`; the new
+  `money()` next to `tokens()` formats it; the new key `agent.priceLegend`.
+- The list of models scrolls on its own (`max-height: min(38vh, 300px)`) and the menu itself is capped by the
+  screen (`max-height: calc(100dvh - 78px)`): twenty models no longer push the menu off the bottom of the window.
+  The wrapper of the badges, `.badges`, is gone — the badges live in the new line `.meta` next to the price.
+- The showcase: the section «Agent» shows six models, two of them without a price.
+
 ## 1.22.0
 
 Three heights of a control and a row that gives them to every control (FTR.NAB.CMN-0005 R27; design §1, §2;
